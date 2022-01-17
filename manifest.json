@@ -1,0 +1,10 @@
+{
+    "id": "obsidian-snippitor",
+    "name": "Snippitor",
+    "version": "0.1.0",
+    "minAppVersion": "0.13.10",
+	"description": "Create and tweak common snippets (starting with custom tasks)",
+	"author": "ebullient",
+	"authorUrl": "https://github.com/ebullient",
+    "isDesktopOnly": false
+}

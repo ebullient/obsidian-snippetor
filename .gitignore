@@ -1,0 +1,22 @@
+# Intellij
+*.iml
+.idea
+
+# VS Code
+.vscode
+
+# npm
+node_modules
+
+# build
+dist
+build
+main.js
+*.js.map
+styles.css
+
+# obsidian
+data.json
+.DS_Store
+*dev.js
+main.js.LICENSE.txt

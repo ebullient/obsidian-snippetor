@@ -1,0 +1,48 @@
+#snippitor-checkboxes-modal ul li .fixed-text {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 60px;
+  max-width: 60px;
+}
+#snippitor-checkboxes-modal ul li .separator {
+  display: inline-block;
+  width: 10px;
+  text-align: center;
+}
+#snippitor-checkboxes-modal ul li {
+  display: flex;
+  align-items: center;
+  line-height: 2em;
+}
+#snippitor-checkboxes-modal ul li input.snippitor-data-task {
+  font-family: var(--font-monospace);
+  font-size: 14px;
+  padding: 0 8px;
+}
+
+#snippitor-checkboxes-modal .markdown-preview-view input.task-list-item-checkbox {
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  filter: none;
+  border: 1px solid var(--text-normal);
+  border-radius: 2px;
+  top: 0;
+}
+#snippitor-checkboxes-modal .markdown-preview-view input.task-list-item-checkbox:checked::before {
+  font-family: var(--font-monospace);
+  position: absolute;
+  text-align: center;
+  font-weight: 500;
+  line-height: 14px;
+  font-size: 14px;
+  left: 1px;
+  right: 1px;
+  content: attr(data);
+}
+
+#snippitor-checkboxes-modal .markdown-preview-view ul > li.task-list-item {
+  font-weight: normal;
+  color: var(--text-normal);
+}
