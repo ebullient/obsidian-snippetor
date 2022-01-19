@@ -139,7 +139,6 @@ export class CreateCheckboxesModal extends Modal {
                 type: "text",
                 name: "task-" + i,
                 size: "1",
-
                 value: taskSettings.data,
             },
         });
@@ -266,20 +265,18 @@ export class CreateCheckboxesModal extends Modal {
         } else {
             checkbox.removeAttribute("data");
         }
-        if (taskSettings.data == "x" || taskSettings.data == "X") {
-            this.setColor(taskSettings, checkbox);
-        }
-        this.setBorderColor(taskSettings, checkbox);
+        this.setColorAttributes(taskSettings, checkbox);
     }
 
     applyCommonSettingsToCheckbox(
         settings: SnippitorSettings,
         checkbox: HTMLInputElement
     ) {
+        checkbox.style.removeProperty("background-color");
         if (settings.clearThemeBackground) {
-            checkbox.style.backgroundColor = "unset";
-        } else {
-            checkbox.style.removeProperty("background-color");
+            // doing this the hard way because we have to override at least one !important in a theme (minimal)
+            const style = checkbox.getAttribute("style");
+            checkbox.setAttribute("style", style + " background-color: unset !important;");
         }
     }
 
@@ -291,11 +288,15 @@ export class CreateCheckboxesModal extends Modal {
         }
     }
 
-    setBorderColor(taskSettings: TaskSettings, element: HTMLElement) {
+    setColorAttributes(taskSettings: TaskSettings, element: HTMLElement) {
         if (taskSettings.taskColor.length > 0) {
             element.style.borderColor = taskSettings.taskColor;
+            element.style.color = taskSettings.taskColor;
+            element.setAttribute("color", taskSettings.taskColor);
         } else {
             element.style.removeProperty("border-color");
+            element.style.removeProperty("color");
+            element.removeAttribute("color");
         }
     }
 }

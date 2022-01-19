@@ -39,6 +39,7 @@
   font-size: 14px;
   left: 1px;
   right: 1px;
+  color: attr(color);
   content: attr(data);
 }
 
