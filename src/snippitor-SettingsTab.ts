@@ -1,6 +1,6 @@
 import { App, ButtonComponent, PluginSettingTab, Setting } from "obsidian";
+import { SnippitorSettings } from "./@types";
 import SnippitorPlugin from "./main";
-import { SnippitorSettings } from "./snippitor-Settings";
 import { CreateCheckboxesModal } from "./snippitor-SettingsCreateCheckboxes";
 
 export class SnippitorSettingsTab extends PluginSettingTab {

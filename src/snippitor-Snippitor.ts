@@ -1,5 +1,5 @@
 import { App } from "obsidian";
-import { SnippitorSettings } from "./snippitor-Settings";
+import { SnippitorSettings } from "./@types";
 
 export class Snippitor {
     settings: SnippitorSettings;
@@ -8,7 +8,7 @@ export class Snippitor {
         this.app = app;
     }
 
-    updateSettings(settings: any) {
+    updateSettings(settings: SnippitorSettings): void {
         this.settings = settings;
     }
 }

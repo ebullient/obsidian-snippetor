@@ -1,6 +1,13 @@
-export interface PluginSettings {}
-
 export interface SnippitorSettings {
+    snippets: Map<string, Snippet>;
+}
+
+export interface Snippet {
+    name: string;
+    type: string;
+}
+
+export interface TaskSnippetSettings extends Snippet {
     clearThemeBackground: boolean;
     taskSettings: TaskSettings[];
 }

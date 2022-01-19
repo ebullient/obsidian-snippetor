@@ -1,7 +1,7 @@
-import { linkSync } from "fs";
-import { App, ButtonComponent, Modal, Setting, Tasks } from "obsidian";
-import { check } from "prettier";
-import { ConstructedElements, SnippitorSettings, TaskSettings } from "./@types";
+import { App, ButtonComponent, Modal, Setting } from "obsidian";
+import { DEFAULT_TASK_SETTINGS, DEFAULT_TASK_SNIPPET_SETTINGS } from "./snippitor-Defaults";
+import type { TaskSnippetSettings, TaskSettings, ConstructedElements,
+} from "./@types";
 
 export class CreateCheckboxesModal extends Modal {
     constructor(app: App) {
@@ -14,29 +14,32 @@ export class CreateCheckboxesModal extends Modal {
             "snippitor-checkboxes markdown-preview-view"
         );
 
-        const settings: SnippitorSettings = {
-            clearThemeBackground: false,
-            taskSettings: [
-                {
-                    data: "x",
-                    taskColor: "",
-                    colorText: false,
-                    strkethrough: false,
-                },
-                {
-                    data: ">",
-                    taskColor: "",
-                    colorText: false,
-                    strkethrough: false,
-                },
-                {
-                    data: "-",
-                    taskColor: "#666666",
-                    colorText: true,
-                    strkethrough: true,
-                },
-            ],
-        };
+        const settings: TaskSnippetSettings = Object.assign(
+            {},
+            DEFAULT_TASK_SNIPPET_SETTINGS,
+            {
+                clearThemeBackground: false,
+                taskSettings: [
+                    {
+                        data: "x",
+                        taskColor: "",
+                        colorText: false,
+                        strkethrough: false,
+                    },
+                    {
+                        data: ">",
+                        taskColor: "",
+                        colorText: false,
+                        strkethrough: false,
+                    },
+                    {
+                        data: "-",
+                        taskColor: "#666666",
+                        colorText: true,
+                        strkethrough: true,
+                    },
+                ],
+            });
 
         content.createEl("h2", {
             text: "Custom Task Values",
@@ -51,9 +54,29 @@ export class CreateCheckboxesModal extends Modal {
         };
 
         for (let i = 0; i < settings.taskSettings.length; i++) {
-            let taskSettings = settings.taskSettings[i]; // for now
+            const taskSettings = settings.taskSettings[i];
             this.createTaskRow(list, settings, taskSettings, i, elements);
         }
+
+        new Setting(content)
+            .setClass("snippitor-create-task")
+            .addButton((button: ButtonComponent) =>
+                button
+                    .setTooltip("Add a task type")
+                    .setButtonText("+")
+                    .onClick(() => {
+                        const taskSettings = Object.assign(
+                            DEFAULT_TASK_SETTINGS
+                        );
+                        this.createTaskRow(
+                            list,
+                            settings,
+                            taskSettings,
+                            elements.tasks.length,
+                            elements
+                        );
+                    })
+            );
 
         content.createEl("h2", {
             text: "Additional settings",
@@ -102,7 +125,7 @@ export class CreateCheckboxesModal extends Modal {
 
     createTaskRow(
         list: HTMLUListElement,
-        commonSettings: SnippitorSettings,
+        commonSettings: TaskSnippetSettings,
         taskSettings: TaskSettings,
         i: number,
         elements: ConstructedElements
@@ -222,7 +245,7 @@ export class CreateCheckboxesModal extends Modal {
         settings: TaskSettings,
         li: HTMLLIElement,
         checkbox: HTMLInputElement
-    ) {
+    ): void {
         console.log(
             "Apply color: %o, %o",
             settings,
@@ -233,7 +256,10 @@ export class CreateCheckboxesModal extends Modal {
         this.applySettingsToListItem(settings, li);
     }
 
-    applySettingsToListItem(taskSettings: TaskSettings, li: HTMLLIElement) {
+    applySettingsToListItem(
+        taskSettings: TaskSettings,
+        li: HTMLLIElement
+    ): void {
         console.log("Apply settings to item: %o", taskSettings);
         li.setAttr("data-task", taskSettings.data);
         li.className =
@@ -254,7 +280,7 @@ export class CreateCheckboxesModal extends Modal {
     applySettingsToCheckbox(
         taskSettings: TaskSettings,
         checkbox: HTMLInputElement
-    ) {
+    ): void {
         console.log("Apply settings to task: %o", taskSettings);
 
         checkbox.className = "task-list-item-checkbox";
@@ -269,18 +295,21 @@ export class CreateCheckboxesModal extends Modal {
     }
 
     applyCommonSettingsToCheckbox(
-        settings: SnippitorSettings,
+        settings: TaskSnippetSettings,
         checkbox: HTMLInputElement
-    ) {
+    ): void {
         checkbox.style.removeProperty("background-color");
         if (settings.clearThemeBackground) {
             // doing this the hard way because we have to override at least one !important in a theme (minimal)
             const style = checkbox.getAttribute("style");
-            checkbox.setAttribute("style", style + " background-color: unset !important;");
+            checkbox.setAttribute(
+                "style",
+                style + " background-color: unset !important;"
+            );
         }
     }
 
-    setColor(taskSettings: TaskSettings, element: HTMLElement) {
+    setColor(taskSettings: TaskSettings, element: HTMLElement): void {
         if (taskSettings.taskColor.length > 0) {
             element.style.color = taskSettings.taskColor;
         } else {
@@ -288,7 +317,7 @@ export class CreateCheckboxesModal extends Modal {
         }
     }
 
-    setColorAttributes(taskSettings: TaskSettings, element: HTMLElement) {
+    setColorAttributes(taskSettings: TaskSettings, element: HTMLElement): void {
         if (taskSettings.taskColor.length > 0) {
             element.style.borderColor = taskSettings.taskColor;
             element.style.color = taskSettings.taskColor;

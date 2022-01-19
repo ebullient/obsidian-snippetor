@@ -1,9 +1,9 @@
-import { Plugin, TFile, View, WorkspaceLeaf } from "obsidian";
+import { Plugin } from "obsidian";
 import { SnippitorSettings } from "./@types";
+import { DEFAULT_SETTINGS } from "./snippitor-Defaults";
 import { SnippitorSettingsTab } from "./snippitor-SettingsTab";
 import { Snippitor } from "./snippitor-Snippitor";
 
-export const DEFAULT_SETTINGS: SnippitorSettings = {};
 
 export class SnippitorPlugin extends Plugin {
     settings: SnippitorSettings;
