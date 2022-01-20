@@ -1,31 +1,66 @@
-#snippitor-checkboxes-modal ul li {
+#snippetor-checkboxes-modal ul li {
+  display: flex;
+  align-items: flex-start;
+  line-height: 2em;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+.theme-light #snippetor-checkboxes-modal ul li:hover {
+  background-color: rgba(0, 0, 0, .02);
+}
+.theme-dark #snippetor-checkboxes-modal ul li:hover {
+  background-color: rgba(255, 255, 255, .02);
+}
+#snippetor-checkboxes-modal ul li .snippetor-preview {
   display: flex;
   align-items: center;
-  line-height: 2em;
+  pointer-events: none;
+  border-right: 1px solid var(--interactive-accent);
+  border-radius: 4px;
+  margin-right: 6px;
+  margin-top: 2px;
 }
-#snippitor-checkboxes-modal ul li .snippitor-box1 {
-  width: 20px;
-  max-width: 20px;
+.snippetor-heading {
+  font-weight: bold;
 }
-#snippitor-checkboxes-modal ul li .snippitor-box2 {
+#snippetor-checkboxes-modal ul li .snippetor-preview .example {
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 60px;
-  max-width: 60px;
+  width: 100px;
+  max-width: 100px;
 }
-#snippitor-checkboxes-modal ul li .separator {
-  display: inline-block;
-  width: 10px;
-  text-align: center;
+#snippetor-checkboxes-modal ul li .snippetor-settings {
+  display: flex;
+  align-items: center;
+  flex-grow: 2;
 }
-#snippitor-checkboxes-modal ul li input.snippitor-data-task {
+#snippetor-checkboxes-modal ul li .theme-toggle {
+  margin-right: 12px;
+}
+#snippetor-checkboxes-modal ul li .theme-toggle:not(.is-enabled)::after {
+  line-height: 15px;
+  content: '🌗';
+  font-size: 15px;
+  background-color: transparent;
+}
+#snippetor-checkboxes-modal ul li .theme-toggle.is-enabled::after {
+  line-height: 15px;
+  content: '🌗';
+  font-size: 15px;
+  background-color: transparent;
+}
+#snippetor-checkboxes-modal ul li button {
+  margin-top: 2px;
+}
+#snippetor-checkboxes-modal ul li .snippetor-settings input.snippetor-data-task {
   font-family: var(--font-monospace);
   padding: 0 8px;
   text-align: center;
+  text-decoration: dashed;
 }
 
-#snippitor-checkboxes-modal .markdown-preview-view input.task-list-item-checkbox {
+#snippetor-checkboxes-modal .markdown-preview-view input.task-list-item-checkbox {
   -webkit-appearance: none;
   box-sizing: border-box;
   cursor: pointer;
@@ -34,7 +69,7 @@
   border-radius: 2px;
   top: 0;
 }
-#snippitor-checkboxes-modal .markdown-preview-view input.task-list-item-checkbox:checked::before {
+#snippetor-checkboxes-modal .markdown-preview-view input.task-list-item-checkbox:checked::before {
   font-family: var(--font-monospace);
   position: absolute;
   text-align: center;
@@ -47,7 +82,7 @@
   content: attr(data);
 }
 
-#snippitor-checkboxes-modal .markdown-preview-view ul > li.task-list-item {
+#snippetor-checkboxes-modal .markdown-preview-view ul > li.task-list-item {
   font-weight: normal;
   color: var(--text-normal);
 }

@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-snippitor",
+  "name": "obsidian-snippetor",
   "version": "0.1.0",
   "description": "Generate and tweak common snippets",
   "main": "main.js",
@@ -20,7 +20,7 @@
     "obsidian-md-plugin"
   ],
   "author": "ebullient",
-  "repository": "github.com:ebullient/obsidian-snippitor",
+  "repository": "github.com:ebullient/obsidian-snippetor",
   "license": "AGPL-3.0-only",
   "devDependencies": {
     "@types/chroma-js": "^2.1.3",

@@ -1,10 +1,10 @@
 import type {
-    SnippitorSettings,
+    SnippetorSettings,
     TaskSettings,
     TaskSnippetConfig,
 } from "./@types";
 
-export const DEFAULT_SETTINGS: SnippitorSettings = {
+export const DEFAULT_SETTINGS: SnippetorSettings = {
     snippets: {},
 };
 
@@ -15,19 +15,19 @@ export const DEFAULT_TASK_SNIPPET_SETTINGS: TaskSnippetConfig = {
     taskSettings: [
         {
             data: "x",
-            taskColor: "",
             applyTextColor: false,
             strkethrough: false,
         },
         {
             data: ">",
-            taskColor: "#3490b2",
+            taskColorLight: "#1b9d9b",
+            taskColorDark: "#3490b2",
             applyTextColor: true,
             strkethrough: false,
         },
         {
             data: "-",
-            taskColor: "#666666",
+            taskColorLight: "#666666",
             applyTextColor: true,
             strkethrough: true,
         },
@@ -36,7 +36,4 @@ export const DEFAULT_TASK_SNIPPET_SETTINGS: TaskSnippetConfig = {
 
 export const DEFAULT_TASK_SETTINGS: TaskSettings = {
     data: "",
-    taskColor: "",
-    applyTextColor: false,
-    strkethrough: false,
 };

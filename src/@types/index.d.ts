@@ -1,4 +1,4 @@
-export interface SnippitorSettings {
+export interface SnippetorSettings {
     snippets: Record<string, SnippetConfig>;
 }
 
@@ -14,12 +14,15 @@ export interface TaskSnippetConfig extends SnippetConfig {
 
 export interface TaskSettings {
     data: string;
-    taskColor: string;
-    applyTextColor: boolean;
-    strkethrough: boolean;
+    alias?: string;
+    taskColorLight?: string;
+    taskColorDark?: string;
+    applyTextColor?: boolean;
+    strkethrough?: boolean;
 }
 
 export interface ConstructedElements {
     tasks: HTMLInputElement[];
     items: HTMLLIElement[];
+    data: HTMLInputElement[];
 }

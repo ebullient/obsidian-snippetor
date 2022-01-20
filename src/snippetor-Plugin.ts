@@ -1,38 +1,38 @@
 import { Plugin } from "obsidian";
-import { SnippetConfig, SnippitorSettings } from "./@types";
-import { DEFAULT_SETTINGS } from "./snippitor-Defaults";
-import { SnippitorSettingsTab } from "./snippitor-SettingsTab";
-import { Snippitor } from "./snippitor-Snippitor";
+import { SnippetConfig, SnippetorSettings } from "./@types";
+import { DEFAULT_SETTINGS } from "./snippetor-Defaults";
+import { SnippetorSettingsTab } from "./snippetor-SettingsTab";
+import { Snippetor as Snippetor } from "./snippetor-Snippetor";
 
-export class SnippitorPlugin extends Plugin {
-    settings: SnippitorSettings;
-    snippitor: Snippitor;
+export class SnippetorPlugin extends Plugin {
+    settings: SnippetorSettings;
+    snippetor: Snippetor;
 
     async onload(): Promise<void> {
-        this.snippitor = new Snippitor(this.app);
+        this.snippetor = new Snippetor(this.app);
         await this.loadSettings();
         console.debug(
-            "loaded Snippitor %s: %o",
+            "loaded Snippetor %s: %o",
             this.manifest.version,
             this.settings
         );
-        this.addSettingTab(new SnippitorSettingsTab(this.app, this));
+        this.addSettingTab(new SnippetorSettingsTab(this.app, this));
     }
 
     onunload(): void {
-        console.debug("unloading Snippitor");
+        console.debug("unloading Snippetor");
     }
 
     async loadSettings(): Promise<void> {
         const options = await this.loadData();
         this.settings = Object.assign({}, DEFAULT_SETTINGS, options);
-        this.snippitor.updateSettings(this.settings);
+        this.snippetor.updateSettings(this.settings);
     }
 
     async saveSettings(): Promise<void> {
-        console.debug("Snippitor: saving settings");
+        console.debug("Snippetor: saving settings");
         await this.saveData(this.settings);
-        this.snippitor.updateSettings(this.settings);
+        this.snippetor.updateSettings(this.settings);
     }
 
     async removeSnippet(snippetCfg: SnippetConfig): Promise<void> {

@@ -1,4 +1,4 @@
-# Snippitor
+# Snippetor
 
 
 

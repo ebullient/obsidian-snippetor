@@ -1,3 +1,3 @@
-import { SnippitorPlugin } from "./snippitor-Plugin";
+import { SnippetorPlugin } from "./snippetor-Plugin";
 
-export default SnippitorPlugin;
+export default SnippetorPlugin;

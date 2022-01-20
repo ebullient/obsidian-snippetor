@@ -5,24 +5,24 @@ import {
     PluginSettingTab,
     Setting,
 } from "obsidian";
-import { SnippetConfig, SnippitorSettings, TaskSnippetConfig } from "./@types";
-import SnippitorPlugin from "./main";
-import { openCreateCheckboxModal } from "./snippitor-CreateCheckboxesModal";
+import { SnippetConfig, SnippetorSettings, TaskSnippetConfig } from "./@types";
+import SnippetorPlugin from "./main";
+import { openCreateCheckboxModal } from "./snippetor-CreateCheckboxesModal";
 
-export class SnippitorSettingsTab extends PluginSettingTab {
-    plugin: SnippitorPlugin;
+export class SnippetorSettingsTab extends PluginSettingTab {
+    plugin: SnippetorPlugin;
     existingEl: HTMLDivElement;
 
-    constructor(app: App, plugin: SnippitorPlugin) {
+    constructor(app: App, plugin: SnippetorPlugin) {
         super(app, plugin);
         this.plugin = plugin;
     }
 
     display(): void {
         this.containerEl.empty();
-        this.containerEl.addClass("snippitor-plugin-settings");
+        this.containerEl.addClass("snippetor-plugin-settings");
 
-        this.containerEl.createEl("h2", { text: "Snippitor" });
+        this.containerEl.createEl("h2", { text: "Snippetor" });
         this.buildNewSnippet();
 
         this.existingEl = this.containerEl.createDiv();
@@ -34,7 +34,7 @@ export class SnippitorSettingsTab extends PluginSettingTab {
             type: "simple-task",
         };
         new Setting(this.containerEl)
-            .setClass("snippitor-create-snippet")
+            .setClass("snippetor-create-snippet")
             .setName("Create a new CSS snippet (select type)")
             .addDropdown((d) => {
                 d.addOption("simple-task", "Custom checkboxes");
@@ -97,7 +97,7 @@ export class SnippitorSettingsTab extends PluginSettingTab {
                 this.app,
                 snippet as TaskSnippetConfig
             );
-            console.debug("Snippitor: modal closed with %o", taskCfg);
+            console.debug("Snippetor: modal closed with %o", taskCfg);
             await this.plugin.setSnippet(taskCfg);
             this.listExistingSnippets();
         }
