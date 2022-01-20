@@ -1,4 +1,13 @@
-#snippitor-checkboxes-modal ul li .fixed-text {
+#snippitor-checkboxes-modal ul li {
+  display: flex;
+  align-items: center;
+  line-height: 2em;
+}
+#snippitor-checkboxes-modal ul li .snippitor-box1 {
+  width: 20px;
+  max-width: 20px;
+}
+#snippitor-checkboxes-modal ul li .snippitor-box2 {
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -10,15 +19,10 @@
   width: 10px;
   text-align: center;
 }
-#snippitor-checkboxes-modal ul li {
-  display: flex;
-  align-items: center;
-  line-height: 2em;
-}
 #snippitor-checkboxes-modal ul li input.snippitor-data-task {
   font-family: var(--font-monospace);
-  font-size: 14px;
   padding: 0 8px;
+  text-align: center;
 }
 
 #snippitor-checkboxes-modal .markdown-preview-view input.task-list-item-checkbox {

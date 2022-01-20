@@ -1,10 +1,17 @@
-import { App, ButtonComponent, PluginSettingTab, Setting } from "obsidian";
-import { SnippitorSettings } from "./@types";
+import {
+    App,
+    ButtonComponent,
+    ExtraButtonComponent,
+    PluginSettingTab,
+    Setting,
+} from "obsidian";
+import { SnippetConfig, SnippitorSettings, TaskSnippetConfig } from "./@types";
 import SnippitorPlugin from "./main";
-import { CreateCheckboxesModal } from "./snippitor-SettingsCreateCheckboxes";
+import { openCreateCheckboxModal } from "./snippitor-CreateCheckboxesModal";
 
 export class SnippitorSettingsTab extends PluginSettingTab {
     plugin: SnippitorPlugin;
+    existingEl: HTMLDivElement;
 
     constructor(app: App, plugin: SnippitorPlugin) {
         super(app, plugin);
@@ -13,21 +20,25 @@ export class SnippitorSettingsTab extends PluginSettingTab {
 
     display(): void {
         this.containerEl.empty();
-        this.containerEl.createEl("h1", { text: "Snippitor" });
+        this.containerEl.addClass("snippitor-plugin-settings");
 
-        const tempSettings: SnippitorSettings = Object.assign(
-            this.plugin.settings
-        );
+        this.containerEl.createEl("h2", { text: "Snippitor" });
+        this.buildNewSnippet();
 
+        this.existingEl = this.containerEl.createDiv();
+        this.listExistingSnippets();
+    }
+
+    buildNewSnippet() {
         const selector = {
-            type: "checkboxes",
+            type: "simple-task",
         };
         new Setting(this.containerEl)
             .setClass("snippitor-create-snippet")
             .setName("Create a new CSS snippet (select type)")
             .addDropdown((d) => {
-                d.addOption("checkboxes", "Custom checkboxes");
-                d.setValue("checkboxes");
+                d.addOption("simple-task", "Custom checkboxes");
+                d.setValue("simple-task");
                 d.onChange((v) => {
                     console.log("Which type %o", v);
                     selector.type = v;
@@ -35,18 +46,60 @@ export class SnippitorSettingsTab extends PluginSettingTab {
             })
             .addButton((button: ButtonComponent) =>
                 button
-                    .setTooltip("Add Calendar")
+                    .setTooltip("Create a Snippet")
                     .setButtonText("+")
-                    .onClick(() => {
-                        console.log("Open Modal to create %o", selector.type);
-                        if (selector.type === "checkboxes") {
-                            const modal = new CreateCheckboxesModal(this.app);
-                            modal.onClose = () => {
-                                console.log("modal closed");
-                            };
-                            modal.open();
-                        }
+                    .onClick(async () => {
+                        console.log("Create new snippet");
+                        await this.openModal(selector.type, null);
                     })
             );
+    }
+
+    listExistingSnippets() {
+        this.existingEl.empty(); // clear, used for refreshing
+
+        for (let snippet of this.plugin.allSnippets) {
+            console.log(snippet);
+            new Setting(this.existingEl)
+                .setName(snippet.name)
+                .setDesc(this.getDescription(snippet.type))
+                .addExtraButton((b: ExtraButtonComponent) =>
+                    b
+                        .setIcon("pencil")
+                        .setTooltip("Edit this Snippet")
+                        .onClick(async () => {
+                            console.log("Editing snippet %o", snippet);
+                            await this.openModal(snippet.type, snippet);
+                        })
+                )
+                .addButton((b: ButtonComponent) =>
+                    b
+                        .setIcon("trash")
+                        .setTooltip("Delete this Snippet")
+                        .onClick(async () => {
+                            console.log("Delete %o", snippet);
+                            await this.plugin.removeSnippet(snippet);
+                            this.listExistingSnippets();
+                        })
+                );
+        }
+    }
+
+    getDescription(type: string): string {
+        // Some day --- more types.
+        return "simple checkboxes";
+    }
+
+    async openModal(type: string, snippet: SnippetConfig): Promise<void> {
+        // Some day --- more types.
+        if (type === "simple-task") {
+            const taskCfg = await openCreateCheckboxModal(
+                this.app,
+                snippet as TaskSnippetConfig
+            );
+            console.debug("Snippitor: modal closed with %o", taskCfg);
+            await this.plugin.setSnippet(taskCfg);
+            this.listExistingSnippets();
+        }
     }
 }

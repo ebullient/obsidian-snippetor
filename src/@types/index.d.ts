@@ -1,13 +1,13 @@
 export interface SnippitorSettings {
-    snippets: Map<string, Snippet>;
+    snippets: Record<string, SnippetConfig>;
 }
 
-export interface Snippet {
+export interface SnippetConfig {
     name: string;
     type: string;
 }
 
-export interface TaskSnippetSettings extends Snippet {
+export interface TaskSnippetConfig extends SnippetConfig {
     clearThemeBackground: boolean;
     taskSettings: TaskSettings[];
 }
@@ -15,7 +15,7 @@ export interface TaskSnippetSettings extends Snippet {
 export interface TaskSettings {
     data: string;
     taskColor: string;
-    colorText: boolean;
+    applyTextColor: boolean;
     strkethrough: boolean;
 }
 
