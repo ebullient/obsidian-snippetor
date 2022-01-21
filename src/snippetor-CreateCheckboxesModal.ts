@@ -8,6 +8,7 @@ import {
 import {
     DEFAULT_TASK_SETTINGS,
     DEFAULT_TASK_SNIPPET_SETTINGS,
+    MAKE_IT_SO,
 } from "./snippetor-Defaults";
 import type {
     TaskSnippetConfig,
@@ -15,13 +16,15 @@ import type {
     ConstructedElements,
 } from "./@types";
 import { generateSlug } from "random-word-slugs";
+import { Snippetor } from "./snippetor-Snippetor";
 
 export function openCreateCheckboxModal(
     app: App,
-    taskSnippetCfg: TaskSnippetConfig
+    taskSnippetCfg: TaskSnippetConfig,
+    snippetor: Snippetor
 ): Promise<TaskSnippetConfig> {
     return new Promise((resolve) => {
-        const modal = new CreateCheckboxesModal(app, taskSnippetCfg);
+        const modal = new CreateCheckboxesModal(app, taskSnippetCfg, snippetor);
         modal.onClose = () => {
             if (!modal.cfg.name) {
                 modal.cfg.name = generateSlug(2);
@@ -36,9 +39,15 @@ class CreateCheckboxesModal extends Modal {
     cfg: TaskSnippetConfig;
     id: number;
     elements: ConstructedElements;
+    snippetor: Snippetor;
 
-    constructor(app: App, taskSnippetCfg: TaskSnippetConfig) {
+    constructor(
+        app: App,
+        taskSnippetCfg: TaskSnippetConfig,
+        snippetor: Snippetor
+    ) {
         super(app);
+        this.snippetor = snippetor;
         this.containerEl.id = "snippetor-checkboxes-modal";
         this.cfg =
             taskSnippetCfg ||
@@ -75,7 +84,20 @@ class CreateCheckboxesModal extends Modal {
                     .onChange((value) => {
                         this.cfg.name = value;
                     });
-            });
+            })
+            .addButton((button) =>
+                button
+                    .setIcon(MAKE_IT_SO)
+                    .setClass("generate-css")
+                    .setTooltip("Generate CSS Snippet")
+                    .onClick(async () => {
+                        button.buttonEl.addClass("is-active");
+                        button.disabled = true;
+                        await this.snippetor.generateCss(this.cfg);
+                        button.buttonEl.removeClass("is-active");
+                        button.disabled = false;
+                    })
+            );
 
         content.createEl("h3", { text: "Custom Task Values" });
 
@@ -223,7 +245,7 @@ class CreateCheckboxesModal extends Modal {
                 name: "task-" + i,
                 size: "1",
                 value: taskSettings.data,
-                title: "Task value"
+                title: "Task value",
             },
         });
         this.elements.data.push(dataTask);

@@ -8,6 +8,7 @@ import {
 import { SnippetConfig, SnippetorSettings, TaskSnippetConfig } from "./@types";
 import SnippetorPlugin from "./main";
 import { openCreateCheckboxModal } from "./snippetor-CreateCheckboxesModal";
+import { DEFAULT_TASK_SNIPPET_SETTINGS } from "./snippetor-Defaults";
 
 export class SnippetorSettingsTab extends PluginSettingTab {
     plugin: SnippetorPlugin;
@@ -32,24 +33,27 @@ export class SnippetorSettingsTab extends PluginSettingTab {
         const fgColor = this.isLightMode() ? "666" : "AAA";
         const bgColor = this.isLightMode() ? "D8C9D5" : "684B62";
         div.createEl("a", {
-            href: "https://www.buymeacoffee.com/ebullient"
+            href: "https://www.buymeacoffee.com/ebullient",
         }).createEl("img", {
             attr: {
-                src: `https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ebullient&button_colour=${bgColor}&font_colour=${fgColor}&font_family=Inter&outline_colour=${fgColor}&coffee_colour=FFDD00`
-            }
+                src: `https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ebullient&button_colour=${bgColor}&font_colour=${fgColor}&font_family=Inter&outline_colour=${fgColor}&coffee_colour=FFDD00`,
+            },
         });
     }
 
     buildNewSnippet() {
         const selector = {
-            type: "simple-task",
+            type: DEFAULT_TASK_SNIPPET_SETTINGS.type,
         };
         new Setting(this.containerEl)
             .setClass("snippetor-create-snippet")
             .setName("Create a new CSS snippet (select type)")
             .addDropdown((d) => {
-                d.addOption("simple-task", "Custom checkboxes");
-                d.setValue("simple-task");
+                d.addOption(
+                    DEFAULT_TASK_SNIPPET_SETTINGS.type,
+                    "Custom checkboxes"
+                );
+                d.setValue(DEFAULT_TASK_SNIPPET_SETTINGS.type);
                 d.onChange((v) => {
                     console.log("Which type %o", v);
                     selector.type = v;
@@ -103,10 +107,11 @@ export class SnippetorSettingsTab extends PluginSettingTab {
 
     async openModal(type: string, snippet: SnippetConfig): Promise<void> {
         // Some day --- more types.
-        if (type === "simple-task") {
+        if (type === DEFAULT_TASK_SNIPPET_SETTINGS.type) {
             const taskCfg = await openCreateCheckboxModal(
                 this.app,
-                snippet as TaskSnippetConfig
+                snippet as TaskSnippetConfig,
+                this.plugin.snippetor
             );
             console.debug("Snippetor: modal closed with %o", taskCfg);
             await this.plugin.setSnippet(taskCfg);

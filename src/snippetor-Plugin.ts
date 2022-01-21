@@ -1,6 +1,12 @@
-import { Plugin } from "obsidian";
+import { addIcon, Plugin } from "obsidian";
 import { SnippetConfig, SnippetorSettings } from "./@types";
-import { DEFAULT_SETTINGS } from "./snippetor-Defaults";
+import {
+    DEFAULT_SETTINGS,
+    SAVE_ICON,
+    SAVE,
+    MAGIC_WAND,
+    MAKE_IT_SO,
+} from "./snippetor-Defaults";
 import { SnippetorSettingsTab } from "./snippetor-SettingsTab";
 import { Snippetor as Snippetor } from "./snippetor-Snippetor";
 
@@ -16,6 +22,8 @@ export class SnippetorPlugin extends Plugin {
             this.manifest.version,
             this.settings
         );
+        addIcon(SAVE_ICON, SAVE);
+        addIcon(MAKE_IT_SO, MAGIC_WAND);
         this.addSettingTab(new SnippetorSettingsTab(this.app, this));
     }
 
@@ -26,13 +34,11 @@ export class SnippetorPlugin extends Plugin {
     async loadSettings(): Promise<void> {
         const options = await this.loadData();
         this.settings = Object.assign({}, DEFAULT_SETTINGS, options);
-        this.snippetor.updateSettings(this.settings);
     }
 
     async saveSettings(): Promise<void> {
         console.debug("Snippetor: saving settings");
         await this.saveData(this.settings);
-        this.snippetor.updateSettings(this.settings);
     }
 
     async removeSnippet(snippetCfg: SnippetConfig): Promise<void> {

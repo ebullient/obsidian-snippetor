@@ -5,6 +5,14 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 #snippetor-checkboxes-modal {
+  button.generate-css.is-active:after {
+    content: '⚙️';
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: block;
+  }
+
   ul li {
     display: flex;
     align-items: flex-start;

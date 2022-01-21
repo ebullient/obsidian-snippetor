@@ -1,13 +1,20 @@
 import { App } from "obsidian";
-import { SnippetorSettings } from "./@types";
+import { SnippetConfig, TaskSnippetConfig } from "./@types";
+import {
+    DEFAULT_TASK_SETTINGS,
+    DEFAULT_TASK_SNIPPET_SETTINGS,
+} from "./snippetor-Defaults";
 
 export class Snippetor {
-    settings: SnippetorSettings;
+    constructor(private app: App) {}
 
-    constructor(private app: App) {
+    generateCss(cfg: SnippetConfig): Promise<void> {
+        console.log("Create CSS file for snippet %o", cfg);
+
+        return Promise.resolve();
     }
 
-    updateSettings(settings: SnippetorSettings): void {
-        this.settings = settings;
+    isTaskSnippetConfig(cfg: SnippetConfig): cfg is TaskSnippetConfig {
+        return cfg.type === DEFAULT_TASK_SNIPPET_SETTINGS.type;
     }
 }
