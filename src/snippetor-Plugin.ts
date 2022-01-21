@@ -37,7 +37,8 @@ export class SnippetorPlugin extends Plugin {
     async removeSnippet(snippetCfg: SnippetConfig): Promise<void> {
         console.log("Removing %o", snippetCfg);
         delete this.settings.snippets[snippetCfg.name];
-        return this.saveSettings();
+        return this.saveSettings()
+            .then(() => this.snippetor.deleteSnippet(snippetCfg));
     }
 
     async setSnippet(snippetCfg: SnippetConfig): Promise<void> {
