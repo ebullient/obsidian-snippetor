@@ -1,0 +1,98 @@
+.theme-light #snippetor-checkboxes-modal ul li:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+.theme-dark #snippetor-checkboxes-modal ul li:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+#snippetor-checkboxes-modal {
+  ul li {
+    display: flex;
+    align-items: flex-start;
+    line-height: 2em;
+    justify-content: space-between;
+    margin-bottom: 3px;
+
+    button {
+      margin-top: 2px;
+    }
+
+    .snippetor-heading {
+      font-weight: bold;
+    }
+
+    .snippetor-preview {
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      border-right: 1px solid var(--interactive-accent);
+      border-radius: 4px;
+      margin-right: 6px;
+      margin-top: 2px;
+
+      .example {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100px;
+        max-width: 100px;
+      }
+    }
+
+    .snippetor-settings {
+      display: flex;
+      align-items: center;
+      flex-grow: 2;
+
+      input.snippetor-data-task {
+        font-family: var(--font-monospace);
+        padding: 0 8px;
+        text-align: center;
+        text-decoration: dashed;
+      }
+    }
+
+    .theme-toggle {
+      margin-right: 12px;
+    }
+    .theme-toggle:not(.is-enabled)::after {
+      line-height: 15px;
+      content: "🌗";
+      font-size: 15px;
+      background-color: transparent;
+    }
+    .theme-toggle.is-enabled::after {
+      line-height: 15px;
+      content: "🌗";
+      font-size: 15px;
+      background-color: transparent;
+    }
+  }
+
+  .markdown-preview-view {
+    ul > li.task-list-item {
+      font-weight: normal;
+      color: var(--text-normal);
+    }
+    input.task-list-item-checkbox {
+      -webkit-appearance: none;
+      box-sizing: border-box;
+      cursor: pointer;
+      filter: none;
+      border: 1px solid var(--text-normal);
+      border-radius: 2px;
+      top: 0;
+    }
+    input.task-list-item-checkbox:checked::before {
+      font-family: var(--font-monospace);
+      position: absolute;
+      text-align: center;
+      font-weight: 500;
+      line-height: 14px;
+      font-size: 14px;
+      left: 1px;
+      right: 1px;
+      color: attr(color);
+      content: attr(data);
+    }
+  }
+}
