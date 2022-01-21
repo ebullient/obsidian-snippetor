@@ -27,6 +27,17 @@ export class SnippetorSettingsTab extends PluginSettingTab {
 
         this.existingEl = this.containerEl.createDiv();
         this.listExistingSnippets();
+
+        const div = this.containerEl.createDiv("coffee");
+        const fgColor = this.isLightMode() ? "666" : "AAA";
+        const bgColor = this.isLightMode() ? "D8C9D5" : "684B62";
+        div.createEl("a", {
+            href: "https://www.buymeacoffee.com/ebullient"
+        }).createEl("img", {
+            attr: {
+                src: `https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ebullient&button_colour=${bgColor}&font_colour=${fgColor}&font_family=Inter&outline_colour=${fgColor}&coffee_colour=FFDD00`
+            }
+        });
     }
 
     buildNewSnippet() {
@@ -101,5 +112,9 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             await this.plugin.setSnippet(taskCfg);
             this.listExistingSnippets();
         }
+    }
+
+    isLightMode(): boolean {
+        return document.body.hasClass("theme-light");
     }
 }

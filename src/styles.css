@@ -1,3 +1,12 @@
+.snippetor-plugin-settings .coffee {
+  width: 60%;
+  color: var(--text-normal);
+  margin: 1rem auto;
+  text-align: center;
+}
+.snippetor-plugin-settings .coffee img {
+  height: 30px;
+}
 #snippetor-checkboxes-modal ul li {
   display: flex;
   align-items: flex-start;
