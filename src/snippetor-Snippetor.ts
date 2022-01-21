@@ -86,13 +86,13 @@ export class Snippetor {
         if (this.app.customCss.snippets.includes(fileName)) {
             update = this.app.vault.adapter.write(path, snippet as string).then(
                 () => {
-                    new Notice("Snippet created successfully.");
+                    new Notice("Snippet updated successfully.");
                 },
                 (reason) => {
                     new Notice(
-                        "Snippet creation failed. Check console for details."
+                        "Snippet modification failed. Check console for details."
                     );
-                    console.error("Snippet creation failed: %o", reason);
+                    console.error("Snippet modification failed: %o", reason);
                 }
             );
         } else {
@@ -108,7 +108,8 @@ export class Snippetor {
                 }
             );
         }
-        return update;
+        this.app.customCss.readCssFolders(); // refresh snippets
+        return update.then();
     }
 
     isTaskSnippetConfig(cfg: SnippetConfig): cfg is TaskSnippetConfig {

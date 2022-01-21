@@ -33,6 +33,7 @@ declare module "obsidian" {
         customCss: {
             snippets: string[];
             getSnippetPath(file?: string): string;
+            readCssFolders(): Promise<void>;
         };
         plugins: {
             enabledPlugins: Set<string>;
