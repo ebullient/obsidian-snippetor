@@ -1,13 +1,12 @@
 import {
     App,
     ButtonComponent,
-    ButtonComponent,
     Notice,
     PluginSettingTab,
     Setting,
 } from "obsidian";
 import { generateSlug } from "random-word-slugs";
-import { SnippetConfig, SnippetorSettings, TaskSnippetConfig } from "./@types";
+import { SnippetConfig, TaskSnippetConfig } from "./@types";
 import SnippetorPlugin from "./main";
 import { openCreateCheckboxModal } from "./snippetor-CreateCheckboxesModal";
 import { DEFAULT_TASK_SNIPPET_SETTINGS } from "./snippetor-Defaults";
@@ -43,7 +42,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
         });
     }
 
-    buildNewSnippet() {
+    buildNewSnippet(): void {
         const selector = {
             type: DEFAULT_TASK_SNIPPET_SETTINGS.type,
         };
@@ -70,10 +69,10 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             );
     }
 
-    listExistingSnippets() {
+    listExistingSnippets(): void {
         this.existingEl.empty(); // clear, used for refreshing
 
-        for (let snippet of this.plugin.allSnippets) {
+        for (const snippet of this.plugin.allSnippets) {
             console.log(snippet);
             new Setting(this.existingEl)
                 .setName(snippet.name)

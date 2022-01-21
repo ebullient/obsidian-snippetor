@@ -7,7 +7,7 @@
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
     "pretest": "eslint --ignore-path .gitignore src/",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "prettier": "prettier -w 'src/**/*.ts'",
     "version": "auto-changelog -p && git add CHANGELOG.md",
     "test-version": "auto-changelog -p",
@@ -45,7 +45,7 @@
   "auto-changelog": {
     "backfillLimit": false,
     "commitLimit": false,
-    "ignoreCommitPattern": "(changelog|release|🔨 brat release|Update README).*"
+    "ignoreCommitPattern": "(🔖|🔨|changelog|release|Update README).*"
   },
   "dependencies": {
     "random-word-slugs": "^0.1.6",

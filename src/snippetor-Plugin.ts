@@ -46,7 +46,7 @@ export class SnippetorPlugin extends Plugin {
         return this.saveSettings();
     }
 
-    get allSnippets() {
+    get allSnippets(): SnippetConfig[] {
         return Object.values(this.settings.snippets);
     }
 }

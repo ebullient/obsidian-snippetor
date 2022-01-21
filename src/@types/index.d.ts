@@ -25,6 +25,7 @@ export interface ConstructedElements {
     tasks: HTMLInputElement[];
     items: HTMLLIElement[];
     data: HTMLInputElement[];
+    list?: HTMLUListElement;
 }
 
 declare module "obsidian" {
@@ -36,7 +37,6 @@ declare module "obsidian" {
         plugins: {
             enabledPlugins: Set<string>;
             plugins: {
-                [id: string]: any;
                 "obsidian-task-collector"?: {
                     taskCollector?: {
                         settings?: {

@@ -1,4 +1,4 @@
-import { App, Notice, Tasks, TFile } from "obsidian";
+import { App, Notice } from "obsidian";
 import { SnippetConfig, TaskSettings, TaskSnippetConfig } from "./@types";
 import { DEFAULT_TASK_SNIPPET_SETTINGS } from "./snippetor-Defaults";
 import * as Eta from "eta";
@@ -14,7 +14,7 @@ export class Snippetor {
         });
     }
 
-    get canUseTaskCollector() {
+    get canUseTaskCollector(): boolean {
         return this.app.plugins.enabledPlugins.has("obsidian-task-collector");
     }
 
@@ -28,19 +28,17 @@ export class Snippetor {
         ) {
             values += "-";
         }
-        let tasks = (values + "xX").replace(" ", "").split("");
-        console.log(tasks);
+        const tasks = (values + "xX").replace(" ", "").split("");
         tasks.sort();
-        console.log(tasks);
         return new Set(tasks);
     }
 
     createNewTaskSnippetCfg(): TaskSnippetConfig {
         const result = Object.assign({}, DEFAULT_TASK_SNIPPET_SETTINGS, {
             name: generateSlug(2),
-            taskSettings: []
+            taskSettings: [],
         });
-        let values = new Set(['x', '-', '>']);
+        let values = new Set(["x", "-", ">"]);
         if (this.canUseTaskCollector) {
             values = this.taskValues;
         }
@@ -54,12 +52,12 @@ export class Snippetor {
         return {
             data: v,
             taskColorLight: randomColor({
-                luminosity: 'dark'
+                luminosity: "dark",
             }),
             taskColorDark: randomColor({
-                luminosity: 'light'
-            })
-        }
+                luminosity: "light",
+            }),
+        };
     }
 
     generateCss(cfg: SnippetConfig): Promise<void> {
@@ -117,4 +115,3 @@ export class Snippetor {
         return cfg.type === DEFAULT_TASK_SNIPPET_SETTINGS.type;
     }
 }
-

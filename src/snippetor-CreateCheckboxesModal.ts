@@ -5,11 +5,7 @@ import {
     Setting,
     ToggleComponent,
 } from "obsidian";
-import {
-    DEFAULT_TASK_SETTINGS,
-    DEFAULT_TASK_SNIPPET_SETTINGS,
-    MAKE_IT_SO,
-} from "./snippetor-Defaults";
+import { MAKE_IT_SO } from "./snippetor-Defaults";
 import type {
     TaskSnippetConfig,
     TaskSettings,
@@ -17,7 +13,6 @@ import type {
 } from "./@types";
 import { generateSlug } from "random-word-slugs";
 import { Snippetor } from "./snippetor-Snippetor";
-import { timeStamp } from "console";
 
 export function openCreateCheckboxModal(
     app: App,
@@ -74,7 +69,6 @@ class CreateCheckboxesModal extends Modal {
     }
 
     onOpen(): void {
-        let list: HTMLUListElement;
         this.titleEl.createSpan({ text: "Snippetor: Tasks" });
 
         const content = this.contentEl.createDiv(
@@ -111,11 +105,11 @@ class CreateCheckboxesModal extends Modal {
         const reset = h3.createSpan("setting-item-control");
         new ButtonComponent(reset).setIcon("reset").onClick(() => {
             this.cfg = JSON.parse(JSON.stringify(this.snapshot)); // reset
-            this.showTaskRows(list);
+            this.showTaskRows();
         });
 
-        list = content.createEl("ul");
-        this.showTaskRows(list);
+        this.elements.list = content.createEl("ul");
+        this.showTaskRows();
 
         new Setting(content)
             .setClass("snippetor-create-task")
@@ -124,8 +118,9 @@ class CreateCheckboxesModal extends Modal {
                     .setTooltip("Add a task type")
                     .setButtonText("+")
                     .onClick(() => {
-                        const taskSettings = this.snippetor.createNewTaskCfg('');
-                        this.createTaskRow(list, taskSettings);
+                        const taskSettings =
+                            this.snippetor.createNewTaskCfg("");
+                        this.createTaskRow(taskSettings);
                         this.cfg.taskSettings.push(taskSettings);
                     })
             );
@@ -153,22 +148,22 @@ class CreateCheckboxesModal extends Modal {
         this.contentEl.empty();
     }
 
-    showTaskRows(list: HTMLUListElement): void {
+    showTaskRows(): void {
         this.elements.tasks.length = 0;
         this.elements.items.length = 0;
         this.elements.data.length = 0;
-        list.empty();
+        this.elements.list.empty();
 
         // Callback to re-draw the whole thing if light/dark mode is toggled.
-        this.createHeaderRow(list, () => this.showTaskRows(list));
+        this.createHeaderRow(() => this.showTaskRows());
 
         this.cfg.taskSettings.forEach((ts) => {
-            this.createTaskRow(list, ts);
+            this.createTaskRow(ts);
         });
     }
 
-    createHeaderRow(list: HTMLUListElement, callback: () => void): void {
-        const heading = list.createEl("li", {
+    createHeaderRow(callback: () => void): void {
+        const heading = this.elements.list.createEl("li", {
             cls: "task-list-item",
         });
         const preview = heading.createSpan("snippetor-preview");
@@ -201,8 +196,8 @@ class CreateCheckboxesModal extends Modal {
             .toggleEl.addClass("theme-toggle");
     }
 
-    createTaskRow(list: HTMLUListElement, taskSettings: TaskSettings): void {
-        const li = list.createEl("li");
+    createTaskRow(taskSettings: TaskSettings): void {
+        const li = this.elements.list.createEl("li");
 
         this.applySettingsToListItem(taskSettings, li);
         this.elements.items.push(li);
@@ -236,7 +231,7 @@ class CreateCheckboxesModal extends Modal {
             .onClick(async () => {
                 console.log("Delete %o", li);
                 this.cfg.taskSettings.remove(taskSettings);
-                this.showTaskRows(list);
+                this.showTaskRows();
             });
     }
 
