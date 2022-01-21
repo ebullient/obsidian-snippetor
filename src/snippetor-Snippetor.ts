@@ -7,7 +7,6 @@ import { generateSlug } from "random-word-slugs";
 import randomColor from "randomcolor";
 
 export class Snippetor {
-
     constructor(private app: App) {
         Eta.configure({
             cache: true, // Make Eta cache templates
@@ -16,7 +15,9 @@ export class Snippetor {
     }
 
     get canUseTaskCollector(): boolean {
-        return this.app.plugins.enabledPlugins.has("obsidian-task-collector");
+        return (
+            this.app.plugins.plugins["obsidian-task-collector"] !== undefined
+        );
     }
 
     get taskValues(): Set<string> {
@@ -29,9 +30,7 @@ export class Snippetor {
         ) {
             values += "-";
         }
-        const tasks = (values + "xX").replace(" ", "").split("");
-        tasks.sort();
-        return new Set(tasks);
+        return new Set((values + "xX").replace(" ", "").split(""));
     }
 
     createNewTaskSnippetCfg(): TaskSnippetConfig {

@@ -36,7 +36,6 @@ declare module "obsidian" {
             readCssFolders(): Promise<void>;
         };
         plugins: {
-            enabledPlugins: Set<string>;
             plugins: {
                 "obsidian-task-collector"?: {
                     taskCollector?: {
