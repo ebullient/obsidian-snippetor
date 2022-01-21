@@ -46,5 +46,8 @@
     "backfillLimit": false,
     "commitLimit": false,
     "ignoreCommitPattern": "(changelog|release|🔨 brat release|Update README).*"
+  },
+  "dependencies": {
+    "eta": "^1.12.3"
   }
 }

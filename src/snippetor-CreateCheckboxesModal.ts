@@ -221,7 +221,7 @@ class CreateCheckboxesModal extends Modal {
         // Remove
         new ButtonComponent(li)
             .setIcon("trash")
-            .setTooltip("Delete this Snippet")
+            .setTooltip("Delete this Task")
             .onClick(async () => {
                 console.log("Delete %o", li);
                 this.cfg.taskSettings.remove(taskSettings);
@@ -237,7 +237,7 @@ class CreateCheckboxesModal extends Modal {
     ): void {
         const i = this.id++;
 
-        // What the task character should be
+        // Specify the task character
         const dataTask = settings.createEl("input", {
             cls: "snippetor-data-task",
             attr: {

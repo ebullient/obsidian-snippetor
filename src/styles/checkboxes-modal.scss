@@ -27,6 +27,9 @@
     .snippetor-heading {
       font-weight: bold;
     }
+    .snippetor-heading.snippetor-settings {
+      margin-top: 4px;
+    }
 
     .snippetor-preview {
       display: flex;
@@ -35,7 +38,7 @@
       border-right: 1px solid var(--interactive-accent);
       border-radius: 4px;
       margin-right: 6px;
-      margin-top: 2px;
+      margin-top: 4px;
 
       .example {
         display: inline-block;
@@ -89,6 +92,9 @@
       border: 1px solid var(--text-normal);
       border-radius: 2px;
       top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
     }
     input.task-list-item-checkbox:checked::before {
       font-family: var(--font-monospace);
@@ -101,6 +107,12 @@
       right: 1px;
       color: attr(color);
       content: attr(data);
+    }
+    input.task-list-item-checkbox:checked:hover,
+    p > input.task-list-item-checkbox:checked:hover {
+      color: var(--text-on-accent) !important;
+      background-color: var(--interactive-accent-hover);
+      border-color: var(--text-on-accent) !important;
     }
   }
 }

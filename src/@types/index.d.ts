@@ -14,7 +14,7 @@ export interface TaskSnippetConfig extends SnippetConfig {
 
 export interface TaskSettings {
     data: string;
-    alias?: string;
+    reader?: string;
     taskColorLight?: string;
     taskColorDark?: string;
     applyTextColor?: boolean;
