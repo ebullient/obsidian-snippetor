@@ -1,4 +1,5 @@
 # Snippetor
+[![GitHub tag (Latest by date)](https://img.shields.io/github/v/tag/ebullient/obsidian-snippetor)](https://github.com/ebullient/obsidian-snippetor/releases) ![GitHub all releases](https://img.shields.io/github/downloads/ebullient/obsidian-snippetor/total?color=success)
 
 Snippetor helps you create common CSS snippets with a few button clicks: 
 - Custom tasks
