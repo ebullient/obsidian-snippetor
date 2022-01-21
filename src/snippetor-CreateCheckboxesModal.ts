@@ -17,6 +17,7 @@ import type {
 } from "./@types";
 import { generateSlug } from "random-word-slugs";
 import { Snippetor } from "./snippetor-Snippetor";
+import { timeStamp } from "console";
 
 export function openCreateCheckboxModal(
     app: App,
@@ -37,6 +38,7 @@ export function openCreateCheckboxModal(
 
 class CreateCheckboxesModal extends Modal {
     cfg: TaskSnippetConfig;
+    orig: TaskSnippetConfig;
     id: number;
     elements: ConstructedElements;
     snippetor: Snippetor;
@@ -49,11 +51,7 @@ class CreateCheckboxesModal extends Modal {
         super(app);
         this.snippetor = snippetor;
         this.containerEl.id = "snippetor-checkboxes-modal";
-        this.cfg =
-            taskSnippetCfg ||
-            Object.assign({}, DEFAULT_TASK_SNIPPET_SETTINGS, {
-                name: generateSlug(2),
-            });
+        this.cfg = taskSnippetCfg || snippetor.createNewTaskSnippetCfg();
 
         this.cfg.taskSettings.forEach((t) => {
             if (t.taskColorDark && !t.taskColorLight) {
@@ -62,6 +60,7 @@ class CreateCheckboxesModal extends Modal {
                 t.taskColorDark = t.taskColorLight;
             }
         });
+        this.orig = this.cfg;
         this.id = 0;
         this.elements = {
             tasks: [],
@@ -70,8 +69,14 @@ class CreateCheckboxesModal extends Modal {
         };
     }
 
+    get snapshot() {
+        return this.orig;
+    }
+
     onOpen(): void {
+        let list: HTMLUListElement;
         this.titleEl.createSpan({ text: "Snippetor: Tasks" });
+
         const content = this.contentEl.createDiv(
             "snippetor-checkboxes markdown-preview-view"
         );
@@ -99,9 +104,17 @@ class CreateCheckboxesModal extends Modal {
                     })
             );
 
-        content.createEl("h3", { text: "Custom Task Values" });
+        const h3 = content.createEl("h3", {
+            cls: "snippetor-reset",
+            text: "Custom Task Values",
+        });
+        const reset = h3.createSpan("setting-item-control");
+        new ButtonComponent(reset).setIcon("reset").onClick(() => {
+            this.cfg = JSON.parse(JSON.stringify(this.snapshot)); // reset
+            this.showTaskRows(list);
+        });
 
-        const list = content.createEl("ul");
+        list = content.createEl("ul");
         this.showTaskRows(list);
 
         new Setting(content)
@@ -111,9 +124,7 @@ class CreateCheckboxesModal extends Modal {
                     .setTooltip("Add a task type")
                     .setButtonText("+")
                     .onClick(() => {
-                        const taskSettings = Object.assign(
-                            DEFAULT_TASK_SETTINGS
-                        );
+                        const taskSettings = this.snippetor.createNewTaskCfg('');
                         this.createTaskRow(list, taskSettings);
                         this.cfg.taskSettings.push(taskSettings);
                     })

@@ -1,10 +1,12 @@
 import {
     App,
     ButtonComponent,
-    ExtraButtonComponent,
+    ButtonComponent,
+    Notice,
     PluginSettingTab,
     Setting,
 } from "obsidian";
+import { generateSlug } from "random-word-slugs";
 import { SnippetConfig, SnippetorSettings, TaskSnippetConfig } from "./@types";
 import SnippetorPlugin from "./main";
 import { openCreateCheckboxModal } from "./snippetor-CreateCheckboxesModal";
@@ -55,7 +57,6 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 );
                 d.setValue(DEFAULT_TASK_SNIPPET_SETTINGS.type);
                 d.onChange((v) => {
-                    console.log("Which type %o", v);
                     selector.type = v;
                 });
             })
@@ -64,7 +65,6 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                     .setTooltip("Create a Snippet")
                     .setButtonText("+")
                     .onClick(async () => {
-                        console.log("Create new snippet");
                         await this.openModal(selector.type, null);
                     })
             );
@@ -78,13 +78,25 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             new Setting(this.existingEl)
                 .setName(snippet.name)
                 .setDesc(this.getDescription(snippet.type))
-                .addExtraButton((b: ExtraButtonComponent) =>
+                .addButton((b: ButtonComponent) =>
                     b
                         .setIcon("pencil")
                         .setTooltip("Edit this Snippet")
                         .onClick(async () => {
-                            console.log("Editing snippet %o", snippet);
                             await this.openModal(snippet.type, snippet);
+                        })
+                )
+                .addButton((b: ButtonComponent) =>
+                    b
+                        .setIcon("duplicate-glyph")
+                        .setTooltip("Copy this Snippet")
+                        .onClick(async () => {
+                            const copy = JSON.parse(JSON.stringify(snippet));
+                            copy.name = generateSlug(2);
+                            new Notice(
+                                `Copied snippet '${snippet.name}' to '${copy.name}'`
+                            );
+                            await this.openModal(snippet.type, copy);
                         })
                 )
                 .addButton((b: ButtonComponent) =>
@@ -92,7 +104,6 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                         .setIcon("trash")
                         .setTooltip("Delete this Snippet")
                         .onClick(async () => {
-                            console.log("Delete %o", snippet);
                             await this.plugin.removeSnippet(snippet);
                             this.listExistingSnippets();
                         })

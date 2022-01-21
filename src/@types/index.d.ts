@@ -26,3 +26,26 @@ export interface ConstructedElements {
     items: HTMLLIElement[];
     data: HTMLInputElement[];
 }
+
+declare module "obsidian" {
+    interface App {
+        customCss: {
+            snippets: string[];
+            getSnippetPath(file?: string): string;
+        };
+        plugins: {
+            enabledPlugins: Set<string>;
+            plugins: {
+                [id: string]: any;
+                "obsidian-task-collector"?: {
+                    taskCollector?: {
+                        settings?: {
+                            supportCanceledTasks: boolean;
+                            incompleteTaskValues: string;
+                        };
+                    };
+                };
+            };
+        };
+    }
+}

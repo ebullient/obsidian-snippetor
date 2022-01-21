@@ -1,12 +1,6 @@
 import { addIcon, Plugin } from "obsidian";
 import { SnippetConfig, SnippetorSettings } from "./@types";
-import {
-    DEFAULT_SETTINGS,
-    SAVE_ICON,
-    SAVE,
-    MAGIC_WAND,
-    MAKE_IT_SO,
-} from "./snippetor-Defaults";
+import { DEFAULT_SETTINGS, MAGIC_WAND, MAKE_IT_SO } from "./snippetor-Defaults";
 import { SnippetorSettingsTab } from "./snippetor-SettingsTab";
 import { Snippetor as Snippetor } from "./snippetor-Snippetor";
 
@@ -22,7 +16,6 @@ export class SnippetorPlugin extends Plugin {
             this.manifest.version,
             this.settings
         );
-        addIcon(SAVE_ICON, SAVE);
         addIcon(MAKE_IT_SO, MAGIC_WAND);
         this.addSettingTab(new SnippetorSettingsTab(this.app, this));
     }
