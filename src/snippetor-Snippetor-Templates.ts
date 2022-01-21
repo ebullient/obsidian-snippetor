@@ -25,6 +25,7 @@ input[type=checkbox]:checked {
     border-radius: 2px;
     margin-top: 2px;
     margin-bottom: 2px;
+    position:relative;
 }
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox:checked::before,
 .markdown-preview-view input.task-list-item-checkbox:checked::before {
