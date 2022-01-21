@@ -1,7 +1,6 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from 'builtin-modules';
-import copy from 'esbuild-copy-plugin';
 import {sassPlugin} from 'esbuild-sass-plugin'
 
 const banner = `/*
@@ -28,13 +27,5 @@ esbuild.build({
     outdir: './build',
     plugins: [
         sassPlugin()
-    //     copy({
-    //         from: './manifest.json',
-    //         to: './manifest.json'
-    //     }),
-    //     copy({
-    //         from: './README.md',
-    //         to: './README.md'
-    //     }),
     ]
 }).catch(() => process.exit(1));
