@@ -7,6 +7,7 @@ import { generateSlug } from "random-word-slugs";
 import randomColor from "randomcolor";
 
 export class Snippetor {
+
     constructor(private app: App) {
         Eta.configure({
             cache: true, // Make Eta cache templates
@@ -86,7 +87,7 @@ export class Snippetor {
         if (this.app.customCss.snippets.includes(fileName)) {
             update = this.app.vault.adapter.write(path, snippet as string).then(
                 () => {
-                    new Notice("Snippet updated successfully.");
+                    new Notice(`Updated ${fileName}`);
                 },
                 (reason) => {
                     new Notice(
@@ -98,7 +99,7 @@ export class Snippetor {
         } else {
             update = this.app.vault.create(path, snippet as string).then(
                 () => {
-                    new Notice("Snippet created successfully.");
+                    new Notice(`Created ${fileName}`);
                 },
                 (reason) => {
                     new Notice(
@@ -108,11 +109,27 @@ export class Snippetor {
                 }
             );
         }
-        this.app.customCss.readCssFolders(); // refresh snippets
-        return update.then();
+        return update.then(() => this.app.customCss.readCssFolders()); // refresh snippets
     }
 
     isTaskSnippetConfig(cfg: SnippetConfig): cfg is TaskSnippetConfig {
         return cfg.type === DEFAULT_TASK_SNIPPET_SETTINGS.type;
+    }
+
+    deleteSnippet(cfg: SnippetConfig): Promise<void> {
+        const fileName = cfg.type + "-" + cfg.name;
+        const path = this.app.customCss.getSnippetPath(fileName);
+
+        return this.app.vault.adapter.remove(path).then(
+            () => {
+                new Notice(`Deleted ${fileName}`);
+            },
+            (reason) => {
+                new Notice(
+                    "Snippet deletion failed. Check console for details."
+                );
+                console.error("Snippet creation failed: %o", reason);
+            }
+        );
     }
 }
