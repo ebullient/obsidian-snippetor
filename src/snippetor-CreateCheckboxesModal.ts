@@ -55,7 +55,7 @@ class CreateCheckboxesModal extends Modal {
                 t.taskColorDark = t.taskColorLight;
             }
         });
-        this.orig = this.cfg;
+        this.orig = JSON.parse(JSON.stringify(this.cfg)); // save original
         this.id = 0;
         this.elements = {
             tasks: [],
