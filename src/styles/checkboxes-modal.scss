@@ -21,13 +21,19 @@
     display: block;
   }
 
+  .snippetor-checkboxes {
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+  }
+
   ul li {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     line-height: 2em;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-bottom: 5px;
+    position: relative;
 
     button {
       margin-top: 2px;
@@ -37,17 +43,17 @@
       font-weight: bold;
     }
     .snippetor-heading.snippetor-settings {
-      margin-top: 4px;
+      height: 30px;
     }
 
     .snippetor-preview {
+      padding: 5px 0;
+      align-self: flex-start;
       display: flex;
       align-items: center;
       pointer-events: none;
       border-right: 1px solid var(--interactive-accent);
       border-radius: 4px;
-      margin-right: 6px;
-      margin-top: 1px;
 
       .example {
         display: inline-block;
@@ -59,9 +65,12 @@
     }
 
     .snippetor-settings {
-      display: flex;
-      align-items: center;
+      padding: 5px;
       flex-grow: 2;
+      display: flex;
+      flex-flow: column wrap;
+      align-items: stretch;
+      justify-content: flex-start;
 
       input,
       .color-sync {
@@ -72,17 +81,52 @@
         font-family: var(--font-monospace);
         padding: 0 8px;
         text-align: center;
-        text-decoration: dashed;
+      }
+
+      .snippetor-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        background-color: var(--background-primary);
+        color: var(--text-normal);
+        border-radius: 2px;
       }
 
       .snippetor-group {
-        vertical-align: middle;
+        display: inline-flex;
+        flex-wrap: nowrap;
+        align-items: center;
         padding-right: 6px;
+      }
+
+      .snippetor-row.background {
+        padding-left: 40px;
       }
     }
 
-    .setting-editor-extra-setting-button {
-      margin-top: 8px;
+    .snippetor-li-actions {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: stretch;
+      background-color: var(--background-primary);
+
+      .snippetor-extra-show svg {
+        transform: rotate(180deg);
+      }
+    }
+
+    .read-mode-heading {
+      padding: 0 6px;
+    }
+
+    .setting-editor-extra-setting-button.no-padding {
+      color: unset;
+      margin: 0 2px;
+    }
+
+    .setting-editor-extra-setting-button:not(.no-padding) {
+      margin-top: 10px;
     }
 
     .theme-toggle {
@@ -124,8 +168,8 @@
       position: absolute;
       text-align: center;
       font-weight: 500;
-      line-height: 14px;
-      font-size: 14px;
+      line-height: var(--snippetor-font-size);
+      font-size: var(--snippetor-font-size);
       left: 1px;
       right: 1px;
       color: attr(color);
@@ -137,5 +181,10 @@
       background-color: var(--interactive-accent-hover);
       border-color: var(--text-on-accent) !important;
     }
+  }
+
+  // override default theme (strikethrough done on an element for testing)
+  ul > li.task-list-item.is-checked {
+    text-decoration: none;
   }
 }

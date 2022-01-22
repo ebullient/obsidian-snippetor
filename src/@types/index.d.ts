@@ -18,8 +18,16 @@ export interface TaskSettings {
     reader?: string;
     taskColorLight?: string;
     taskColorDark?: string;
+    bgColorLight?: string;
+    bgColorDark?: string;
     applyTextColor?: boolean;
-    strkethrough?: boolean;
+    applyTextBgColor?: boolean;
+    strikethrough?: boolean;
+    hideBorder?: boolean;
+    fontSize?: number;
+    cache?: {
+        expanded?: boolean;
+    };
 }
 
 export interface ConstructedElements {
@@ -27,6 +35,9 @@ export interface ConstructedElements {
     items: HTMLLIElement[];
     data: HTMLInputElement[];
     list?: HTMLUListElement;
+    canvas?: HTMLCanvasElement;
+    defaultColorSource?: HTMLElement;
+    defaultFontSize?: number;
 }
 
 declare module "obsidian" {

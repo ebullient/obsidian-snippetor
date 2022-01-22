@@ -71,38 +71,46 @@ input[type=checkbox]:checked {
    let ts = it.cfg.taskSettings[i]; %>
 /* '<%~ ts.data %>' for completed task ('- [<%~ ts.data %>]') */
 .theme-dark {
-    --snippetor-checkbox-<%= i %>: <%= ts.taskColorDark %>;
+    --snippetor-checkbox-<%= i %>: <% tR += ts.taskColorDark ? ts.taskColorDark : "inherit" %>;
+    --snippetor-checkbox-bg-<%= i %>: <% tR += ts.bgColorDark ? ts.bgColorDark : "transparent" %>;
 }
 .theme-dark .print,
 .theme-light {
-    --snippetor-checkbox-<%= i %>: <%= ts.taskColorLight %>;
+    --snippetor-checkbox-<%= i %>: <% tR += ts.taskColorLight ? ts.taskColorLight : "inherit" %>;
+    --snippetor-checkbox-bg-<%= i %>: <% tR += ts.bgColorLight ? ts.bgColorLight : "transparent" %>;
 }
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"]::before,
 .markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > input.task-list-item-checkbox:checked::before,
 .markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > p > input.task-list-item-checkbox:checked::before {
-<% if (ts.reader) { %>
-    content: "<%= ts.reader %>";
-<% } else { %>
-    content: "<%~ ts.data %>";
-<% } %>
+    content: '<% tR += ts.reader ? ts.reader : ts.data %>';
     color: var(--snippetor-checkbox-<%= i %>);
 }
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"],
 .markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > input.task-list-item-checkbox,
 .markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > p > input.task-list-item-checkbox {
-    border-color: var(--snippetor-checkbox-<%= i %>);
     color: var(--snippetor-checkbox-<%= i %>);
+<% if (ts.hideBorder) { %>
+    border-color: transparent;
+<% } else { %>
+    border-color: var(--snippetor-checkbox-<%= i %>);
+<% } %>
+<% if (ts.applyTextBgColor) { %>
+    background-color: var(--snippetor-checkbox-bg-<%= i %>);
+<% } %>
 }
-<% if (ts.strkethrough || ts.applyTextColor) { %>
+<% if (ts.strkethrough || ts.applyTextColor || ts.applyTextBgColor) { %>
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"],
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"] + span,
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"] + span + span,
 .markdown-preview-view ul > li[data-task="<%~ ts.data %>"].task-list-item.is-checked {
-<% if (ts.strkethrough) { %>
+<% if (ts.strikethrough) { %>
     text-decoration: line-through;
 <% } %>
 <% if (ts.applyTextColor) { %>
     color: var(--snippetor-checkbox-<%= i %>);
+<% } %>
+<% if (ts.applyTextBgColor) { %>
+    background-color: var(--snippetor-checkbox-bg-<%= i %>);
 <% } %>
 }
 <% } %>

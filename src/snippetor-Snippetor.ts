@@ -57,6 +57,9 @@ export class Snippetor {
             taskColorDark: randomColor({
                 luminosity: "light",
             }),
+            cache: {
+                expanded: false
+            }
         };
     }
 

@@ -42,8 +42,9 @@ The configuration for custom checkboxes are presented in the format of a task li
 - The first text field allows you to specify the value you will use when completing the task. `x` is the default. 
 - The color picker allows you to change the foreground color for the checkbox.
 - A small moon phase icon is next. There is a toggle that has the same icon. The toggle alows you to switcth the settings panel between light and dark modes. The icon next to the picker allows you to copy the color from the other mode. For example: if you start in dark mode, and choose a bright red for x, you can use the toggle to flip to light mode, use this small icon to copy that bright red, and then adjust the color so that your task looks good in light mode, too.
+- There is an icon at the end of the row that will expand to show... even more settings! All of these should explain themselves if you mess with them for a bit.
 
-There are additional checkboxes and settings that should be self-explanatory. Use the `+` and `trashcan` buttons to add and remove custom tasks from the list.
+Use the `+` and `trashcan` buttons to add and remove custom tasks from the list.
 
 When your tasks are configured the way you want them (don't panic, your settings will be saved, you can tweak this any time you like), use the "magic wand" button next to the file name to create your snippet. 
 
@@ -60,4 +61,3 @@ Some themes do a lot of customization for task lists. The way Snippetor works, y
 - [My Snippets](https://github.com/chetachiezikeuzor/MySnippets-Plugin) -- Chetachi's plugin is an excellent source (and a complement to this)
 - [Fantasy Calendar](https://github.com/valentine195/obsidian-fantasy-calendar) as a plugin with complicated modal settings
 - [Style Settings](https://github.com/mgmeyers/obsidian-style-settings/) for the color picker and dynamic style setting
-- [Font Awesome: Magic Wand](https://fontawesome.com/v5.15/icons/magic?style=solid) ([License](https://fontawesome.com/license))
