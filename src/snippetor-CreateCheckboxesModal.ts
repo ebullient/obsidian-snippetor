@@ -1,6 +1,7 @@
 import {
     App,
     ButtonComponent,
+    ExtraButtonComponent,
     Modal,
     Setting,
     ToggleComponent,
@@ -229,10 +230,10 @@ class CreateCheckboxesModal extends Modal {
         const settings = li.createSpan("snippetor-settings");
         this.showBasicSettings(taskSettings, li, checkbox, settings);
 
-        // Twistie (moar settings!)
+
 
         // Remove
-        new ButtonComponent(li)
+        new ExtraButtonComponent(li)
             .setIcon("trash")
             .setTooltip("Delete this Task")
             .onClick(async () => {
@@ -276,47 +277,43 @@ class CreateCheckboxesModal extends Modal {
 
         // the checkbox / symbol color
         let taskColor: HTMLInputElement;
+        const initial = this.getThemeColor(taskSettings)
         if (this.cfg.hideColorPicker) {
             taskColor = settings.createEl("input", {
                 cls: "snippetor-data-color-txt",
                 attr: {
                     name: "color-txt-" + i,
                     type: "text",
-                    value: this.getThemeColor(taskSettings),
-                    title: "Foreground color for the task",
+                    size: 8,
+                    value: initial,
+                    title: "Foreground color for the task: " + initial,
                 },
             });
-            taskColor.addEventListener(
-                "input",
-                () => {
-                    this.setThemeColor(taskSettings, taskColor.value);
-                    this.applyColor(taskSettings, li, checkbox);
-                },
-                false
-            );
         } else {
             taskColor = settings.createEl("input", {
                 cls: "snippetor-data-color",
                 attr: {
                     name: "color-" + i,
                     type: "color",
-                    value: this.getThemeColor(taskSettings),
-                    title: "Foreground color for the task",
+                    value: initial,
+                    title: "Foreground color for the task: " + initial,
                 },
             });
-            taskColor.addEventListener(
-                "input",
-                () => {
-                    this.setThemeColor(taskSettings, taskColor.value);
-                    this.applyColor(taskSettings, li, checkbox);
-                },
-                false
-            );
         }
+        taskColor.addEventListener(
+            "input",
+            () => {
+                this.setThemeColor(taskSettings, taskColor.value);
+                this.applyColor(taskSettings, li, checkbox);
+                taskColor.title = "Foreground color for the task: " + taskColor.value;
+            },
+            false
+        );
 
         // sync light/dark mode
         const colorSync = settings.createSpan({
             text: "🌗",
+            cls: "color-sync",
             attr: {
                 name: "color-sync-" + i,
                 "aria-label": `Copy value from ${

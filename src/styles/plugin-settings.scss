@@ -1,4 +1,9 @@
 .snippetor-plugin-settings {
+  .snippetor-create-snippet {
+    select.dropdown {
+      margin-right: 12px;
+    }
+  }
   .coffee {
     width: 60%;
     color: var(--text-normal);

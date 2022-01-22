@@ -26,7 +26,8 @@
     align-items: flex-start;
     line-height: 2em;
     justify-content: space-between;
-    margin-bottom: 3px;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
 
     button {
       margin-top: 2px;
@@ -46,7 +47,7 @@
       border-right: 1px solid var(--interactive-accent);
       border-radius: 4px;
       margin-right: 6px;
-      margin-top: 4px;
+      margin-top: 1px;
 
       .example {
         display: inline-block;
@@ -62,17 +63,26 @@
       align-items: center;
       flex-grow: 2;
 
+      input,
+      .color-sync {
+        margin-right: 6px;
+      }
+
       input.snippetor-data-task {
         font-family: var(--font-monospace);
         padding: 0 8px;
         text-align: center;
         text-decoration: dashed;
       }
+
+      .snippetor-group {
+        vertical-align: middle;
+        padding-right: 6px;
+      }
     }
 
-    .snippetor-group {
-      vertical-align: middle;
-      padding-left: 6px;
+    .setting-editor-extra-setting-button {
+      margin-top: 8px;
     }
 
     .theme-toggle {

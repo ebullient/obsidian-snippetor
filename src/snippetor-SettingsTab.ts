@@ -1,6 +1,7 @@
 import {
     App,
     ButtonComponent,
+    ExtraButtonComponent,
     Notice,
     PluginSettingTab,
     Setting,
@@ -62,7 +63,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             .addButton((button: ButtonComponent) =>
                 button
                     .setTooltip("Create a Snippet")
-                    .setButtonText("+")
+                    .setIcon("plus-with-circle")
                     .onClick(async () => {
                         await this.openModal(selector.type, null);
                     })
@@ -77,7 +78,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             new Setting(this.existingEl)
                 .setName(snippet.name)
                 .setDesc(this.getDescription(snippet.type))
-                .addButton((b: ButtonComponent) =>
+                .addExtraButton((b: ExtraButtonComponent) =>
                     b
                         .setIcon("pencil")
                         .setTooltip("Edit this Snippet")
@@ -85,7 +86,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                             await this.openModal(snippet.type, snippet);
                         })
                 )
-                .addButton((b: ButtonComponent) =>
+                .addExtraButton((b: ExtraButtonComponent) =>
                     b
                         .setIcon("duplicate-glyph")
                         .setTooltip("Copy this Snippet")
@@ -98,7 +99,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                             await this.openModal(snippet.type, copy);
                         })
                 )
-                .addButton((b: ButtonComponent) =>
+                .addExtraButton((b: ExtraButtonComponent) =>
                     b
                         .setIcon("trash")
                         .setTooltip("Delete this Snippet")
