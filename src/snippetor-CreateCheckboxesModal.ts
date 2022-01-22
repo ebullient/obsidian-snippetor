@@ -5,7 +5,6 @@ import {
     Setting,
     ToggleComponent,
 } from "obsidian";
-import { MAKE_IT_SO } from "./snippetor-Defaults";
 import type {
     TaskSnippetConfig,
     TaskSettings,
@@ -48,13 +47,6 @@ class CreateCheckboxesModal extends Modal {
         this.containerEl.id = "snippetor-checkboxes-modal";
         this.cfg = taskSnippetCfg || snippetor.createNewTaskSnippetCfg();
 
-        this.cfg.taskSettings.forEach((t) => {
-            if (t.taskColorDark && !t.taskColorLight) {
-                t.taskColorLight = t.taskColorDark;
-            } else if (t.taskColorLight && !t.taskColorDark) {
-                t.taskColorDark = t.taskColorLight;
-            }
-        });
         this.orig = JSON.parse(JSON.stringify(this.cfg)); // save original
         this.id = 0;
         this.elements = {
@@ -86,7 +78,7 @@ class CreateCheckboxesModal extends Modal {
             })
             .addButton((button) =>
                 button
-                    .setIcon(MAKE_IT_SO)
+                    .setIcon("wand-glyph")
                     .setClass("generate-css")
                     .setTooltip("Generate CSS Snippet")
                     .onClick(async () => {
@@ -140,6 +132,21 @@ class CreateCheckboxesModal extends Modal {
                     this.elements.tasks.forEach((t) =>
                         this.applyCommonSettingsToCheckbox(t)
                     );
+                });
+            });
+
+        new Setting(content)
+            .setName("Hide the color picker")
+            .setDesc(
+                "If you prefer working with the raw values (Hex, RGB, CSS variables, etc), enable this to hide the color picker and show a text box instead."
+            )
+            .addToggle((t) => {
+                t.setValue(this.cfg.hideColorPicker).onChange((v) => {
+                    const redraw = v != this.cfg.hideColorPicker;
+                    this.cfg.hideColorPicker = v;
+                    if (redraw) {
+                        this.showTaskRows();
+                    }
                 });
             });
     }
@@ -268,23 +275,44 @@ class CreateCheckboxesModal extends Modal {
         );
 
         // the checkbox / symbol color
-        const taskColor = settings.createEl("input", {
-            cls: "snippetor-data-color",
-            attr: {
-                name: "color-" + i,
-                type: "color",
-                value: this.getThemeColor(taskSettings),
-                title: "Foreground color for the task",
-            },
-        });
-        taskColor.addEventListener(
-            "input",
-            () => {
-                this.setThemeColor(taskSettings, taskColor.value);
-                this.applyColor(taskSettings, li, checkbox);
-            },
-            false
-        );
+        let taskColor: HTMLInputElement;
+        if (this.cfg.hideColorPicker) {
+            taskColor = settings.createEl("input", {
+                cls: "snippetor-data-color-txt",
+                attr: {
+                    name: "color-txt-" + i,
+                    type: "text",
+                    value: this.getThemeColor(taskSettings),
+                    title: "Foreground color for the task",
+                },
+            });
+            taskColor.addEventListener(
+                "input",
+                () => {
+                    this.setThemeColor(taskSettings, taskColor.value);
+                    this.applyColor(taskSettings, li, checkbox);
+                },
+                false
+            );
+        } else {
+            taskColor = settings.createEl("input", {
+                cls: "snippetor-data-color",
+                attr: {
+                    name: "color-" + i,
+                    type: "color",
+                    value: this.getThemeColor(taskSettings),
+                    title: "Foreground color for the task",
+                },
+            });
+            taskColor.addEventListener(
+                "input",
+                () => {
+                    this.setThemeColor(taskSettings, taskColor.value);
+                    this.applyColor(taskSettings, li, checkbox);
+                },
+                false
+            );
+        }
 
         // sync light/dark mode
         const colorSync = settings.createSpan({
@@ -312,7 +340,8 @@ class CreateCheckboxesModal extends Modal {
         );
 
         // should the color apply to the text, too?
-        const colorText = settings.createEl("input", {
+        const groupColorText = settings.createSpan("snippetor-group");
+        const colorText = groupColorText.createEl("input", {
             attr: {
                 name: "text-color-" + i,
                 type: "checkbox",
@@ -330,13 +359,14 @@ class CreateCheckboxesModal extends Modal {
             },
             false
         );
-        settings.createEl("label", {
+        groupColorText.createEl("label", {
             text: "apply color to text",
             attr: { for: "text-color-" + i },
         });
 
         // strikethrough?
-        const strikethrough = settings.createEl("input", {
+        const groupStrikethrough = settings.createSpan("snippetor-group");
+        const strikethrough = groupStrikethrough.createEl("input", {
             attr: {
                 name: "strikethrough-" + i,
                 type: "checkbox",
@@ -353,7 +383,7 @@ class CreateCheckboxesModal extends Modal {
             },
             false
         );
-        settings.createEl("label", {
+        groupStrikethrough.createEl("label", {
             text: "strikethrough",
             attr: { for: "strikethrough-" + i },
         });

@@ -8,8 +8,9 @@ export interface SnippetConfig {
 }
 
 export interface TaskSnippetConfig extends SnippetConfig {
-    clearThemeBackground: boolean;
     taskSettings: TaskSettings[];
+    hideColorPicker?: boolean;
+    clearThemeBackground?: boolean;
 }
 
 export interface TaskSettings {
