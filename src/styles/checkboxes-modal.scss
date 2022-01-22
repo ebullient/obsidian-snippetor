@@ -26,7 +26,7 @@
     color: var(--text-normal);
   }
 
-  ul li {
+  ul > li {
     display: flex;
     align-items: stretch;
     line-height: 2em;
@@ -41,9 +41,6 @@
 
     .snippetor-heading {
       font-weight: bold;
-    }
-    .snippetor-heading.snippetor-settings {
-      height: 30px;
     }
 
     .snippetor-preview {
@@ -143,6 +140,14 @@
       content: "🌗";
       font-size: 15px;
       background-color: transparent;
+    }
+  }
+
+  ul > li.header {
+    align-items: center;
+
+    .snippetor-li-actions {
+      padding-right: 8px;
     }
   }
 

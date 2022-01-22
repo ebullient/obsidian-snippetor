@@ -106,13 +106,7 @@ class CreateCheckboxesModal extends Modal {
             );
 
         const h3 = content.createEl("h3", {
-            cls: "snippetor-reset",
             text: "Custom Task Values",
-        });
-        const reset = h3.createSpan("setting-item-control");
-        new ButtonComponent(reset).setIcon("reset").onClick(() => {
-            this.cfg = JSON.parse(JSON.stringify(this.snapshot)); // reset
-            this.showTaskRows();
         });
 
         this.elements.list = content.createEl("ul");
@@ -189,7 +183,7 @@ class CreateCheckboxesModal extends Modal {
 
     createHeaderRow(callback: () => void): void {
         const heading = this.elements.list.createEl("li", {
-            cls: "task-list-item",
+            cls: "task-list-item header",
         });
         const preview = heading.createSpan("snippetor-preview");
         const checkbox = preview.createEl("input", {
@@ -223,6 +217,15 @@ class CreateCheckboxesModal extends Modal {
                 return callback();
             })
             .toggleEl.addClass("theme-toggle");
+
+        const actions = heading.createSpan("snippetor-li-actions");
+        new ExtraButtonComponent(actions)
+            .setIcon("reset")
+            .onClick(() => {
+                this.cfg = JSON.parse(JSON.stringify(this.snapshot)); // reset
+                this.showTaskRows();
+            })
+            .extraSettingsEl.addClass("no-padding");
     }
 
     createTaskRow(taskSettings: TaskSettings): void {
