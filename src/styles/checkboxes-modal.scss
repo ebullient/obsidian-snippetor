@@ -96,8 +96,9 @@
         padding-right: 6px;
       }
 
-      .snippetor-row.background {
-        padding-left: 40px;
+      .background-heading,
+      .read-mode-heading {
+        padding: 0 6px;
       }
     }
 
@@ -111,10 +112,6 @@
       .snippetor-extra-show svg {
         transform: rotate(180deg);
       }
-    }
-
-    .read-mode-heading {
-      padding: 0 6px;
     }
 
     .setting-editor-extra-setting-button.no-padding {

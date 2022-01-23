@@ -510,11 +510,12 @@ class CreateCheckboxesModal extends Modal {
         parent: HTMLSpanElement,
         i: number
     ): void {
-        const settings = parent.createSpan("snippetor-row background");
+        const settings = parent.createSpan("snippetor-row");
 
         const colorGroup = settings.createSpan("snippetor-group");
         colorGroup.createDiv({
             text: "Background: ",
+            cls: "background-heading",
         });
 
         // the checkbox / symbol color
