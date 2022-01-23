@@ -512,9 +512,13 @@ class CreateCheckboxesModal extends Modal {
     ): void {
         const settings = parent.createSpan("snippetor-row background");
 
+        const colorGroup = settings.createSpan("snippetor-group");
+        colorGroup.createDiv({
+            text: "Background: ",
+        });
+
         // the checkbox / symbol color
         const initial = this.getThemeBackgroundColor(taskSettings);
-        const colorGroup = settings.createSpan("snippetor-group");
         const taskColor = colorGroup.createEl("input", {
             cls: "snippetor-data-color-txt",
             attr: {
@@ -793,10 +797,13 @@ class CreateCheckboxesModal extends Modal {
     }
 
     getThemeBackgroundColor(taskSettings: TaskSettings): string {
-        return taskSettings.bgColorLight === undefined
+        if (this.isLightMode()) {
+            return taskSettings.bgColorLight === undefined
+                ? this.getBackgroundColor()
+                : taskSettings.bgColorLight;
+        }
+        return taskSettings.bgColorDark === undefined
             ? this.getBackgroundColor()
-            : this.isLightMode()
-            ? taskSettings.bgColorLight
             : taskSettings.bgColorDark;
     }
 
