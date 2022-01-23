@@ -1,10 +1,5 @@
-.theme-light #snippetor-checkboxes-modal ul li:hover {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-.theme-dark #snippetor-checkboxes-modal ul li:hover {
-  background-color: rgba(255, 255, 255, 0.02);
-}
 #snippetor-checkboxes-modal {
+
   h3.snippetor-reset {
     display: flex;
     .setting-item-control {
@@ -37,10 +32,6 @@
 
     button {
       margin-top: 2px;
-    }
-
-    .snippetor-heading {
-      font-weight: bold;
     }
 
     .snippetor-preview {
@@ -78,6 +69,16 @@
         font-family: var(--font-monospace);
         padding: 0 8px;
         text-align: center;
+        position: relative;
+      }
+
+      input.snippetor-data-task.data-value-required {
+        border-color: var(--text-accent);
+      }
+
+      input.snippetor-data-task.data-value-error {
+        border-color: var(--text-error);
+        text-decoration: underline;
       }
 
       .snippetor-row {
@@ -109,8 +110,11 @@
       justify-content: stretch;
       background-color: var(--background-primary);
 
-      .snippetor-extra-show svg {
-        transform: rotate(180deg);
+      .toggle-extra:not(.is-active) {
+        display: none;
+      }
+      .toggle-extra.is-active {
+        display: inherit;
       }
     }
 
@@ -143,6 +147,11 @@
   ul > li.header {
     align-items: center;
 
+    .example,
+    .snippetor-settings {
+      font-weight: bold;
+    }
+
     .snippetor-li-actions {
       padding-right: 8px;
     }
@@ -155,7 +164,14 @@
       padding-left: 3px;
       text-indent: unset; /** override base theme for preview */
     }
-    input.task-list-item-checkbox {
+    ul > li.task-list-item {
+      margin-right: 1px;
+    }
+    ul > li.task-list-item:hover {
+      margin-right: 0px;
+      border-right: 1px solid var(--interactive-accent);
+    }
+    input.task-list-item-checkbox[data] {
       -webkit-appearance: none;
       box-sizing: border-box;
       cursor: pointer;
@@ -167,7 +183,8 @@
       bottom: 0;
       left: 0;
     }
-    input.task-list-item-checkbox:checked::before {
+    input.task-list-item-checkbox[data]:not(:checked)::before,
+    input.task-list-item-checkbox[data]:checked::before {
       font-family: var(--font-monospace);
       position: absolute;
       text-align: center;
@@ -176,7 +193,7 @@
       font-size: var(--snippetor-font-size);
       left: 1px;
       right: 1px;
-      color: attr(color);
+      color: var(--snippetor-fg-color);
       content: attr(data);
     }
     ul > li.task-list-item:not(.live-preview) {
@@ -185,12 +202,6 @@
         top: 10px;
         left: -21px;
       }
-    }
-    input.task-list-item-checkbox:checked:hover,
-    p > input.task-list-item-checkbox:checked:hover {
-      color: var(--text-on-accent) !important;
-      background-color: var(--interactive-accent-hover);
-      border-color: var(--text-on-accent) !important;
     }
   }
 

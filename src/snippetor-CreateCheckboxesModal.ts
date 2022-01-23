@@ -131,16 +131,15 @@ class CreateCheckboxesModal extends Modal {
         });
 
         new Setting(content)
-            .setName("Suppress theme-defined background color")
-            .setDesc(
-                "Does theme styling show around your selected tasks? Your theme may provide a way to disable task styling (preferred). This might also work."
-            )
+            .setName("Define style for incomplete tasks")
+            .setDesc("Add a special row to style incomplete (unchecked) items.")
             .addToggle((t) => {
-                t.setValue(this.cfg.clearThemeBackground).onChange((v) => {
-                    this.cfg.clearThemeBackground = v;
-                    this.elements.tasks.forEach((t) =>
-                        this.applyCommonSettingsToCheckbox(t)
-                    );
+                t.setValue(this.cfg.styleUncheckedTask).onChange((v) => {
+                    const redraw = v != this.cfg.styleUncheckedTask;
+                    this.cfg.styleUncheckedTask = v;
+                    if (redraw) {
+                        this.showTaskRows();
+                    }
                 });
             });
 
@@ -158,6 +157,20 @@ class CreateCheckboxesModal extends Modal {
                     }
                 });
             });
+
+        new Setting(content)
+            .setName("Suppress theme-defined background color")
+            .setDesc(
+                "Does theme styling show around your selected tasks? Your theme may provide a way to disable task styling (preferred). This might also work."
+            )
+            .addToggle((t) => {
+                t.setValue(this.cfg.clearThemeBackground).onChange((v) => {
+                    this.cfg.clearThemeBackground = v;
+                    this.elements.tasks.forEach((t) =>
+                        this.applyCommonSettingsToCheckbox(t)
+                    );
+                });
+            });
     }
 
     onClose(): void {
@@ -172,6 +185,14 @@ class CreateCheckboxesModal extends Modal {
 
         // Callback to re-draw the whole thing if light/dark mode is toggled.
         this.createHeaderRow(() => this.showTaskRows());
+
+        if (this.cfg.styleUncheckedTask) {
+            if (this.cfg.uncheckedTask === undefined) {
+                this.cfg.uncheckedTask = this.snippetor.createNewTaskCfg(" ");
+                this.cfg.uncheckedTask.unchecked = true;
+            }
+            this.createTaskRow(this.cfg.uncheckedTask, true);
+        }
 
         this.cfg.taskSettings.forEach((ts) => {
             if (ts.cache === undefined) {
@@ -195,14 +216,19 @@ class CreateCheckboxesModal extends Modal {
         this.elements.defaultFontSize = Math.ceil(
             Number(getComputedStyle(checkbox).fontSize.replace("px", ""))
         );
+        if (this.cfg.styleUncheckedTask) {
+            // make the preview checkbox invisible
+            checkbox.style.borderColor = "transparent";
+            checkbox.style.backgroundColor = "inherit";
+        }
 
         preview.createSpan({
             text: "Preview",
-            cls: "example snippetor-heading",
+            cls: "example",
         });
         heading.createSpan({
             text: "Settings",
-            cls: "snippetor-settings snippetor-heading",
+            cls: "snippetor-settings",
         });
         new ToggleComponent(heading)
             .setValue(this.isLightMode())
@@ -228,7 +254,7 @@ class CreateCheckboxesModal extends Modal {
             .extraSettingsEl.addClass("no-padding");
     }
 
-    createTaskRow(taskSettings: TaskSettings): void {
+    createTaskRow(taskSettings: TaskSettings, unchecked?: boolean): void {
         const li = this.elements.list.createEl("li");
 
         this.applySettingsToListItem(taskSettings, li);
@@ -250,20 +276,19 @@ class CreateCheckboxesModal extends Modal {
         // Example: Sample text -- attributes will be updated
         preview.createSpan({ text: "example", cls: "example" });
 
-        // Settings..
+        // Basic settings..
         const settings = li.createDiv("snippetor-settings");
         this.showSettings(taskSettings, li, preview, checkbox, settings);
 
-        // Twistie (moar settings!)
+        // Twistie: toggle display of more settings
         const actions = li.createSpan("snippetor-li-actions");
-        const extra = new ExtraButtonComponent(actions)
-            .setIcon("down-chevron-glyph")
+        const showExtra = new ExtraButtonComponent(actions)
+            .setIcon("enlarge-glyph")
             .setTooltip("Show additional options")
             .onClick(() => {
-                taskSettings.cache.expanded =
-                    taskSettings.cache.expanded === undefined
-                        ? true
-                        : !taskSettings.cache.expanded;
+                taskSettings.cache.expanded = true;
+                showExtra.extraSettingsEl.removeClass("is-active");
+                hideExtra.extraSettingsEl.addClass("is-active");
                 this.showSettings(
                     taskSettings,
                     li,
@@ -271,15 +296,34 @@ class CreateCheckboxesModal extends Modal {
                     checkbox,
                     settings
                 );
-                if (taskSettings.cache.expanded) {
-                    extra.extraSettingsEl.addClass("snippetor-extra-show");
-                } else {
-                    extra.extraSettingsEl.removeClass("snippetor-extra-show");
-                }
             });
+        const hideExtra = new ExtraButtonComponent(actions)
+            .setIcon("compress-glyph")
+            .setTooltip("Show additional options")
+            .onClick(() => {
+                taskSettings.cache.expanded = false;
+                showExtra.extraSettingsEl.addClass("is-active");
+                hideExtra.extraSettingsEl.removeClass("is-active");
+                this.showSettings(
+                    taskSettings,
+                    li,
+                    preview,
+                    checkbox,
+                    settings
+                );
+            });
+        showExtra.extraSettingsEl.addClass("toggle-extra");
+        hideExtra.extraSettingsEl.addClass("toggle-extra");
+        if (taskSettings.cache.expanded) {
+            showExtra.extraSettingsEl.removeClass("is-active");
+            hideExtra.extraSettingsEl.addClass("is-active");
+        } else {
+            showExtra.extraSettingsEl.addClass("is-active");
+            hideExtra.extraSettingsEl.removeClass("is-active");
+        }
 
         // Remove
-        new ExtraButtonComponent(actions)
+        const remove = new ExtraButtonComponent(actions)
             .setIcon("trash")
             .setTooltip("Delete this Task")
             .onClick(async () => {
@@ -287,6 +331,11 @@ class CreateCheckboxesModal extends Modal {
                 this.cfg.taskSettings.remove(taskSettings);
                 this.showTaskRows();
             });
+        // unchecked task can not be removed; hide/disable control to preserve alignment
+        if (taskSettings.unchecked) {
+            remove.extraSettingsEl.style.color = "transparent";
+            remove.extraSettingsEl.style.pointerEvents = "none";
+        }
     }
 
     showSettings(
@@ -298,7 +347,7 @@ class CreateCheckboxesModal extends Modal {
     ): void {
         const i = this.id++;
         settings.empty();
-        this.showBasicSettings(
+        this.showCheckboxSettings(
             taskSettings,
             li,
             previewSpan,
@@ -324,7 +373,7 @@ class CreateCheckboxesModal extends Modal {
         }
     }
 
-    showBasicSettings(
+    showCheckboxSettings(
         taskSettings: TaskSettings,
         li: HTMLLIElement,
         previewSpan: HTMLSpanElement,
@@ -334,29 +383,31 @@ class CreateCheckboxesModal extends Modal {
     ): void {
         const settings = parent.createSpan("snippetor-row");
 
-        // Specify the task character
-        const dataTask = settings.createEl("input", {
-            cls: "snippetor-data-task",
-            attr: {
-                type: "text",
-                name: "task-" + i,
-                size: "1",
-                value: taskSettings.data,
-                title: "Task data",
-            },
-        });
-        this.elements.data.push(dataTask);
-        this.verifyDataValue(dataTask);
-        dataTask.addEventListener(
-            "input",
-            () => {
-                taskSettings.data = dataTask.value;
-                this.applySettingsToListItem(taskSettings, li);
-                this.applySettingsToCheckbox(taskSettings, checkbox);
-                this.verifyDataValue(dataTask);
-            },
-            false
-        );
+        // Input box for the task character: UNLESS unchecked
+        if (!taskSettings.unchecked) {
+            const dataTask = settings.createEl("input", {
+                cls: "snippetor-data-task",
+                attr: {
+                    type: "text",
+                    name: "task-" + i,
+                    size: "1",
+                    value: taskSettings.data,
+                    title: "Task data",
+                },
+            });
+            this.elements.data.push(dataTask);
+            this.verifyDataValue(dataTask);
+            dataTask.addEventListener(
+                "input",
+                () => {
+                    taskSettings.data = dataTask.value;
+                    this.applySettingsToListItem(taskSettings, li);
+                    this.applySettingsToCheckbox(taskSettings, checkbox);
+                    this.verifyDataValue(dataTask);
+                },
+                false
+            );
+        }
 
         // the checkbox / symbol color
         const initial = this.getThemeColor(taskSettings);
@@ -724,12 +775,13 @@ class CreateCheckboxesModal extends Modal {
         checkbox.removeAttribute("data");
         checkbox.style.removeProperty("--snippetor-font-size");
 
-        if (taskSettings.data !== " ") {
-            const data = taskSettings.reader
-                ? taskSettings.reader
-                : taskSettings.data;
+        const data = taskSettings.reader
+            ? taskSettings.reader
+            : taskSettings.data;
+        checkbox.setAttribute("data", data);
+
+        if (!taskSettings.unchecked) {
             checkbox.setAttribute("checked", "");
-            checkbox.setAttribute("data", data);
         }
         if (taskSettings.fontSize) {
             checkbox.style.setProperty(
@@ -840,11 +892,11 @@ class CreateCheckboxesModal extends Modal {
         if (fgColor && fgColor.length > 0) {
             checkbox.style.borderColor = fgColor;
             checkbox.style.color = fgColor;
-            checkbox.setAttribute("color", fgColor);
+            checkbox.style.setProperty("--snippetor-fg-color", fgColor);
         } else {
             checkbox.style.removeProperty("border-color");
             checkbox.style.removeProperty("color");
-            checkbox.removeAttribute("color");
+            checkbox.style.setProperty("--snippetor-fg-color", "inherit");
         }
         if (bgColor && bgColor.length > 0) {
             checkbox.style.backgroundColor = bgColor;
@@ -857,11 +909,16 @@ class CreateCheckboxesModal extends Modal {
     }
 
     verifyDataValue(input: HTMLInputElement) {
-        if (
-            this.cfg.taskSettings.filter((t) => input.value === t.data).length >
-            1
-        ) {
-            input.style.borderColor = "var(--background-modifier-error)";
+        const count = this.cfg.taskSettings.filter(
+            (t) => input.value === t.data
+        ).length;
+        input.removeClass("data-value-error");
+        input.removeAttribute("aria-label");
+        delete input.after;
+        console.log("verifyDataValue: [%s] %o %s", input.value, input, count);
+        if (count > 1) {
+            console.log("verifyDataValue: conflict");
+            input.addClass("data-value-error");
             input.setAttribute(
                 "aria-label",
                 "Another task uses the same value"
@@ -873,10 +930,23 @@ class CreateCheckboxesModal extends Modal {
                 }
             });
         } else {
-            input.style.removeProperty("border-color");
-            input.removeAttribute("aria-label");
             const conflict = input.getAttribute("conflict");
-            if (conflict) {
+            if (input.value === " ") {
+                console.log("verifyDataValue: unchecked item");
+                input.addClass("data-value-error");
+                input.setAttribute(
+                    "aria-label",
+                    "Unchecked tasks are a special case. See additional settings."
+                );
+            } else if (input.value === "") {
+                console.log("verifyDataValue: empty value");
+                input.addClass("data-value-required");
+                input.setAttribute(
+                    "aria-label",
+                    "Specify a task value, e.g. X"
+                );
+            } else if (conflict) {
+                console.log("verifyDataValue: conflict resolved");
                 input.removeAttribute("conflict");
                 this.elements.data.forEach((e) => {
                     if (e.value === conflict) {

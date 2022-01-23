@@ -11,10 +11,13 @@ export interface TaskSnippetConfig extends SnippetConfig {
     taskSettings: TaskSettings[];
     hideColorPicker?: boolean;
     clearThemeBackground?: boolean;
+    styleUncheckedTask?: boolean;
+    uncheckedTask: TaskSettings;
 }
 
 export interface TaskSettings {
     data: string;
+    unchecked?: boolean;
     reader?: string;
     taskColorLight?: string;
     taskColorDark?: string;
