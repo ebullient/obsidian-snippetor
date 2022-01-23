@@ -105,7 +105,7 @@ class CreateCheckboxesModal extends Modal {
                     })
             );
 
-        const h3 = content.createEl("h3", {
+        content.createEl("h3", {
             text: "Custom Task Values",
         });
 

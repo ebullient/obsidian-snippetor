@@ -58,8 +58,8 @@ export class Snippetor {
                 luminosity: "light",
             }),
             cache: {
-                expanded: false
-            }
+                expanded: false,
+            },
         };
     }
 
