@@ -1,6 +1,6 @@
 {
   "name": "obsidian-snippetor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Generate and tweak common snippets",
   "main": "main.js",
   "scripts": {
@@ -44,7 +44,7 @@
   "auto-changelog": {
     "backfillLimit": false,
     "commitLimit": false,
-    "ignoreCommitPattern": "(🔖|🔨|changelog|release|Update README).*"
+    "ignoreCommitPattern": "(🔖|🔨|🧹|changelog|release|Update README).*"
   },
   "dependencies": {
     "eta": "^1.12.3",
