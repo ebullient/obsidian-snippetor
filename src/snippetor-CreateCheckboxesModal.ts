@@ -453,9 +453,9 @@ class CreateCheckboxesModal extends Modal {
             "click",
             () => {
                 if (this.isLightMode()) {
-                    taskColor.value = taskSettings.taskColorLight;
-                } else {
                     taskColor.value = taskSettings.taskColorDark;
+                } else {
+                    taskColor.value = taskSettings.taskColorLight;
                 }
                 this.setThemeColor(taskSettings, taskColor.value);
                 this.applyColor(taskSettings, li, checkbox);
