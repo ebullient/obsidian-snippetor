@@ -155,6 +155,8 @@
     ul > li.task-list-item {
       font-weight: normal;
       color: var(--text-normal);
+      padding-left: 3px;
+      text-indent: unset; /** override base theme for preview */
     }
     input.task-list-item-checkbox {
       -webkit-appearance: none;
@@ -179,6 +181,13 @@
       right: 1px;
       color: attr(color);
       content: attr(data);
+    }
+    ul > li.task-list-item:not(.live-preview) {
+      input[type="checkbox"].task-list-item-checkbox {
+        position: absolute;
+        top: 10px;
+        left: -21px;
+      }
     }
     input.task-list-item-checkbox:checked:hover,
     p > input.task-list-item-checkbox:checked:hover {
