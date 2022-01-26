@@ -1,14 +1,15 @@
 {
   "name": "obsidian-snippetor",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Generate and tweak common snippets",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
-    "build": "rm build/*; node esbuild.config.mjs production; cp manifest.json README.md build",
+    "build": "npm run prettier && node esbuild.config.mjs production && cp manifest.json README.md build",
     "pretest": "eslint --ignore-path .gitignore src/",
     "test": "jest --passWithNoTests",
     "prettier": "prettier -w 'src/**/*.ts'",
+    "preversion": "npm run build && npm run test",
     "version": "auto-changelog -p && git add CHANGELOG.md",
     "test-version": "auto-changelog -p",
     "brat-notes": "run() { auto-changelog --stdout --hide-credit --hide-empty-releases --template .github/changelog.hbs -v $1 --starting-version $1  > release-notes.md; }; run"
