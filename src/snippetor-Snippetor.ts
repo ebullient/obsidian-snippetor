@@ -164,7 +164,7 @@ export class Snippetor {
         return ts as TaskSettings;
     }
 
-    generateCss(cfg: SnippetConfig): Promise<void> {
+    async generateCss(cfg: SnippetConfig): Promise<void> {
         console.log("Create CSS file for snippet %o", cfg);
         if (!cfg.name) {
             new Notice("Unable to create snippet: Missing file name.");
@@ -186,8 +186,10 @@ export class Snippetor {
 
         const fileName = cfg.type + "-" + cfg.name;
         const path = this.app.customCss.getSnippetPath(fileName);
+        const exists = await this.app.vault.adapter.exists(path);
+
         let update;
-        if (this.app.customCss.snippets.includes(fileName)) {
+        if (exists) {
             update = this.app.vault.adapter.write(path, snippet as string).then(
                 () => {
                     new Notice(`Updated ${fileName}`);
@@ -212,7 +214,7 @@ export class Snippetor {
                 }
             );
         }
-        return update.then(() => this.app.customCss.readCssFolders()); // refresh snippets
+        return update.then(this.app.customCss.readCssFolders); // refresh snippets
     }
 
     isTaskSnippetConfig(cfg: SnippetConfig): cfg is TaskSnippetConfig {
