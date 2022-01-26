@@ -214,7 +214,7 @@ export class Snippetor {
                 }
             );
         }
-        return update.then(this.app.customCss.readCssFolders); // refresh snippets
+        return update.then(() => this.app.customCss.readCssFolders()); // refresh snippets
     }
 
     isTaskSnippetConfig(cfg: SnippetConfig): cfg is TaskSnippetConfig {
