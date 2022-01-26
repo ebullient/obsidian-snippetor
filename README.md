@@ -11,6 +11,12 @@ Snippetor helps you create common CSS snippets with a few button clicks:
 
 ## Installing Snippetor
 
+1. Open `Settings` -> `Community Plugins`
+2. Disable safe mode
+3. **Browse** and search for "snippetor"
+3. Install the latest version of Snippetor
+4. "Enable" the plugin directly after installation 
+
 ### Preview with Beta Reviewers Auto-update Tester (BRAT)
 
 1. Install BRAT
