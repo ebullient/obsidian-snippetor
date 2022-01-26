@@ -124,8 +124,10 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 snippet as TaskSnippetConfig,
                 this.plugin.snippetor
             );
-            console.debug("Snippetor: modal closed with %o", taskCfg);
-            await this.plugin.setSnippet(taskCfg);
+            if (taskCfg) {
+                console.debug("Snippetor: modal closed with %o", taskCfg);
+                await this.plugin.setSnippet(taskCfg);
+            }
             this.listExistingSnippets();
         }
     }

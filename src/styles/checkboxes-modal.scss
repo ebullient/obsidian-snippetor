@@ -1,5 +1,4 @@
 #snippetor-checkboxes-modal {
-
   h3.snippetor-reset {
     display: flex;
     .setting-item-control {
@@ -9,13 +8,14 @@
   }
 
   button.generate-css.is-active:after {
-    content: '⚙️';
+    content: "⚙️";
     position: absolute;
     right: 20px;
     top: 20px;
     display: block;
   }
 
+  /* This should match the standard page colors */
   .snippetor-checkboxes {
     background-color: var(--background-primary);
     color: var(--text-normal);
@@ -30,10 +30,6 @@
     margin-bottom: 5px;
     position: relative;
 
-    button {
-      margin-top: 2px;
-    }
-
     .snippetor-preview {
       padding: 5px 0;
       align-self: flex-start;
@@ -47,8 +43,8 @@
         display: inline-block;
         overflow: hidden;
         text-overflow: ellipsis;
-        width: 100px;
-        max-width: 100px;
+        width: 75px;
+        max-width: 75px;
       }
     }
 
@@ -60,9 +56,8 @@
       align-items: stretch;
       justify-content: flex-start;
 
-      input,
-      .color-sync {
-        margin-right: 6px;
+      .source-mode-label {
+        font-family: var(--font-monospace);
       }
 
       input.snippetor-data-task {
@@ -85,8 +80,6 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        background-color: var(--background-primary);
-        color: var(--text-normal);
         border-radius: 2px;
       }
 
@@ -94,12 +87,62 @@
         display: inline-flex;
         flex-wrap: nowrap;
         align-items: center;
-        padding-right: 6px;
+      }
+
+      .row-label,
+      .snippetor-group.decorated {
+        border: none;
+        border-radius: 6px;
+        color: var(--text-normal);
+        background-color: var(--background-secondary-alt);
+        margin-right: 6px;
+        padding: 2px 4px;
+
+        input[type="text"] {
+          background-color: var(--background-secondary);
+          font-size: 14px;
+          height: 26px;
+          margin: 0 2px;
+          padding: 5px 5px;
+        }
+      }
+
+      .settings-reset,
+      .row-label {
+        align-self: flex-start;
+        background-color: inherit;
+      }
+
+      button,
+      .row-label,
+      .snippetor-group {
+        margin-bottom: 5px;
+      }
+
+      button,
+      .row-label,
+      .snippetor-group.decorated {
+        height: 30px;
+      }
+
+      button.is-active {
+        background-color: var(--interactive-accent);
+        color: var(--text-on-accent);
       }
 
       .background-heading,
       .read-mode-heading {
         padding: 0 6px;
+      }
+
+      button.toggle-sync-color {
+        font-family: monospace;
+        padding: 0 12px;
+        font-size: 18px;
+      }
+
+      .hide-text-colors > .snippetor-group.color {
+        display: none;
       }
     }
 
@@ -108,7 +151,6 @@
       flex-direction: row;
       align-items: flex-start;
       justify-content: stretch;
-      background-color: var(--background-primary);
 
       .toggle-extra:not(.is-active) {
         display: none;
@@ -118,15 +160,24 @@
       }
     }
 
+    .color-sync,
     .setting-editor-extra-setting-button.no-padding {
       color: unset;
       margin: 0 2px;
+    }
+    button.no-padding {
+      margin-bottom: 0px;
     }
 
     .setting-editor-extra-setting-button:not(.no-padding) {
       margin-top: 10px;
     }
 
+    .setting-editor-extra-setting-button.settings-reset {
+      padding-top: 3px
+    }
+
+    .picker-toggle,
     .theme-toggle {
       margin-right: 12px;
     }
@@ -135,10 +186,24 @@
       content: "🌗";
       font-size: 15px;
       background-color: transparent;
+      transform: rotate(180deg);
     }
     .theme-toggle.is-enabled::after {
       line-height: 15px;
       content: "🌗";
+      font-size: 15px;
+      background-color: transparent;
+      transform: translate3d(19px, 0, 0) rotate(180deg);
+    }
+    .picker-toggle:not(.is-enabled)::after {
+      line-height: 15px;
+      content: "🎨";
+      font-size: 15px;
+      background-color: transparent;
+    }
+    .picker-toggle.is-enabled::after {
+      line-height: 15px;
+      content: "🎨";
       font-size: 15px;
       background-color: transparent;
     }
@@ -165,11 +230,15 @@
       text-indent: unset; /** override base theme for preview */
     }
     ul > li.task-list-item {
-      margin-right: 1px;
+      margin-right: 1px; // pad for border on hover
     }
     ul > li.task-list-item:hover {
       margin-right: 0px;
       border-right: 1px solid var(--interactive-accent);
+    }
+    input.task-list-item-checkbox.snippetor {
+      top: 0;
+      border-right-color: unset;
     }
     input.task-list-item-checkbox[data] {
       -webkit-appearance: none;
@@ -191,15 +260,16 @@
       font-weight: 500;
       line-height: var(--snippetor-font-size);
       font-size: var(--snippetor-font-size);
-      left: 1px;
+      top: var(--snippetor-top);
+      left: var(--snippetor-left);
       right: 1px;
       color: var(--snippetor-fg-color);
       content: attr(data);
     }
     ul > li.task-list-item:not(.live-preview) {
-      input[type="checkbox"].task-list-item-checkbox {
+      input[type="checkbox"].task-list-item-checkbox.snippetor {
         position: absolute;
-        top: 10px;
+        top: 8px;
         left: -21px;
       }
     }

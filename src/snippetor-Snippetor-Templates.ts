@@ -36,21 +36,32 @@ input[type=checkbox]:checked {
     margin-top: 3px;
     margin-bottom: 3px;
 }
+<% if (it.cfg.styleUncheckedTask && it.cfg.uncheckedTask) { %>
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox:not(:checked)::before,
+.markdown-preview-view input.task-list-item-checkbox:not(:checked)::before,
+.markdown-preview-view ul > li > input.task-list-item-checkbox:not(:checked)::before,
+.markdown-preview-view ul > li > p > input.task-list-item-checkbox:not(:checked)::before,
+<% } %>
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox:checked::before,
 .markdown-preview-view input.task-list-item-checkbox:checked::before,
 .markdown-preview-view ul > li > input.task-list-item-checkbox:checked::before,
-.markdown-preview-view ul > li > p > input.task-list-item-checkbox:checked::before
- {
+.markdown-preview-view ul > li > p > input.task-list-item-checkbox:checked::before {
     font-family: var(--font-monospace);
-    content: "✓";
     color: var(--text-normal);
     position: absolute;
     text-align: center;
     font-weight: 500;
     line-height: 14px;
     font-size: 14px;
+    top: 0px;
     left: 1px;
     right: 1px;
+}
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox:checked::before,
+.markdown-preview-view input.task-list-item-checkbox:checked::before,
+.markdown-preview-view ul > li > input.task-list-item-checkbox:checked::before,
+.markdown-preview-view ul > li > p > input.task-list-item-checkbox:checked::before {
+    content: "✓";
 }
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]),
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox + span,
@@ -64,18 +75,35 @@ input[type=checkbox]:checked {
     color: var(--text-normal);
 }
 <%
-function defineColors(i, ts) {
-%>
 
+function getForeground(e, light) {
+    value = light ? e.lightMode.foreground : e.darkMode.foreground;
+    return value ? value : '"inherit"'
+}
+function getBackground(e, light) {
+    value = light ? e.lightMode.background : e.darkMode.background;
+    return value ? value : '"transparent"'
+}
+
+function defineColors(i, ts) {
+    const li = ts.li.syncTaskColor ? ts.checkbox : ts.li;
+%>
 /* '<%~ ts.data %>' for task ('- [<%~ ts.data %>]') */
+/** TASK CONFIGURATION
+<% tR += JSON.stringify(ts, null, 2); %>
+*/
 .theme-dark {
-    --snippetor-checkbox-<%= i %>: <% tR += ts.taskColorDark ? ts.taskColorDark : "inherit" %>;
-    --snippetor-checkbox-bg-<%= i %>: <% tR += ts.bgColorDark ? ts.bgColorDark : "transparent" %>;
+    --snippetor-checkbox-<%= i %>: <% tR += getForeground(ts.checkbox, false) %>;
+    --snippetor-checkbox-bg-<%= i %>: <% tR += getBackground(ts.checkbox, false) %>;
+    --snippetor-li-<%= i %>: <% tR += getForeground(li, false) %>;
+    --snippetor-li-bg-<%= i %>: <% tR += getBackground(li, false) %>;
 }
 .theme-dark .print,
 .theme-light {
-    --snippetor-checkbox-<%= i %>: <% tR += ts.taskColorLight ? ts.taskColorLight : "inherit" %>;
-    --snippetor-checkbox-bg-<%= i %>: <% tR += ts.bgColorLight ? ts.bgColorLight : "transparent" %>;
+    --snippetor-checkbox-<%= i %>: <% tR += getForeground(ts.checkbox, true) %>;
+    --snippetor-checkbox-bg-<%= i %>: <% tR += getBackground(ts.checkbox, true) %>;
+    --snippetor-li-<%= i %>: <% tR += getForeground(li, true) %>;
+    --snippetor-li-bg-<%= i %>: <% tR += getBackground(li, true) %>;
 }
 <%
 } // end defineColors
@@ -83,33 +111,50 @@ function defineColors(i, ts) {
 function checkboxSettings(i, ts) {
 %>
     color: var(--snippetor-checkbox-<%= i %>);
-<% if (ts.hideBorder) { %>
+    background-color: var(--snippetor-checkbox-bg-<%= i %>);
+<% if (ts.checkbox.hideBorder) { %>
     border-color: transparent;
 <% } else { %>
     border-color: var(--snippetor-checkbox-<%= i %>);
-<% } %>
-<% if (ts.applyTextBgColor) { %>
-    background-color: var(--snippetor-checkbox-bg-<%= i %>);
+<% }
+   if (ts.checkbox.preventClick) { %>
+    pointer-events: none;
+    cursor: not-allowed;
 <% }
 } // end checkboxSettings
 
 function pseudoElementSettings(i, ts) {
 %>
-    content: '<% tR += ts.reader ? ts.reader : ts.data %>';
+    content: '<% tR += ts.checkbox.readModeData ? ts.checkbox.readModeData : ts.data %>';
     color: var(--snippetor-checkbox-<%= i %>);
+<% if (ts.checkbox.format && ts.checkbox.format.fontSize) { %>
+    font-size: <%~ ts.checkbox.format.fontSize %>px;
+    line-height: <%~ ts.checkbox.format.fontSize %>px;
+<% }
+   if (ts.checkbox.top) { %>
+    top: <%~ ts.checkbox.top %>px;
+<% }
+   if (ts.checkbox.left) { %>
+    left: <%~ ts.checkbox.left %>px;
+<% } %>
 <%
 } // end pseudoElementSettings
 
 function listElementSettings(i, ts) {
-  if (ts.strikethrough) { %>
+  if ( ts.li.format ) {
+   if (ts.li.format.strikethrough) { %>
     text-decoration: line-through;
-<% } %>
-<% if (ts.applyTextColor) { %>
-    color: var(--snippetor-checkbox-<%= i %>);
-<% } %>
-<% if (ts.applyTextBgColor) { %>
-    background-color: var(--snippetor-checkbox-bg-<%= i %>);
 <% }
+    if (ts.li.format.bold) { %>
+    font-weight: 700;
+<% }
+    if (ts.li.format.italics) { %>
+    font-style: italic;
+<% }
+  } %>
+    color: var(--snippetor-li-<%= i %>);
+    background-color: var(--snippetor-li-bg-<%= i %>);
+<%
 } // end listElementSettings
 
 if (it.cfg.styleUncheckedTask && it.cfg.uncheckedTask) {
@@ -117,24 +162,22 @@ if (it.cfg.styleUncheckedTask && it.cfg.uncheckedTask) {
     const i = "u";
     defineColors(i, ts);
 %>
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"]::before,
-.markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > input.task-list-item-checkbox:not(:checked)::before,
-.markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > p > input.task-list-item-checkbox:not(:checked)::before {
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox:not(:checked)::before,
+.markdown-preview-view ul > li[data-task=""] > input.task-list-item-checkbox:not(:checked)::before,
+.markdown-preview-view ul > li[data-task=""] > p > input.task-list-item-checkbox:not(:checked)::before {
 <% pseudoElementSettings(i, ts); %>
 }
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"],
-.markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > input.task-list-item-checkbox,
-.markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > p > input.task-list-item-checkbox {
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox:not(:checked),
+.markdown-preview-view ul > li[data-task=""] > input.task-list-item-checkbox:not(:checked),
+.markdown-preview-view ul > li[data-task=""] > p > input.task-list-item-checkbox:not(:checked) {
 <% checkboxSettings(i, ts); %>
 }
-<% if (ts.strikethrough || ts.applyTextColor || ts.applyTextBgColor) { %>
-.markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"],
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"] + span,
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"] + span + span,
-.markdown-preview-view ul > li[data-task="<%~ ts.data %>"].task-list-item:not(.is-checked) {
+.markdown-source-view.mod-cm6 .HyperMD-task-line[data-task=""],
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=""] + span,
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=""] + span + span,
+.markdown-preview-view ul > li.task-list-item:not(.is-checked) {
 <% listElementSettings(i, ts); %>
 }
-<% } // end strikethrough || applyTextColor || applyTextBgColor%>
 <% } // end if unchecked %>
 
 <%
@@ -152,14 +195,12 @@ for (let i = 0; i < list.length; i++) {
 .markdown-preview-view ul > li[data-task="<%~ ts.data %>"] > p > input.task-list-item-checkbox {
 <% checkboxSettings(i, ts); %>
 }
-<% if (ts.strkethrough || ts.applyTextColor || ts.applyTextBgColor) { %>
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"],
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"] + span,
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="<%~ ts.data %>"] + span + span,
 .markdown-preview-view ul > li[data-task="<%~ ts.data %>"].task-list-item.is-checked {
 <% listElementSettings(i, ts); %>
 }
-<% } // end strikethrough || applyTextColor || applyTextBgColor%>
 <% } // end if unchecked %>
 
 /* Consistent hover colors */

@@ -8,39 +8,79 @@ export interface SnippetConfig {
 }
 
 export interface TaskSnippetConfig extends SnippetConfig {
+    version: string;
     taskSettings: TaskSettings[];
     hideColorPicker?: boolean;
     clearThemeBackground?: boolean;
     styleUncheckedTask?: boolean;
-    uncheckedTask: TaskSettings;
+    uncheckedTask?: TaskSettings;
 }
 
 export interface TaskSettings {
     data: string;
     unchecked?: boolean;
-    reader?: string;
-    taskColorLight?: string;
-    taskColorDark?: string;
-    bgColorLight?: string;
-    bgColorDark?: string;
-    applyTextColor?: boolean;
-    applyTextBgColor?: boolean;
-    strikethrough?: boolean;
-    hideBorder?: boolean;
-    fontSize?: number;
+    checkbox: CheckboxSettings;
+    li: TaskListItemSettings;
     cache?: {
+        // not persisted
         expanded?: boolean;
+        textEl?: HTMLSpanElement;
+        itemEl?: HTMLLIElement;
+        checkboxEl?: HTMLInputElement;
+        dataEl?: HTMLInputElement;
     };
 }
 
+export interface CheckboxSettings extends ColoredElement, FormattedElement {
+    hideBorder?: boolean;
+    readModeData?: string;
+    preventClick?: boolean;
+    left?: number;
+    top?: number;
+}
+
+export interface TaskListItemSettings extends ColoredElement, FormattedElement {
+    syncTaskColor?: boolean;
+}
+
+export interface ColoredElement {
+    lightMode: ColorSettings;
+    darkMode: ColorSettings;
+}
+
+export interface ColorSettings {
+    foreground?: string;
+    background?: string;
+}
+export interface FormattedElement {
+    format?: TextSettings;
+}
+
+export interface TextSettings {
+    bold?: boolean;
+    italics?: boolean;
+    fontSize?: number;
+    fontWeight?: number;
+    strikethrough?: boolean;
+}
+
 export interface ConstructedElements {
-    tasks: HTMLInputElement[];
-    items: HTMLLIElement[];
-    data: HTMLInputElement[];
+    content?: HTMLElement;
     list?: HTMLUListElement;
-    canvas?: HTMLCanvasElement;
-    defaultColorSource?: HTMLElement;
     defaultFontSize?: number;
+}
+
+export interface OldTaskSettings extends TaskSettings {
+    reader?: string /* deprecated */;
+    taskColorLight?: string /* deprecated */;
+    taskColorDark?: string /* deprecated */;
+    bgColorLight?: string /* deprecated */;
+    bgColorDark?: string /* deprecated */;
+    applyTextColor?: boolean /* deprecated */;
+    applyTextBgColor?: boolean /* deprecated */;
+    strikethrough?: boolean /* deprecated */;
+    hideBorder?: boolean /* deprecated */;
+    fontSize?: number /* deprecated */;
 }
 
 declare module "obsidian" {

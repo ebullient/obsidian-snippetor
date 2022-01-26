@@ -1,6 +1,12 @@
-import { Plugin } from "obsidian";
+import { addIcon, Plugin } from "obsidian";
 import { SnippetConfig, SnippetorSettings } from "./@types";
-import { DEFAULT_SETTINGS } from "./snippetor-Defaults";
+import {
+    DEFAULT_SETTINGS,
+    LOCK,
+    LOCK_ICON,
+    UNLOCK,
+    UNLOCK_ICON,
+} from "./snippetor-Defaults";
 import { SnippetorSettingsTab } from "./snippetor-SettingsTab";
 import { Snippetor as Snippetor } from "./snippetor-Snippetor";
 
@@ -16,6 +22,8 @@ export class SnippetorPlugin extends Plugin {
             this.manifest.version,
             this.settings
         );
+        addIcon(LOCK, LOCK_ICON);
+        addIcon(UNLOCK, UNLOCK_ICON);
         this.addSettingTab(new SnippetorSettingsTab(this.app, this));
     }
 

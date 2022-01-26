@@ -1,5 +1,10 @@
 import { App, Notice } from "obsidian";
-import { SnippetConfig, TaskSettings, TaskSnippetConfig } from "./@types";
+import {
+    OldTaskSettings,
+    SnippetConfig,
+    TaskSettings,
+    TaskSnippetConfig,
+} from "./@types";
 import { DEFAULT_TASK_SNIPPET_SETTINGS } from "./snippetor-Defaults";
 import * as Eta from "eta";
 import { SIMPLE_TASK } from "./snippetor-Snippetor-Templates";
@@ -51,16 +56,112 @@ export class Snippetor {
     createNewTaskCfg(v: string): TaskSettings {
         return {
             data: v,
-            taskColorLight: randomColor({
-                luminosity: "dark",
-            }),
-            taskColorDark: randomColor({
-                luminosity: "light",
-            }),
+            checkbox: {
+                lightMode: {
+                    foreground: randomColor({
+                        luminosity: "dark",
+                    }),
+                },
+                darkMode: {
+                    foreground: randomColor({
+                        luminosity: "light",
+                    }),
+                },
+            },
+            li: {
+                lightMode: {},
+                darkMode: {},
+            },
             cache: {
                 expanded: false,
             },
         };
+    }
+
+    initConfig(cfg: Partial<TaskSnippetConfig>): void {
+        cfg.taskSettings.forEach((ts) => {
+            this.initTaskSettings(cfg.version, ts);
+        });
+        if (cfg.uncheckedTask) {
+            this.initTaskSettings(cfg.version, cfg.uncheckedTask);
+            if (cfg.version === null) {
+                this.convertTaskSettings(cfg.uncheckedTask);
+            }
+        }
+        cfg.version = "0.1.6";
+    }
+
+    initTaskSettings(version: string, ts: Partial<TaskSettings>): void {
+        console.log("init task settings");
+        this.initialize(ts, "cache");
+        this.initialize(ts, "checkbox", "lightMode");
+        this.initialize(ts, "checkbox", "darkMode");
+        this.initialize(ts, "li");
+        this.initialize(ts, "li", "lightMode");
+        this.initialize(ts, "li", "darkMode");
+
+        if (version === undefined) {
+            this.convertTaskSettings(ts);
+        }
+    }
+
+    private convertTaskSettings(ts: Partial<OldTaskSettings>): TaskSettings {
+        if (ts.reader) {
+            ts.checkbox.readModeData = ts.reader;
+            delete ts.reader;
+        }
+
+        if (ts.hideBorder) {
+            ts.checkbox.hideBorder = ts.hideBorder;
+            delete ts.hideBorder;
+        }
+
+        if (ts.fontSize) {
+            this.initialize(ts, "checkbox", "format");
+            ts.checkbox.format.fontSize = ts.fontSize;
+            delete ts.fontSize;
+        }
+
+        if (ts.taskColorLight) {
+            ts.checkbox.lightMode.foreground = ts.taskColorLight;
+            delete ts.taskColorLight;
+        }
+        if (ts.taskColorDark) {
+            ts.checkbox.darkMode.foreground = ts.taskColorDark;
+            delete ts.taskColorDark;
+        }
+        if (ts.applyTextColor || ts.applyTextBgColor) {
+            this.initialize(ts, "li");
+            ts.li.syncTaskColor = true;
+            delete ts.applyTextColor;
+            delete ts.applyTextBgColor;
+        }
+
+        if (ts.bgColorLight) {
+            ts.checkbox.lightMode.background = ts.bgColorLight;
+            if (ts.applyTextBgColor) {
+                ts.li.lightMode.background = ts.bgColorLight;
+            }
+            delete ts.bgColorLight;
+        }
+        if (ts.bgColorDark) {
+            ts.checkbox.darkMode.background = ts.bgColorDark;
+            if (ts.applyTextBgColor) {
+                ts.li.darkMode.background = ts.bgColorDark;
+            }
+            delete ts.bgColorDark;
+        }
+
+        if (ts.strikethrough) {
+            this.initialize(ts, "li", "format");
+
+            if (ts.strikethrough) {
+                ts.li.format.strikethrough = ts.strikethrough;
+                delete ts.strikethrough;
+            }
+        }
+
+        return ts as TaskSettings;
     }
 
     generateCss(cfg: SnippetConfig): Promise<void> {
@@ -118,20 +219,37 @@ export class Snippetor {
         return cfg.type === DEFAULT_TASK_SNIPPET_SETTINGS.type;
     }
 
-    deleteSnippet(cfg: SnippetConfig): Promise<void> {
+    async deleteSnippet(cfg: SnippetConfig): Promise<void> {
         const fileName = cfg.type + "-" + cfg.name;
         const path = this.app.customCss.getSnippetPath(fileName);
+        const exists = await this.app.vault.adapter.exists(path);
 
-        return this.app.vault.adapter.remove(path).then(
-            () => {
-                new Notice(`Deleted ${fileName}`);
-            },
-            (reason) => {
-                new Notice(
-                    "Snippet deletion failed. Check console for details."
-                );
-                console.error("Snippet creation failed: %o", reason);
-            }
-        );
+        if (exists) {
+            return this.app.vault.adapter.remove(path).then(
+                () => {
+                    new Notice(`Deleted ${fileName}`);
+                },
+                (reason) => {
+                    new Notice(
+                        "Snippet deletion failed. Check console for details."
+                    );
+                    console.error("Snippet creation failed: %o", reason);
+                }
+            );
+        }
+
+        return Promise.resolve();
     }
+
+    /* eslint-disable */
+    initialize(root: any, ...args: string[]): void {
+        let o = root;
+        args.forEach((arg) => {
+            if (o[arg] === undefined) {
+                o[arg] = {};
+            }
+            o = o[arg];
+        });
+    }
+    /* eslint-enable */
 }

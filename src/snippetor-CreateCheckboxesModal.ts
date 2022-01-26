@@ -11,9 +11,12 @@ import type {
     TaskSnippetConfig,
     TaskSettings,
     ConstructedElements,
+    ColoredElement,
 } from "./@types";
 import { generateSlug } from "random-word-slugs";
 import { Snippetor } from "./snippetor-Snippetor";
+import { ModalHelper } from "./snippetor-ModalHelper";
+import { COLOR, LOCK, UNLOCK } from "./snippetor-Defaults";
 
 export function openCreateCheckboxModal(
     app: App,
@@ -22,26 +25,29 @@ export function openCreateCheckboxModal(
 ): Promise<TaskSnippetConfig> {
     return new Promise((resolve) => {
         const modal = new CreateCheckboxesModal(app, taskSnippetCfg, snippetor);
+
         modal.onClose = () => {
-            // do not persist the transient cache
-            modal.cfg.taskSettings
-                .filter((ts) => ts.cache)
-                .forEach((ts) => delete ts.cache);
             // make sure a name is set
             if (!modal.cfg.name) {
                 modal.cfg.name = generateSlug(2);
             }
             resolve(modal.cfg);
         };
-        modal.open();
+        try {
+            modal.open();
+        } catch (error) {
+            console.log("Caught %o, rejecting promise", error);
+            Promise.reject();
+        }
     });
 }
 
 class CreateCheckboxesModal extends Modal {
     cfg: TaskSnippetConfig;
-    orig: TaskSnippetConfig;
+    origTaskSettings: TaskSettings;
     id: number;
     elements: ConstructedElements;
+    helper: ModalHelper;
     snippetor: Snippetor;
 
     constructor(
@@ -54,18 +60,16 @@ class CreateCheckboxesModal extends Modal {
         this.containerEl.id = "snippetor-checkboxes-modal";
         this.cfg = taskSnippetCfg || snippetor.createNewTaskSnippetCfg();
 
-        this.orig = JSON.parse(JSON.stringify(this.cfg)); // save original
+        // For now.. migrate old task data
+        this.snippetor.initConfig(this.cfg);
+
+        // save snapshot of task settings
+        this.origTaskSettings = JSON.parse(
+            JSON.stringify(this.cfg.taskSettings)
+        );
+
+        this.elements = {};
         this.id = 0;
-
-        this.elements = {
-            tasks: [],
-            items: [],
-            data: [],
-        };
-    }
-
-    get snapshot() {
-        return this.orig;
     }
 
     onOpen(): void {
@@ -74,13 +78,12 @@ class CreateCheckboxesModal extends Modal {
         const content = this.contentEl.createDiv(
             "snippetor-checkboxes markdown-preview-view"
         );
-        this.elements.defaultColorSource = content; // just need a row, any row
 
-        this.elements.canvas = content.createEl("canvas", {
-            attr: {
-                style: "display: none",
-            },
-        });
+        this.helper = new ModalHelper(
+            this.snippetor,
+            this.containerEl,
+            content
+        );
 
         new Setting(content)
             .setName("Name of generated snippet (filename)")
@@ -110,7 +113,7 @@ class CreateCheckboxesModal extends Modal {
         });
 
         this.elements.list = content.createEl("ul");
-        this.showTaskRows();
+        this.showTasks();
 
         new Setting(content)
             .setClass("snippetor-create-task")
@@ -121,7 +124,7 @@ class CreateCheckboxesModal extends Modal {
                     .onClick(() => {
                         const taskSettings =
                             this.snippetor.createNewTaskCfg("");
-                        this.createTaskRow(taskSettings);
+                        this.createTaskItem(taskSettings);
                         this.cfg.taskSettings.push(taskSettings);
                     })
             );
@@ -138,22 +141,7 @@ class CreateCheckboxesModal extends Modal {
                     const redraw = v != this.cfg.styleUncheckedTask;
                     this.cfg.styleUncheckedTask = v;
                     if (redraw) {
-                        this.showTaskRows();
-                    }
-                });
-            });
-
-        new Setting(content)
-            .setName("Hide the color picker")
-            .setDesc(
-                "If you prefer working with the raw values (Hex, RGB, CSS variables, etc), enable this to hide the color picker and show a text box instead."
-            )
-            .addToggle((t) => {
-                t.setValue(this.cfg.hideColorPicker).onChange((v) => {
-                    const redraw = v != this.cfg.hideColorPicker;
-                    this.cfg.hideColorPicker = v;
-                    if (redraw) {
-                        this.showTaskRows();
+                        this.showTasks();
                     }
                 });
             });
@@ -163,64 +151,74 @@ class CreateCheckboxesModal extends Modal {
             .setDesc(
                 "Does theme styling show around your selected tasks? Your theme may provide a way to disable task styling (preferred). This might also work."
             )
-            .addToggle((t) => {
-                t.setValue(this.cfg.clearThemeBackground).onChange((v) => {
+            .addToggle((toggle) => {
+                toggle.setValue(this.cfg.clearThemeBackground).onChange((v) => {
                     this.cfg.clearThemeBackground = v;
-                    this.elements.tasks.forEach((t) =>
-                        this.applyCommonSettingsToCheckbox(t)
-                    );
+                    this.cfg.taskSettings.forEach((ts) => {
+                        this.applySettingsToCheckbox(ts);
+                    });
                 });
             });
     }
 
     onClose(): void {
         this.contentEl.empty();
+        this.elements = {};
+        // do not persist the transient cache
+        Reflect.deleteProperty(this.cfg.uncheckedTask, "cache");
+        this.cfg.taskSettings.forEach((ts) =>
+            Reflect.deleteProperty(ts, "cache")
+        );
     }
 
-    showTaskRows(): void {
-        this.elements.tasks.length = 0;
-        this.elements.items.length = 0;
-        this.elements.data.length = 0;
+    showTasks(): void {
         this.elements.list.empty();
+        this.cfg.taskSettings.forEach((ts) => {
+            this.initTaskElements(ts);
+        });
+        if (this.cfg.uncheckedTask) {
+            this.initTaskElements(this.cfg.uncheckedTask);
+        }
 
-        // Callback to re-draw the whole thing if light/dark mode is toggled.
-        this.createHeaderRow(() => this.showTaskRows());
+        // Create a header. Pass a callback to .
+        this.createHeader();
 
         if (this.cfg.styleUncheckedTask) {
+            // Add an item for styling unchecked tasks to the list
             if (this.cfg.uncheckedTask === undefined) {
                 this.cfg.uncheckedTask = this.snippetor.createNewTaskCfg(" ");
                 this.cfg.uncheckedTask.unchecked = true;
             }
-            this.createTaskRow(this.cfg.uncheckedTask, true);
+            console.log(this.cfg.uncheckedTask);
+            this.createTaskItem(this.cfg.uncheckedTask, true);
         }
 
         this.cfg.taskSettings.forEach((ts) => {
-            if (ts.cache === undefined) {
-                ts.cache = {};
-            }
-            this.createTaskRow(ts);
+            this.createTaskItem(ts);
         });
     }
 
-    createHeaderRow(callback: () => void): void {
+    createHeader(): void {
         const heading = this.elements.list.createEl("li", {
             cls: "task-list-item header",
         });
+
         const preview = heading.createSpan("snippetor-preview");
+
         const checkbox = preview.createEl("input", {
-            cls: "task-list-item-checkbox",
+            cls: "task-list-item-checkbox snippetor",
             attr: {
                 type: "checkbox",
             },
         });
-        this.elements.defaultFontSize = Math.ceil(
-            Number(getComputedStyle(checkbox).fontSize.replace("px", ""))
-        );
         if (this.cfg.styleUncheckedTask) {
             // make the preview checkbox invisible
             checkbox.style.borderColor = "transparent";
             checkbox.style.backgroundColor = "inherit";
         }
+        this.elements.defaultFontSize = Math.ceil(
+            Number(getComputedStyle(checkbox).fontSize.replace("px", ""))
+        );
 
         preview.createSpan({
             text: "Preview",
@@ -230,563 +228,572 @@ class CreateCheckboxesModal extends Modal {
             text: "Settings",
             cls: "snippetor-settings",
         });
-        new ToggleComponent(heading)
-            .setValue(this.isLightMode())
-            .onChange(async (value) => {
-                if (value) {
-                    this.containerEl.addClass("theme-light");
-                    this.containerEl.removeClass("theme-dark");
-                } else {
-                    this.containerEl.addClass("theme-dark");
-                    this.containerEl.removeClass("theme-light");
-                }
-                return callback();
-            })
-            .toggleEl.addClass("theme-toggle");
 
         const actions = heading.createSpan("snippetor-li-actions");
-        new ExtraButtonComponent(actions)
+
+        const hidePicker = new ToggleComponent(actions)
+            .setValue(this.cfg.hideColorPicker)
+            .setTooltip(
+                `${this.cfg.hideColorPicker ? "Show" : "Hide"} color picker`
+            )
+            .onChange((v) => {
+                const redraw = v != this.cfg.hideColorPicker;
+                this.cfg.hideColorPicker = v;
+                hidePicker.setTooltip(
+                    `${this.cfg.hideColorPicker ? "Show" : "Hide"} color picker`
+                );
+                if (redraw) {
+                    this.showTasks();
+                }
+            });
+        hidePicker.toggleEl.addClass("picker-toggle");
+
+        this.helper.createThemeToggleComponent(actions, () => this.showTasks());
+
+        const reset = new ExtraButtonComponent(actions)
             .setIcon("reset")
+            .setTooltip("Reset to previously saved (or generated) values")
             .onClick(() => {
-                this.cfg = JSON.parse(JSON.stringify(this.snapshot)); // reset
-                this.showTaskRows();
-            })
-            .extraSettingsEl.addClass("no-padding");
+                this.cfg.taskSettings = JSON.parse(
+                    JSON.stringify(this.origTaskSettings)
+                ); // reset
+                this.showTasks();
+            });
+        reset.extraSettingsEl.addClass("no-padding");
+        reset.extraSettingsEl.addClass("settings-reset");
     }
 
-    createTaskRow(taskSettings: TaskSettings, unchecked?: boolean): void {
-        const li = this.elements.list.createEl("li");
-
-        this.applySettingsToListItem(taskSettings, li);
-        this.elements.items.push(li);
-
-        const preview = li.createSpan("snippetor-preview");
-
-        // Example: Checkbox -- attributes will be updated
-        const checkbox = preview.createEl("input", {
-            cls: "task-list-item-checkbox",
+    createTaskItem(taskSettings: TaskSettings, unchecked?: boolean): void {
+        const itemEl = this.elements.list.createEl("li");
+        const textEl = itemEl.createSpan("snippetor-preview");
+        const checkboxEl = textEl.createEl("input", {
+            cls: "task-list-item-checkbox snippetor",
             attr: {
                 type: "checkbox",
+                checked: "",
             },
         });
-        this.applySettingsToCheckbox(taskSettings, checkbox);
-        this.applyCommonSettingsToCheckbox(checkbox);
-        this.elements.tasks.push(checkbox);
 
-        // Example: Sample text -- attributes will be updated
-        preview.createSpan({ text: "example", cls: "example" });
+        taskSettings.cache.itemEl = itemEl;
+        taskSettings.cache.textEl = textEl;
+        taskSettings.cache.checkboxEl = checkboxEl;
 
-        // Basic settings..
-        const settings = li.createDiv("snippetor-settings");
-        this.showSettings(taskSettings, li, preview, checkbox, settings);
+        this.applySettingsToCheckbox(taskSettings);
+        this.applySettingsToListItem(taskSettings);
+
+        // Sample text -- attributes will be updated
+        textEl.createSpan({ text: "example", cls: "example" });
+
+        // Section for settings
+        const settings = itemEl.createDiv("snippetor-settings");
+        this.drawSettings(taskSettings, settings);
 
         // Twistie: toggle display of more settings
-        const actions = li.createSpan("snippetor-li-actions");
-        const showExtra = new ExtraButtonComponent(actions)
-            .setIcon("enlarge-glyph")
-            .setTooltip("Show additional options")
-            .onClick(() => {
-                taskSettings.cache.expanded = true;
-                showExtra.extraSettingsEl.removeClass("is-active");
-                hideExtra.extraSettingsEl.addClass("is-active");
-                this.showSettings(
-                    taskSettings,
-                    li,
-                    preview,
-                    checkbox,
-                    settings
-                );
-            });
-        const hideExtra = new ExtraButtonComponent(actions)
-            .setIcon("compress-glyph")
-            .setTooltip("Show additional options")
-            .onClick(() => {
-                taskSettings.cache.expanded = false;
-                showExtra.extraSettingsEl.addClass("is-active");
-                hideExtra.extraSettingsEl.removeClass("is-active");
-                this.showSettings(
-                    taskSettings,
-                    li,
-                    preview,
-                    checkbox,
-                    settings
-                );
-            });
-        showExtra.extraSettingsEl.addClass("toggle-extra");
-        hideExtra.extraSettingsEl.addClass("toggle-extra");
-        if (taskSettings.cache.expanded) {
-            showExtra.extraSettingsEl.removeClass("is-active");
-            hideExtra.extraSettingsEl.addClass("is-active");
-        } else {
-            showExtra.extraSettingsEl.addClass("is-active");
-            hideExtra.extraSettingsEl.removeClass("is-active");
-        }
-
-        // Remove
+        const actions = itemEl.createSpan("snippetor-li-actions");
+        this.helper.createExpandCollapseComponents(
+            actions,
+            taskSettings.cache.expanded,
+            (expanded) => {
+                taskSettings.cache.expanded = expanded;
+                this.drawSettings(taskSettings, settings);
+            }
+        );
         const remove = new ExtraButtonComponent(actions)
             .setIcon("trash")
             .setTooltip("Delete this Task")
             .onClick(async () => {
-                console.log("Delete %o", li);
+                console.log("Delete %o", itemEl);
                 this.cfg.taskSettings.remove(taskSettings);
-                this.showTaskRows();
+                this.showTasks();
             });
-        // unchecked task can not be removed; hide/disable control to preserve alignment
         if (taskSettings.unchecked) {
+            remove.disabled = true;
             remove.extraSettingsEl.style.color = "transparent";
             remove.extraSettingsEl.style.pointerEvents = "none";
         }
     }
 
-    showSettings(
-        taskSettings: TaskSettings,
-        li: HTMLLIElement,
-        previewSpan: HTMLSpanElement,
-        checkbox: HTMLInputElement,
-        settings: HTMLSpanElement
-    ): void {
+    drawSettings(ts: TaskSettings, parent: HTMLSpanElement): void {
         const i = this.id++;
-        settings.empty();
-        this.showCheckboxSettings(
-            taskSettings,
-            li,
-            previewSpan,
-            checkbox,
-            settings,
-            i
-        );
-        if (taskSettings.cache.expanded) {
-            this.showBackgroundSettings(
-                taskSettings,
-                li,
-                checkbox,
-                settings,
-                i
-            );
-            this.showReaderValueSettings(
-                taskSettings,
-                li,
-                checkbox,
-                settings,
-                i
-            );
+        parent.empty();
+
+        this.drawCheckboxSettings(ts, parent, i);
+        if (ts.cache.expanded) {
+            this.drawReadingModeCheckboxSettings(ts, parent, i);
+            this.drawTextSettings(ts, parent, i);
         }
     }
 
-    showCheckboxSettings(
-        taskSettings: TaskSettings,
-        li: HTMLLIElement,
-        previewSpan: HTMLSpanElement,
-        checkbox: HTMLInputElement,
+    drawCheckboxSettings(
+        ts: TaskSettings,
         parent: HTMLSpanElement,
         i: number
     ): void {
         const settings = parent.createSpan("snippetor-row");
 
         // Input box for the task character: UNLESS unchecked
-        if (!taskSettings.unchecked) {
-            const dataTask = settings.createEl("input", {
+        if (!ts.unchecked) {
+            const sourceGroup = settings.createSpan(
+                "snippetor-group decorated"
+            );
+            const dataTaskLabel = sourceGroup.createEl("label", {
+                text: `- [${ts.data}]`,
+                cls: "source-mode-label",
+                attr: { for: `task-${i}` },
+            });
+            const dataTask = sourceGroup.createEl("input", {
                 cls: "snippetor-data-task",
                 attr: {
                     type: "text",
-                    name: "task-" + i,
+                    name: `task-${i}`,
                     size: "1",
-                    value: taskSettings.data,
-                    title: "Task data",
+                    value: ts.data,
+                    title: "Source mode value",
                 },
             });
-            this.elements.data.push(dataTask);
-            this.verifyDataValue(dataTask);
             dataTask.addEventListener(
                 "input",
                 () => {
-                    taskSettings.data = dataTask.value;
-                    this.applySettingsToListItem(taskSettings, li);
-                    this.applySettingsToCheckbox(taskSettings, checkbox);
+                    ts.data = dataTask.value;
+                    dataTaskLabel.setText(`- [${dataTask.value}]`);
+                    this.applySettingsToCheckbox(ts);
+                    this.applySettingsToListItem(ts);
                     this.verifyDataValue(dataTask);
                 },
                 false
             );
+            ts.cache.dataEl = dataTask;
+            this.verifyDataValue(dataTask);
         }
 
-        // the checkbox / symbol color
-        const initial = this.getThemeColor(taskSettings);
-        const colorGroup = settings.createSpan("snippetor-group");
-        const taskColor = colorGroup.createEl("input", {
-            cls: "snippetor-data-color-txt",
-            attr: {
-                name: "color-fg-" + i,
-                value: initial,
-                title: "Foreground color for the task: " + initial,
-            },
-        });
-        if (this.cfg.hideColorPicker) {
-            taskColor.setAttribute("type", "text");
-            taskColor.setAttribute("size", "8");
-        } else {
-            taskColor.setAttribute("type", "color");
-        }
-        taskColor.addEventListener(
-            "input",
-            () => {
-                this.setThemeColor(taskSettings, taskColor.value);
-                this.applyColor(taskSettings, li, checkbox);
-                taskColor.title =
-                    "Foreground color for the task: " + taskColor.value;
-            },
-            false
-        );
-
-        // sync light/dark mode
-        const colorSync = colorGroup.createSpan({
-            text: "🌗",
-            cls: "color-sync",
-            attr: {
-                name: "color-sync-" + i,
-                "aria-label": `Copy value from ${
-                    this.isLightMode() ? "dark" : "light"
-                } mode`,
-                style: "cursor: pointer",
-            },
-        });
-        colorSync.addEventListener(
-            "click",
-            () => {
-                if (this.isLightMode()) {
-                    taskColor.value = taskSettings.taskColorDark;
-                } else {
-                    taskColor.value = taskSettings.taskColorLight;
+        // the checkbox foreground
+        this.foregroundColorPicker(
+            settings,
+            ts.checkbox,
+            `checkbox-color-fg-${i}`,
+            "fg:",
+            (value) => {
+                this.helper.setColor(ts.checkbox, value, COLOR.FOREGROUND);
+                this.applySettingsToCheckbox(ts);
+                if (ts.li.syncTaskColor) {
+                    this.applySettingsToListItem(ts);
                 }
-                this.setThemeColor(taskSettings, taskColor.value);
-                this.applyColor(taskSettings, li, checkbox);
-            },
-            false
+            }
         );
 
-        new ExtraButtonComponent(colorGroup)
-            .setIcon("reset")
-            .setTooltip("Reset foreground color to default")
-            .onClick(async () => {
-                if (!this.cfg.hideColorPicker) {
-                    taskColor.value = this.getForegroundColor();
+        // the checkbox background
+        this.backgroundColorPicker(
+            settings,
+            ts.checkbox,
+            `checkbox-color-bg-${i}`,
+            "bg:",
+            (value) => {
+                this.helper.setColor(ts.checkbox, value, COLOR.BACKGROUND);
+                this.applySettingsToCheckbox(ts);
+                if (ts.li.syncTaskColor) {
+                    this.applySettingsToListItem(ts);
                 }
-                if (this.isLightMode()) {
-                    delete taskSettings.taskColorLight;
-                } else {
-                    delete taskSettings.taskColorDark;
-                }
-                this.applyColor(taskSettings, li, checkbox);
-            })
-            .extraSettingsEl.addClass("no-padding");
-
-        // should the color apply to the text, too?
-        const colorTextGroup = settings.createSpan("snippetor-group");
-        const colorText = colorTextGroup.createEl("input", {
-            attr: {
-                name: "text-color-" + i,
-                type: "checkbox",
-                value: taskSettings.applyTextColor,
-            },
-        });
-        if (taskSettings.applyTextColor) {
-            colorText.setAttribute("checked", "");
-        }
-        colorText.addEventListener(
-            "click",
-            () => {
-                taskSettings.applyTextColor = colorText.checked;
-                this.applyColor(taskSettings, li, checkbox);
-            },
-            false
+            }
         );
-        colorTextGroup.createEl("label", {
-            text: "color text",
-            attr: { for: "text-color-" + i },
-        });
 
-        // strikethrough?
-        const strikethroughGroup = settings.createSpan("snippetor-group");
-        const strikethrough = strikethroughGroup.createEl("input", {
-            attr: {
-                name: "strikethrough-" + i,
-                type: "checkbox",
-            },
-        });
-        if (taskSettings.strikethrough) {
-            strikethrough.setAttribute("checked", "");
-        }
-        strikethrough.addEventListener(
-            "click",
-            () => {
-                taskSettings.strikethrough = strikethrough.checked;
-                this.applyStrikethrough(taskSettings, previewSpan);
-            },
-            false
+        // Checkbox border
+        const hideBorder = this.helper.createToggleButton(
+            settings,
+            ts.checkbox.hideBorder,
+            (enabled) => {
+                ts.checkbox.hideBorder = enabled;
+                this.applySettingsToCheckbox(ts);
+            }
         );
-        strikethroughGroup.createEl("label", {
-            text: "strikethrough",
-            attr: { for: "strikethrough-" + i },
-        });
-        this.applyStrikethrough(taskSettings, previewSpan);
+        hideBorder.setIcon("fullscreen").setTooltip("Toggle: Hide border");
 
-        // border
-        const borderGroup = settings.createSpan("snippetor-group");
-        const hideBorder = borderGroup.createEl("input", {
-            attr: {
-                name: "border-" + i,
-                type: "checkbox",
-            },
-        });
-        if (taskSettings.hideBorder) {
-            hideBorder.setAttribute("checked", "");
-        }
-        hideBorder.addEventListener(
-            "click",
-            () => {
-                taskSettings.hideBorder = hideBorder.checked;
-                this.applySettingsToCheckbox(taskSettings, checkbox);
-            },
-            false
+        const lockMode = this.helper.createToggleButton(
+            settings,
+            ts.checkbox.preventClick,
+            (enabled) => {
+                ts.checkbox.preventClick = enabled;
+                lockMode.setIcon(ts.checkbox.preventClick ? LOCK : UNLOCK);
+                this.applySettingsToCheckbox(ts);
+            }
         );
-        borderGroup.createEl("label", {
-            text: "hide border",
-            attr: { for: "border-" + i },
-        });
+        lockMode
+            .setIcon(ts.checkbox.preventClick ? LOCK : UNLOCK)
+            .setTooltip("Toggle: Prevent mouse clicks in Preview mode");
     }
 
-    showBackgroundSettings(
-        taskSettings: TaskSettings,
-        li: HTMLLIElement,
-        checkbox: HTMLInputElement,
+    drawReadingModeCheckboxSettings(
+        ts: TaskSettings,
         parent: HTMLSpanElement,
         i: number
     ): void {
         const settings = parent.createSpan("snippetor-row");
-
-        const colorGroup = settings.createSpan("snippetor-group");
-        colorGroup.createDiv({
-            text: "Background: ",
-            cls: "background-heading",
+        settings.createEl("label", {
+            cls: "row-label",
+            text: "Rendered: ",
+            attr: { for: `task-reader-${i}` },
         });
 
-        // the checkbox / symbol color
-        const initial = this.getThemeBackgroundColor(taskSettings);
-        const taskColor = colorGroup.createEl("input", {
-            cls: "snippetor-data-color-txt",
-            attr: {
-                name: "color-bg-" + i,
-                value: initial,
-                title: "Background color for the task: " + initial,
-            },
-        });
-        if (this.cfg.hideColorPicker) {
-            taskColor.setAttribute("type", "text");
-            taskColor.setAttribute("size", "8");
-        } else {
-            taskColor.setAttribute("type", "color");
-        }
-        taskColor.addEventListener(
-            "input",
-            () => {
-                this.setThemeBackgroundColor(taskSettings, taskColor.value);
-                this.applyColor(taskSettings, li, checkbox);
-                taskColor.title =
-                    "Background color for the task: " + taskColor.value;
-            },
-            false
+        const initalValue = this.helper.valueOrDefault(
+            ts.checkbox.readModeData,
+            ts.data
         );
 
-        // sync light/dark mode
-        const colorSync = colorGroup.createSpan({
-            text: "🌗",
-            cls: "color-sync",
-            attr: {
-                name: "color-bg-sync-" + i,
-                "aria-label": `Copy background color value from ${
-                    this.isLightMode() ? "dark" : "light"
-                } mode`,
-                style: "cursor: pointer",
-            },
-        });
-        colorSync.addEventListener(
-            "click",
-            () => {
-                if (this.isLightMode()) {
-                    if (taskSettings.bgColorDark) {
-                        taskColor.value = taskSettings.bgColorDark;
-                    }
-                } else {
-                    if (taskSettings.bgColorLight) {
-                        taskColor.value = taskSettings.bgColorLight;
-                    }
-                }
-                this.setThemeBackgroundColor(taskSettings, taskColor.value);
-                this.applyColor(taskSettings, li, checkbox);
-            },
-            false
-        );
-
-        new ExtraButtonComponent(colorGroup)
-            .setIcon("reset")
-            .setTooltip("Reset background color to default")
-            .onClick(async () => {
-                if (!this.cfg.hideColorPicker) {
-                    taskColor.value = this.getBackgroundColor();
-                }
-                if (this.isLightMode()) {
-                    delete taskSettings.bgColorLight;
-                } else {
-                    delete taskSettings.bgColorDark;
-                }
-                this.applyColor(taskSettings, li, checkbox);
-            })
-            .extraSettingsEl.addClass("no-padding");
-
-        // should the color apply to the text, too?
-        const colorTextGroup = settings.createSpan("snippetor-group");
-        const colorText = colorTextGroup.createEl("input", {
-            attr: {
-                name: "text-color-" + i,
-                type: "checkbox",
-                value: taskSettings.applyTextBgColor,
-            },
-        });
-        if (taskSettings.applyTextBgColor) {
-            colorText.setAttribute("checked", "");
-        }
-        colorText.addEventListener(
-            "click",
-            () => {
-                taskSettings.applyTextBgColor = colorText.checked;
-                this.applyColor(taskSettings, li, checkbox);
-            },
-            false
-        );
-        colorTextGroup.createEl("label", {
-            text: "apply background to text",
-            attr: { for: "text-color-" + i },
-        });
-    }
-
-    showReaderValueSettings(
-        taskSettings: TaskSettings,
-        li: HTMLLIElement,
-        checkbox: HTMLInputElement,
-        parent: HTMLSpanElement,
-        i: number
-    ): void {
-        const settings = parent.createSpan("snippetor-row reader");
-
-        settings.createDiv({
-            text: "Rendered as ",
-            cls: "read-mode-heading",
-        });
-
-        // Specify the task character
-        const readerTask = settings.createEl("input", {
+        const sourceGroup = settings.createSpan("snippetor-group decorated");
+        const readModeData = sourceGroup.createEl("input", {
             cls: "snippetor-data-task",
             attr: {
                 type: "text",
-                name: "task-reader-" + i,
+                name: `task-reader-${i}`,
                 size: "1",
-                value:
-                    taskSettings.reader === undefined
-                        ? taskSettings.data
-                        : taskSettings.reader,
-                title: "Display character for preview / reading mode",
+                value: initalValue,
+                title: "Value shown in Live Preview or Reading mode",
             },
         });
-        readerTask.addEventListener(
-            "input",
-            () => {
-                taskSettings.reader = readerTask.value;
-                this.applySettingsToListItem(taskSettings, li);
-                this.applySettingsToCheckbox(taskSettings, checkbox);
-            },
-            false
-        );
 
-        const sizeGroup = settings.createSpan("snippetor-group");
-        sizeGroup.createEl("label", {
-            text: "size: ",
+        const sizeGroup = settings.createSpan("snippetor-group decorated");
+        const sizeLabel = sizeGroup.createEl("label", {
+            text: `[${initalValue}] size: `,
             attr: { for: "size-" + i },
         });
         const fontSize = new SliderComponent(sizeGroup)
             .setValue(
-                taskSettings.fontSize === undefined
+                ts.checkbox.format === undefined ||
+                    ts.checkbox.format.fontSize === undefined
                     ? this.elements.defaultFontSize
-                    : taskSettings.fontSize
+                    : ts.checkbox.format.fontSize
             )
             .setLimits(6, 30, 1)
             .setDynamicTooltip()
             .onChange((v) => {
-                console.log(v);
-                taskSettings.fontSize = v;
-                this.applySettingsToCheckbox(taskSettings, checkbox);
+                this.snippetor.initialize(ts, "checkbox", "format");
+                ts.checkbox.format.fontSize = v;
+                this.applySettingsToCheckbox(ts);
             });
-
-        fontSize.sliderEl.id = "size-" + i;
+        fontSize.sliderEl.name = "size-" + i;
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
             .setTooltip("Reset font size to default")
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
-                delete taskSettings.fontSize;
-                this.applySettingsToCheckbox(taskSettings, checkbox);
+                Reflect.deleteProperty(ts.checkbox.format, "fontSize");
+                this.applySettingsToCheckbox(ts);
+            })
+            .extraSettingsEl.addClass("no-padding");
+
+        // Size Event Listener: when read mode value is changed,
+        // change the label on the size element, too
+        readModeData.addEventListener(
+            "input",
+            () => {
+                ts.checkbox.readModeData = readModeData.value;
+                if (readModeData.value) {
+                    sizeLabel.setText(`[${readModeData.value}] size: `);
+                } else {
+                    sizeLabel.setText(`[${ts.data}] size: `);
+                }
+                this.applySettingsToCheckbox(ts);
+                this.applySettingsToListItem(ts);
+            },
+            false
+        );
+
+        this.positionAdjust(
+            settings,
+            `pos-x-${i}`,
+            "x: ",
+            1,
+            ts.checkbox.left ? ts.checkbox.left : 1,
+            (v) => {
+                if (v) {
+                    ts.checkbox.left = v;
+                } else {
+                    Reflect.deleteProperty(ts.checkbox, "left");
+                }
+                this.applySettingsToCheckbox(ts);
+            }
+        );
+
+        this.positionAdjust(
+            settings,
+            `pos-y-${i}`,
+            "y: ",
+            0,
+            ts.checkbox.top ? ts.checkbox.top : 0,
+            (v) => {
+                if (v) {
+                    ts.checkbox.top = v;
+                } else {
+                    Reflect.deleteProperty(ts.checkbox, "top");
+                }
+                this.applySettingsToCheckbox(ts);
+            }
+        );
+    }
+
+    drawTextSettings(
+        ts: TaskSettings,
+        parent: HTMLSpanElement,
+        i: number
+    ): void {
+        const settings = parent.createSpan("snippetor-row text-settings");
+        settings.createSpan({
+            cls: "row-label",
+            text: "Text: ",
+        });
+
+        // Checkbox text formatting
+        const styleGroup = settings.createSpan("snippetor-group");
+        this.helper
+            .createBoldButton(styleGroup, ts.checkbox, (enabled) => {
+                this.snippetor.initialize(ts, "li", "format");
+                ts.li.format.bold = enabled;
+                this.applySettingsToListItem(ts);
+            })
+            .buttonEl.addClass("no-padding");
+        this.helper
+            .createItalicButton(styleGroup, ts.checkbox, (enabled) => {
+                this.snippetor.initialize(ts, "li", "format");
+                ts.li.format.italics = enabled;
+                this.applySettingsToListItem(ts);
+            })
+            .buttonEl.addClass("no-padding");
+        this.helper
+            .createStrikethroughButton(styleGroup, ts.checkbox, (enabled) => {
+                this.snippetor.initialize(ts, "li", "format");
+                ts.li.format.strikethrough = enabled;
+                this.applySettingsToListItem(ts);
+            })
+            .buttonEl.addClass("no-padding");
+
+        const useTaskColors = "🎨 = ☑︎";
+        const useTextColors = "🎨 ≠ ☑︎";
+        const textColorMode = this.helper.createToggleButton(
+            settings,
+            ts.li.syncTaskColor,
+            (enabled) => {
+                ts.li.syncTaskColor = enabled;
+                textColorMode.buttonEl.setText(
+                    ts.li.syncTaskColor ? useTaskColors : useTextColors
+                );
+                this.applySettingsToListItem(ts);
+                if (ts.li.syncTaskColor) {
+                    settings.addClass("hide-text-colors");
+                } else {
+                    settings.removeClass("hide-text-colors");
+                }
+            }
+        );
+        textColorMode.buttonEl.addClass("toggle-sync-color");
+        textColorMode.setTooltip("Toggle: Sync text color with task color");
+        textColorMode.setButtonText(
+            ts.li.syncTaskColor ? useTaskColors : useTextColors
+        );
+        settings.addClass(
+            ts.li.syncTaskColor ? "hide-text-colors" : "show-text-colors"
+        );
+
+        // the checkbox foreground
+        this.foregroundColorPicker(
+            settings,
+            ts.li,
+            `li-color-fg-${i}`,
+            "fg:",
+            (value) => {
+                this.helper.setColor(ts.li, value, COLOR.FOREGROUND);
+                this.applySettingsToListItem(ts);
+            }
+        );
+
+        // the checkbox background
+        this.backgroundColorPicker(
+            settings,
+            ts.li,
+            `li-color-bg-${i}`,
+            "bg:",
+            (value) => {
+                this.helper.setColor(ts.li, value, COLOR.BACKGROUND);
+                this.applySettingsToListItem(ts);
+            }
+        );
+    }
+
+    foregroundColorPicker(
+        container: HTMLElement,
+        element: ColoredElement,
+        name: string,
+        label: string,
+        update: (value: string) => void
+    ) {
+        const colorGroup = container.createSpan(
+            "snippetor-group decorated color"
+        );
+        colorGroup.createEl("label", {
+            text: label,
+            attr: { for: name },
+        });
+        const taskColor = this.helper.createColorPickerComponent(
+            colorGroup,
+            element,
+            name,
+            update,
+            COLOR.FOREGROUND,
+            this.cfg.hideColorPicker
+        );
+        // sync light/dark mode
+        this.helper.createColorSyncComponent(
+            colorGroup,
+            element,
+            COLOR.FOREGROUND,
+            (value) => {
+                taskColor.value = this.helper.getPickerValue(
+                    element,
+                    COLOR.FOREGROUND,
+                    this.cfg.hideColorPicker
+                );
+                update(value);
+            }
+        );
+        // reset input element
+        const resetFg = this.helper.createResetColorComponent(
+            colorGroup,
+            async () => {
+                this.helper.clearModeColor(element, COLOR.FOREGROUND);
+                taskColor.value = this.helper.getPickerValue(
+                    element,
+                    COLOR.FOREGROUND,
+                    this.cfg.hideColorPicker
+                );
+                update(undefined);
+            },
+            COLOR.FOREGROUND
+        );
+        resetFg.extraSettingsEl.addClass("no-padding");
+    }
+
+    backgroundColorPicker(
+        container: HTMLElement,
+        element: ColoredElement,
+        name: string,
+        label: string,
+        update: (value: string) => void
+    ) {
+        const colorGroup = container.createSpan(
+            "snippetor-group decorated color"
+        );
+        colorGroup.createEl("label", {
+            text: label,
+            attr: { for: name },
+        });
+        const taskColor = this.helper.createColorPickerComponent(
+            colorGroup,
+            element,
+            name,
+            update,
+            COLOR.BACKGROUND,
+            this.cfg.hideColorPicker
+        );
+        // sync light/dark mode
+        this.helper.createColorSyncComponent(
+            colorGroup,
+            element,
+            COLOR.BACKGROUND,
+            (value) => {
+                taskColor.value = this.helper.getPickerValue(
+                    element,
+                    COLOR.BACKGROUND,
+                    this.cfg.hideColorPicker
+                );
+                update(value);
+            }
+        );
+        // reset input element
+        const reset = this.helper.createResetColorComponent(
+            colorGroup,
+            async () => {
+                this.helper.clearModeColor(element, COLOR.BACKGROUND);
+                taskColor.value = this.helper.getPickerValue(
+                    element,
+                    COLOR.BACKGROUND,
+                    this.cfg.hideColorPicker
+                );
+                update(undefined);
+            },
+            COLOR.BACKGROUND
+        );
+        reset.extraSettingsEl.addClass("no-padding");
+    }
+
+    positionAdjust(
+        container: HTMLElement,
+        name: string,
+        label: string,
+        base: number,
+        initial: number,
+        update: (value: number) => void
+    ): void {
+        const posGroup = container.createSpan(
+            "snippetor-group decorated position"
+        );
+        posGroup.createEl("label", {
+            text: label,
+            attr: { for: name },
+        });
+        const position = new SliderComponent(posGroup)
+            .setValue(initial)
+            .setLimits(-12, 12, 1)
+            .setDynamicTooltip()
+            .onChange(update);
+        position.sliderEl.name = name;
+        new ExtraButtonComponent(posGroup)
+            .setIcon("reset")
+            .setTooltip("Reset position to default")
+            .onClick(async () => {
+                position.setValue(base);
+                update(undefined);
             })
             .extraSettingsEl.addClass("no-padding");
     }
 
-    applyColor(
-        taskSettings: TaskSettings,
-        li: HTMLLIElement,
-        checkbox: HTMLInputElement
-    ): void {
-        this.applySettingsToCheckbox(taskSettings, checkbox);
-        this.applySettingsToListItem(taskSettings, li);
-    }
+    applySettingsToListItem(taskSettings: TaskSettings): void {
+        const textEl = taskSettings.cache.textEl;
+        const itemEl = taskSettings.cache.itemEl;
 
-    applySettingsToListItem(
-        taskSettings: TaskSettings,
-        li: HTMLLIElement
-    ): void {
-        li.setAttr("data-task", taskSettings.data);
-        li.className =
+        itemEl.setAttr("data-task", taskSettings.data);
+        itemEl.className =
             "task-list-item" + (taskSettings.data == " " ? "" : " is-checked");
-
-        this.setListItemColors(taskSettings, li);
-    }
-
-    applyStrikethrough(
-        taskSettings: TaskSettings,
-        preview: HTMLSpanElement
-    ): void {
-        if (taskSettings.strikethrough) {
-            preview.style.textDecoration = "line-through";
-        } else {
-            preview.style.textDecoration = "none";
+        this.setListItemColors(taskSettings);
+        if (taskSettings.li.format) {
+            if (taskSettings.li.format.strikethrough) {
+                textEl.style.textDecoration = "line-through";
+            } else {
+                textEl.style.removeProperty("text-decoration");
+            }
+            if (taskSettings.li.format.bold) {
+                textEl.style.fontWeight = "700";
+            } else {
+                textEl.style.removeProperty("font-weight");
+            }
+            if (taskSettings.li.format.italics) {
+                textEl.style.fontStyle = "italic";
+            } else {
+                textEl.style.removeProperty("font-style");
+            }
         }
     }
 
-    applySettingsToCheckbox(
-        taskSettings: TaskSettings,
-        checkbox: HTMLInputElement
-    ): void {
+    applySettingsToCheckbox(ts: TaskSettings): void {
+        const checkbox = ts.cache.checkboxEl;
         checkbox.removeAttribute("data");
-        checkbox.style.removeProperty("--snippetor-font-size");
 
-        const data = taskSettings.reader
-            ? taskSettings.reader
-            : taskSettings.data;
+        const data = ts.checkbox.readModeData
+            ? ts.checkbox.readModeData
+            : ts.data;
         checkbox.setAttribute("data", data);
 
-        if (!taskSettings.unchecked) {
-            checkbox.setAttribute("checked", "");
-        }
-        if (taskSettings.fontSize) {
+        if (ts.checkbox.format && ts.checkbox.format.fontSize) {
             checkbox.style.setProperty(
                 "--snippetor-font-size",
-                taskSettings.fontSize + "px"
+                ts.checkbox.format.fontSize + "px"
             );
         } else {
             checkbox.style.setProperty(
@@ -794,137 +801,93 @@ class CreateCheckboxesModal extends Modal {
                 this.elements.defaultFontSize + "px"
             );
         }
-        this.setCheckboxColors(taskSettings, checkbox);
+        checkbox.style.setProperty(
+            "--snippetor-top",
+            (ts.checkbox.top ? ts.checkbox.top : 0) + "px"
+        );
+        checkbox.style.setProperty(
+            "--snippetor-left",
+            (ts.checkbox.left ? ts.checkbox.left : 0) + "px"
+        );
+
+        this.setCheckboxColors(ts);
     }
 
-    applyCommonSettingsToCheckbox(checkbox: HTMLInputElement): void {
-        checkbox.style.removeProperty("background-color");
-        if (this.cfg.clearThemeBackground) {
-            // doing this the hard way because we have to override at least one !important in a theme (minimal)
-            const style = checkbox.getAttribute("style");
-            checkbox.setAttribute(
+    setListItemColors(taskSettings: TaskSettings): void {
+        const itemEl = taskSettings.cache.itemEl;
+        const fgColor = this.helper.getColor(
+            taskSettings.li.syncTaskColor
+                ? taskSettings.checkbox
+                : taskSettings.li,
+            COLOR.FOREGROUND
+        );
+        const bgColor = this.helper.getColor(
+            taskSettings.li.syncTaskColor
+                ? taskSettings.checkbox
+                : taskSettings.li,
+            COLOR.BACKGROUND
+        );
+        itemEl.style.color = fgColor;
+        itemEl.style.backgroundColor = bgColor;
+    }
+
+    setCheckboxColors(taskSettings: TaskSettings): void {
+        const checkboxEl = taskSettings.cache.checkboxEl;
+        const fgColor = this.helper.getColor(
+            taskSettings.checkbox,
+            COLOR.FOREGROUND
+        );
+        const bgColor = this.helper.getColor(
+            taskSettings.checkbox,
+            COLOR.BACKGROUND
+        );
+
+        if (fgColor === "inherit") {
+            checkboxEl.style.removeProperty("border-color");
+            checkboxEl.style.color = "var(--text-normal)";
+        } else {
+            checkboxEl.style.borderColor = fgColor;
+            checkboxEl.style.color = fgColor;
+        }
+        checkboxEl.style.setProperty("--snippetor-fg-color", fgColor);
+
+        checkboxEl.style.removeProperty("background-color");
+        const style = checkboxEl.getAttribute("style");
+        // doing this the hard way because we have to override at least one !important in a theme (minimal)
+        if (this.cfg.clearThemeBackground && bgColor === "transparent") {
+            checkboxEl.setAttribute(
                 "style",
                 style + " background-color: unset !important;"
             );
-        }
-    }
-
-    isLightMode(): boolean {
-        return (
-            this.containerEl.hasClass("theme-light") ||
-            (!this.containerEl.hasClass("theme-dark") &&
-                document.body.hasClass("theme-light"))
-        );
-    }
-
-    getForegroundColor(): string {
-        const ctx = this.elements.canvas.getContext("2d");
-        ctx.fillStyle = getComputedStyle(
-            this.elements.defaultColorSource
-        ).color;
-        return ctx.fillStyle;
-    }
-
-    getBackgroundColor(): string {
-        const ctx = this.elements.canvas.getContext("2d");
-        ctx.fillStyle = getComputedStyle(
-            this.elements.defaultColorSource
-        ).backgroundColor;
-        return ctx.fillStyle;
-    }
-
-    getThemeColor(taskSettings: TaskSettings): string {
-        if (this.isLightMode()) {
-            return taskSettings.taskColorLight;
         } else {
-            return taskSettings.taskColorDark;
+            checkboxEl.setAttribute(
+                "style",
+                style + ` background-color: ${bgColor} !important;`
+            );
         }
-    }
 
-    setThemeColor(taskSettings: TaskSettings, color: string) {
-        if (this.isLightMode()) {
-            taskSettings.taskColorLight = color;
-        } else {
-            taskSettings.taskColorDark = color;
-        }
-    }
-
-    getThemeBackgroundColor(taskSettings: TaskSettings): string {
-        if (this.isLightMode()) {
-            return taskSettings.bgColorLight === undefined
-                ? this.getBackgroundColor()
-                : taskSettings.bgColorLight;
-        }
-        return taskSettings.bgColorDark === undefined
-            ? this.getBackgroundColor()
-            : taskSettings.bgColorDark;
-    }
-
-    setThemeBackgroundColor(taskSettings: TaskSettings, color: string) {
-        if (this.isLightMode()) {
-            taskSettings.bgColorLight = color;
-        } else {
-            taskSettings.bgColorDark = color;
-        }
-    }
-
-    setListItemColors(taskSettings: TaskSettings, li: HTMLLIElement): void {
-        const taskColor = this.getThemeColor(taskSettings);
-        const bgColor = this.getThemeBackgroundColor(taskSettings);
-        if (taskSettings.applyTextColor && taskColor && taskColor.length > 0) {
-            li.style.color = taskColor;
-        } else {
-            li.style.removeProperty("color");
-        }
-        if (taskSettings.applyTextBgColor && bgColor && bgColor.length > 0) {
-            li.style.backgroundColor = bgColor;
-        } else {
-            li.style.removeProperty("background-color");
-        }
-    }
-
-    setCheckboxColors(
-        taskSettings: TaskSettings,
-        checkbox: HTMLInputElement
-    ): void {
-        const fgColor = this.getThemeColor(taskSettings);
-        const bgColor = this.getThemeBackgroundColor(taskSettings);
-        if (fgColor && fgColor.length > 0) {
-            checkbox.style.borderColor = fgColor;
-            checkbox.style.color = fgColor;
-            checkbox.style.setProperty("--snippetor-fg-color", fgColor);
-        } else {
-            checkbox.style.removeProperty("border-color");
-            checkbox.style.removeProperty("color");
-            checkbox.style.setProperty("--snippetor-fg-color", "inherit");
-        }
-        if (bgColor && bgColor.length > 0) {
-            checkbox.style.backgroundColor = bgColor;
-        } else {
-            checkbox.style.removeProperty("background-color");
-        }
-        if (taskSettings.hideBorder) {
-            checkbox.style.borderColor = "transparent";
+        if (taskSettings.checkbox.hideBorder) {
+            checkboxEl.style.borderColor = "transparent";
         }
     }
 
     verifyDataValue(input: HTMLInputElement) {
+        input.removeClass("data-value-error");
+        input.removeAttribute("aria-label");
+
         const count = this.cfg.taskSettings.filter(
             (t) => input.value === t.data
         ).length;
-        input.removeClass("data-value-error");
-        input.removeAttribute("aria-label");
-        delete input.after;
-        console.log("verifyDataValue: [%s] %o %s", input.value, input, count);
         if (count > 1) {
-            console.log("verifyDataValue: conflict");
+            console.log("verifyDataValue: conflict over %s", input.value);
+            input.setAttribute("conflict", input.value);
             input.addClass("data-value-error");
             input.setAttribute(
                 "aria-label",
                 "Another task uses the same value"
             );
-            input.setAttribute("conflict", input.value);
-            this.elements.data.forEach((e) => {
+            this.cfg.taskSettings.forEach((ts) => {
+                const e = ts.cache.dataEl;
                 if (e.value === input.value && !e.hasAttribute("conflict")) {
                     this.verifyDataValue(e);
                 }
@@ -948,11 +911,20 @@ class CreateCheckboxesModal extends Modal {
             } else if (conflict) {
                 console.log("verifyDataValue: conflict resolved");
                 input.removeAttribute("conflict");
-                this.elements.data.forEach((e) => {
+                this.cfg.taskSettings.forEach((ts) => {
+                    const e = ts.cache.dataEl;
                     if (e.value === conflict) {
                         this.verifyDataValue(e);
                     }
                 });
+            }
+        }
+    }
+
+    initTaskElements(ts: TaskSettings): void {
+        for (const [key, value] of Object.entries(ts.cache)) {
+            if (value instanceof HTMLElement) {
+                Reflect.deleteProperty(ts.cache, key);
             }
         }
     }
