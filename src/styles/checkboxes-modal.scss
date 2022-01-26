@@ -56,8 +56,14 @@
       align-items: stretch;
       justify-content: flex-start;
 
+      label,
+      .row-label,
       .source-mode-label {
-        font-family: var(--font-monospace);
+        font-family: var(--font-monospace) !important;
+      }
+      label,
+      .row-label {
+        white-space: nowrap;
       }
 
       input.snippetor-data-task {
@@ -122,7 +128,7 @@
       button,
       .row-label,
       .snippetor-group.decorated {
-        height: 30px;
+        height: 30px !important;
       }
 
       button.is-active {
@@ -136,9 +142,9 @@
       }
 
       button.toggle-sync-color {
-        font-family: monospace;
-        padding: 0 12px;
-        font-size: 18px;
+        font-family: monospace !important;
+        padding: 0 12px !important;
+        font-size: 18px !important;
       }
 
       .hide-text-colors > .snippetor-group.color {
@@ -165,6 +171,11 @@
       color: unset;
       margin: 0 2px;
     }
+    button:not(.no-padding) {
+      border-radius: 4px;
+      border: none;
+      padding: 6px 20px;
+    }
     button.no-padding {
       margin-bottom: 0px;
     }
@@ -177,35 +188,41 @@
       padding-top: 3px
     }
 
-    .picker-toggle,
-    .theme-toggle {
+    .checkbox-container.picker-toggle,
+    .checkbox-container.theme-toggle {
+      height: 22px;
+      width: 44px;
       margin-right: 12px;
+      box-shadow: 0px 0px 0px 2px rgb(0 0 0 / 2%), 0px 0px 2px 1px rgb(0 0 0 / 5%) inset;
     }
-    .theme-toggle:not(.is-enabled)::after {
-      line-height: 15px;
+    .theme-toggle::after {
       content: "🌗";
-      font-size: 15px;
-      background-color: transparent;
-      transform: rotate(180deg);
+      line-height: 16px;
+      font-size: 16px;
+      height: 16px;
+      width: 16px;
+      background: none;
+      box-shadow: none;
+      border-radius: 9px;
+      transform: translate3d(3px, 0, 0);
+      display: block;
     }
-    .theme-toggle.is-enabled::after {
-      line-height: 15px;
-      content: "🌗";
-      font-size: 15px;
-      background-color: transparent;
-      transform: translate3d(19px, 0, 0) rotate(180deg);
-    }
-    .picker-toggle:not(.is-enabled)::after {
-      line-height: 15px;
+    .picker-toggle::after {
       content: "🎨";
-      font-size: 15px;
-      background-color: transparent;
+      line-height: 16px;
+      font-size: 16px;
+      height: 16px;
+      width: 16px;
+      background: none;
+      box-shadow: none;
+      border-radius: 9px;
+      transform: translate3d(3px, 0, 0);
+      display: block;
     }
+    .theme-toggle.is-enabled::after,
     .picker-toggle.is-enabled::after {
-      line-height: 15px;
-      content: "🎨";
-      font-size: 15px;
-      background-color: transparent;
+      transform: translate3d(24px, 0, 0);
+      display: block;
     }
   }
 
