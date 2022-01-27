@@ -145,20 +145,6 @@ class CreateCheckboxesModal extends Modal {
                     }
                 });
             });
-
-        new Setting(content)
-            .setName("Suppress theme-defined background color")
-            .setDesc(
-                "Does theme styling show around your selected tasks? Your theme may provide a way to disable task styling (preferred). This might also work."
-            )
-            .addToggle((toggle) => {
-                toggle.setValue(this.cfg.clearThemeBackground).onChange((v) => {
-                    this.cfg.clearThemeBackground = v;
-                    this.cfg.taskSettings.forEach((ts) => {
-                        this.applySettingsToCheckbox(ts);
-                    });
-                });
-            });
     }
 
     onClose(): void {
@@ -842,33 +828,32 @@ class CreateCheckboxesModal extends Modal {
             COLOR.BACKGROUND
         );
 
-        if (fgColor === "inherit") {
-            checkboxEl.style.removeProperty("border-color");
-            checkboxEl.style.color = "var(--text-normal)";
-        } else {
-            checkboxEl.style.borderColor = fgColor;
-            checkboxEl.style.color = fgColor;
-        }
-        checkboxEl.style.setProperty("--snippetor-fg-color", fgColor);
-
+        // doing this the hard way because we have to override at least
+        // one !important from themes
         checkboxEl.style.removeProperty("background-color");
-        const style = checkboxEl.getAttribute("style");
-        // doing this the hard way because we have to override at least one !important in a theme (minimal)
-        if (this.cfg.clearThemeBackground && bgColor === "transparent") {
-            checkboxEl.setAttribute(
-                "style",
-                style + " background-color: unset !important;"
-            );
+        checkboxEl.style.removeProperty("border-color");
+
+        let style = checkboxEl.getAttribute("style");
+
+        if (fgColor === "inherit") {
+            style += " color: var(--text-normal)";
         } else {
-            checkboxEl.setAttribute(
-                "style",
-                style + ` background-color: ${bgColor} !important;`
-            );
+            style += ` color: ${fgColor} !important;`;
+        }
+        style += ` --snippetor-fg-color: ${fgColor};`;
+
+        if (bgColor === "transparent") {
+            style += " background-color: unset !important;";
+        } else {
+            style += ` background-color: ${bgColor} !important;`;
         }
 
         if (taskSettings.checkbox.hideBorder) {
-            checkboxEl.style.borderColor = "transparent";
+            style += " border-color: transparent !important;";
+        } else {
+            style += ` border-color: ${fgColor} !important;`;
         }
+        checkboxEl.setAttribute("style", style);
     }
 
     verifyDataValue(input: HTMLInputElement) {

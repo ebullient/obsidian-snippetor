@@ -10,8 +10,8 @@ export interface SnippetConfig {
 export interface TaskSnippetConfig extends SnippetConfig {
     version: string;
     taskSettings: TaskSettings[];
+    baseFontSize: number;
     hideColorPicker?: boolean;
-    clearThemeBackground?: boolean;
     styleUncheckedTask?: boolean;
     uncheckedTask?: TaskSettings;
 }
@@ -71,6 +71,7 @@ export interface ConstructedElements {
 }
 
 export interface OldTaskSettings extends TaskSettings {
+    clearThemeBackground?: boolean /* deprecated */;
     reader?: string /* deprecated */;
     taskColorLight?: string /* deprecated */;
     taskColorDark?: string /* deprecated */;

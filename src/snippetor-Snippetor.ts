@@ -88,7 +88,11 @@ export class Snippetor {
                 this.convertTaskSettings(cfg.uncheckedTask);
             }
         }
-        cfg.version = "0.1.6";
+        if (cfg.version !== "1.7") {
+            Reflect.deleteProperty(cfg, "clearThemeBackground");
+            cfg.baseFontSize = 14;
+        }
+        cfg.version = "0.1.7";
     }
 
     initTaskSettings(version: string, ts: Partial<TaskSettings>): void {

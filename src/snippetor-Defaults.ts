@@ -1,8 +1,4 @@
-import type {
-    SnippetorSettings,
-    TaskSettings,
-    TaskSnippetConfig,
-} from "./@types";
+import type { SnippetorSettings, TaskSnippetConfig } from "./@types";
 
 export const LOCK = "lock";
 export const LOCK_ICON =

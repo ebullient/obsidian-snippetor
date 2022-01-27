@@ -203,9 +203,10 @@ test("Mammoth", () => {
     }
 
     const expected: TaskSnippetConfig = {
-        version: "0.1.6",
+        version: "0.1.7",
         name: "name",
         type: DEFAULT_TASK_SNIPPET_SETTINGS.type,
+        baseFontSize: 14,
         uncheckedTask: {
             data: " ",
             unchecked: true,
