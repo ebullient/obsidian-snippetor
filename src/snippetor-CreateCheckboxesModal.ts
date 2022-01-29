@@ -78,7 +78,7 @@ class CreateCheckboxesModal extends Modal {
         this.titleEl.createSpan({ text: "Snippetor: Tasks" });
 
         const content = this.contentEl.createDiv(
-            "snippetor-checkboxes markdown-preview-view"
+            "snippetor-content markdown-preview-view"
         );
 
         this.helper = new ModalHelper(
@@ -89,6 +89,7 @@ class CreateCheckboxesModal extends Modal {
 
         new Setting(content)
             .setName("Name of generated snippet (filename)")
+            .setClass("snippet-filename")
             .addText((text) => {
                 text.setPlaceholder("trigger")
                     .setValue(this.cfg.name)
@@ -115,6 +116,8 @@ class CreateCheckboxesModal extends Modal {
         });
 
         this.elements.list = content.createEl("ul");
+        this.elements.list.addClass("contains-task-list");
+
         this.showTasks();
 
         new Setting(content)
@@ -192,7 +195,7 @@ class CreateCheckboxesModal extends Modal {
 
     createHeader(): void {
         const heading = this.elements.list.createEl("li", {
-            cls: "task-list-item header",
+            cls: "task-list-item",
         });
 
         const preview = heading.createSpan("snippetor-preview");
@@ -203,23 +206,24 @@ class CreateCheckboxesModal extends Modal {
                 type: "checkbox",
             },
         });
-        if (this.cfg.styleUncheckedTask) {
-            // make the preview checkbox invisible
-            checkbox.style.borderColor = "transparent";
-            checkbox.style.backgroundColor = "inherit";
-        }
-        this.elements.defaultFontSize = Math.ceil(
-            Number(getComputedStyle(checkbox).fontSize.replace("px", ""))
-        );
-
-        preview.createSpan({
-            text: "Preview",
+        const example = preview.createSpan({
+            text: "unchecked",
             cls: "example",
         });
         heading.createSpan({
             text: "Settings",
-            cls: "snippetor-settings",
+            cls: "header",
         });
+
+        if (this.cfg.styleUncheckedTask) {
+            // make the preview checkbox invisible
+            checkbox.style.borderStyle = "hidden";
+            checkbox.style.backgroundColor = "inherit";
+            example.style.color = "transparent";
+        }
+        this.elements.defaultFontSize = Math.ceil(
+            Number(getComputedStyle(checkbox).fontSize.replace("px", ""))
+        );
 
         const actions = heading.createSpan("snippetor-li-actions");
 
@@ -754,22 +758,34 @@ class CreateCheckboxesModal extends Modal {
         itemEl.className =
             "task-list-item" + (taskSettings.data == " " ? "" : " is-checked");
         this.setListItemColors(taskSettings);
+
+        textEl.style.removeProperty("--snippetor-decoration");
+        textEl.style.removeProperty("--snippetor-weight");
+        textEl.style.removeProperty("--snippetor-text-style");
+
         if (taskSettings.li.format) {
             if (taskSettings.li.format.strikethrough) {
-                textEl.style.textDecoration = "line-through";
+                textEl.style.setProperty(
+                    "--snippetor-decoration",
+                    "line-through"
+                );
             } else {
-                textEl.style.removeProperty("text-decoration");
+                textEl.style.setProperty("--snippetor-decoration", "none");
             }
             if (taskSettings.li.format.bold) {
-                textEl.style.fontWeight = "700";
+                textEl.style.setProperty("--snippetor-weight", "700");
             } else {
-                textEl.style.removeProperty("font-weight");
+                textEl.style.setProperty("--snippetor-weight", "500");
             }
             if (taskSettings.li.format.italics) {
-                textEl.style.fontStyle = "italic";
+                textEl.style.setProperty("--snippetor-text-style", "italic");
             } else {
-                textEl.style.removeProperty("font-style");
+                textEl.style.setProperty("--snippetor-text-style", "normal");
             }
+        } else {
+            textEl.style.setProperty("--snippetor-decoration", "none");
+            textEl.style.setProperty("--snippetor-weight", "500");
+            textEl.style.setProperty("--snippetor-text-style", "normal");
         }
     }
 
@@ -836,30 +852,33 @@ class CreateCheckboxesModal extends Modal {
 
         // doing this the hard way because we have to override at least
         // one !important from themes
-        checkboxEl.style.removeProperty("background-color");
-        checkboxEl.style.removeProperty("border-color");
-
-        let style = checkboxEl.getAttribute("style");
+        checkboxEl.style.removeProperty("--snippetor-fg-color");
+        checkboxEl.style.removeProperty("--snippetor-bg-color");
+        checkboxEl.style.removeProperty("--snippetor-border-color");
 
         if (fgColor === "inherit") {
-            style += " color: var(--text-normal)";
+            checkboxEl.style.setProperty(
+                "--snippetor-fg-color",
+                "var(--text-normal)"
+            );
         } else {
-            style += ` color: ${fgColor} !important;`;
+            checkboxEl.style.setProperty("--snippetor-fg-color", fgColor);
         }
-        style += ` --snippetor-fg-color: ${fgColor};`;
 
         if (bgColor === "transparent") {
-            style += " background-color: unset !important;";
+            checkboxEl.style.setProperty("--snippetor-bg-color", "transparent");
         } else {
-            style += ` background-color: ${bgColor} !important;`;
+            checkboxEl.style.setProperty("--snippetor-bg-color", bgColor);
         }
 
         if (taskSettings.checkbox.hideBorder) {
-            style += " border-color: transparent !important;";
+            checkboxEl.style.setProperty(
+                "--snippetor-border-color",
+                "transparent"
+            );
         } else {
-            style += ` border-color: ${fgColor} !important;`;
+            checkboxEl.style.setProperty("--snippetor-border-color", fgColor);
         }
-        checkboxEl.setAttribute("style", style);
     }
 
     verifyDataValue(input: HTMLInputElement) {

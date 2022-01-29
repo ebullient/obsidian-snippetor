@@ -1,299 +1,267 @@
 #snippetor-checkboxes-modal {
-  h3.snippetor-reset {
-    display: flex;
-    .setting-item-control {
-      display: inline-flex;
-      align-items: flex-end;
-    }
-  }
 
-  button.generate-css.is-active:after {
-    content: "⚙️";
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    display: block;
-  }
-
-  /* This should match the standard page colors */
-  .snippetor-checkboxes {
-    background-color: var(--background-primary);
-    color: var(--text-normal);
-  }
-
-  ul > li {
-    display: flex;
-    align-items: stretch;
-    line-height: 2em;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    margin-bottom: 5px;
-    position: relative;
-
-    .snippetor-preview {
-      padding: 5px 0;
-      align-self: flex-start;
-      display: flex;
-      align-items: center;
-      pointer-events: none;
-      border-right: 1px solid var(--interactive-accent);
-      border-radius: 4px;
-
-      .example {
-        display: inline-block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 75px;
-        max-width: 75px;
-      }
-    }
-
-    .snippetor-settings {
-      padding: 5px;
-      flex-grow: 2;
-      display: flex;
-      flex-flow: column wrap;
-      align-items: stretch;
-      justify-content: flex-start;
-
-      label,
-      .row-label,
-      .source-mode-label {
-        font-family: var(--font-monospace) !important;
-      }
-      label,
-      .row-label {
-        white-space: nowrap;
-      }
-
-      input.snippetor-data-task {
-        font-family: var(--font-monospace);
-        padding: 0 8px;
-        text-align: center;
-        position: relative;
-      }
-
-      input.snippetor-data-task.data-value-required {
-        border-color: var(--text-accent);
-      }
-
-      input.snippetor-data-task.data-value-error {
-        border-color: var(--text-error);
-        text-decoration: underline;
-      }
-
-      .snippetor-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        border-radius: 2px;
-      }
-
-      .snippetor-group {
-        display: inline-flex;
-        flex-wrap: nowrap;
-        align-items: center;
-      }
-
-      .row-label,
-      .snippetor-group.decorated {
-        border: none;
-        border-radius: 6px;
-        color: var(--text-normal);
-        background-color: var(--background-secondary-alt);
-        margin-right: 6px;
-        padding: 2px 4px;
-
-        input[type="text"] {
-          background-color: var(--background-secondary);
-          font-size: 14px;
-          height: 26px;
-          margin: 0 2px;
-          padding: 5px 5px;
-        }
-      }
-
-      .settings-reset,
-      .row-label {
-        align-self: flex-start;
-        background-color: inherit;
-      }
-
-      button,
-      .row-label,
-      .snippetor-group {
-        margin-bottom: 5px;
-      }
-
-      button,
-      .row-label,
-      .snippetor-group.decorated {
-        height: 30px !important;
-      }
-
-      button.is-active {
-        background-color: var(--interactive-accent);
-        color: var(--text-on-accent);
-      }
-
-      .background-heading,
-      .read-mode-heading {
-        padding: 0 6px;
-      }
-
-      button.toggle-sync-color {
-        font-family: monospace !important;
-        padding: 0 12px !important;
-        font-size: 18px !important;
-      }
-
-      .hide-text-colors > .snippetor-group.color {
-        display: none;
-      }
-    }
-
-    .snippetor-li-actions {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: stretch;
-
-      .toggle-extra:not(.is-active) {
-        display: none;
-      }
-      .toggle-extra.is-active {
-        display: inherit;
-      }
-    }
-
-    .color-sync,
-    .setting-editor-extra-setting-button.no-padding {
-      color: unset;
-      margin: 0 2px;
-    }
-    button:not(.no-padding) {
-      border-radius: 4px;
-      border: none;
-      padding: 6px 20px;
-    }
-    button.no-padding {
-      margin-bottom: 0px;
-    }
-
-    .setting-editor-extra-setting-button:not(.no-padding) {
-      margin-top: 10px;
-    }
-
-    .setting-editor-extra-setting-button.settings-reset {
-      padding-top: 3px
-    }
-
-    .checkbox-container.picker-toggle,
-    .checkbox-container.theme-toggle {
-      height: 22px;
-      width: 44px;
-      margin-right: 12px;
-      box-shadow: 0px 0px 0px 2px rgb(0 0 0 / 2%), 0px 0px 2px 1px rgb(0 0 0 / 5%) inset;
-    }
-    .theme-toggle::after {
-      content: "🌗";
-      line-height: 16px;
-      font-size: 16px;
-      height: 16px;
-      width: 16px;
-      background: none;
-      box-shadow: none;
-      border-radius: 9px;
-      transform: translate3d(3px, 0, 0);
-      display: block;
-    }
-    .picker-toggle::after {
-      content: "🎨";
-      line-height: 16px;
-      font-size: 16px;
-      height: 16px;
-      width: 16px;
-      background: none;
-      box-shadow: none;
-      border-radius: 9px;
-      transform: translate3d(3px, 0, 0);
-      display: block;
-    }
-    .theme-toggle.is-enabled::after,
-    .picker-toggle.is-enabled::after {
-      transform: translate3d(24px, 0, 0);
-      display: block;
-    }
-  }
-
-  ul > li.header {
-    align-items: center;
-
-    .example,
-    .snippetor-settings {
-      font-weight: bold;
-    }
-
-    .snippetor-li-actions {
-      padding-right: 8px;
-    }
-  }
-
-  .markdown-preview-view {
-    ul > li.task-list-item {
-      font-weight: normal;
-      color: var(--text-normal);
-      padding-left: 3px;
-      text-indent: unset; /** override base theme for preview */
-    }
-    ul > li.task-list-item {
-      margin-right: 1px; // pad for border on hover
-    }
-    ul > li.task-list-item:hover {
-      margin-right: 0px;
-      border-right: 1px solid var(--interactive-accent);
-    }
-    input.task-list-item-checkbox.snippetor {
-      top: 0;
-      border-right-color: unset;
-    }
-    input.task-list-item-checkbox[data] {
-      -webkit-appearance: none;
-      box-sizing: border-box;
-      cursor: pointer;
-      filter: none;
-      border: 1px solid var(--text-normal);
-      border-radius: 2px;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-    }
-    input.task-list-item-checkbox[data]:not(:checked)::before,
-    input.task-list-item-checkbox[data]:checked::before {
-      font-family: var(--font-monospace);
-      position: absolute;
-      text-align: center;
-      font-weight: 500;
-      line-height: var(--snippetor-font-size);
-      font-size: var(--snippetor-font-size);
-      top: var(--snippetor-top);
-      left: var(--snippetor-left);
-      right: 1px;
-      color: var(--snippetor-fg-color);
-      content: attr(data);
-    }
-    ul > li.task-list-item:not(.live-preview) {
-      input[type="checkbox"].task-list-item-checkbox.snippetor {
-        position: absolute;
-        top: 8px;
-        left: -21px;
-      }
-    }
-  }
-
-  // override default theme (strikethrough done on an element for testing)
+  /* disable strikethrough (it is inherited); will apply selectively to preview */
   ul > li.task-list-item.is-checked {
     text-decoration: none;
+  }
+
+  /* Content: This should match the standard page colors */
+  .snippetor-content {
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+
+    .setting-item.snippet-filename {
+      border-top: 0px;
+      padding-top: 0px;
+
+      button.generate-css.is-active:after {
+        content: "⚙️";
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        display: block;
+      }
+    }
+
+    /* This is a list that contains preview AND settings */
+    ul.contains-task-list {
+      li.task-list-item {
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        margin-bottom: 5px;
+        position: relative;
+
+        .snippetor-preview {
+          width: 100px;
+          max-width: 100px;
+          min-width: 100px;
+          pointer-events: none;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          /* Task list item settings */
+          font-weight: var(--snippetor-weight);
+          font-style: var(--snippetor-text-style);
+          text-decoration: var(--snippetor-decoration);
+
+          input.task-list-item-checkbox {
+            margin-left: 0px; /* Override themes so always visible */
+          }
+
+          input.task-list-item-checkbox[data] {
+            -webkit-appearance: none;
+            box-sizing: border-box;
+            cursor: pointer;
+            filter: none;
+            background: unset !important;
+            background-color: var(--snippetor-bg-color) !important;
+            color: var(--snippetor-fg-color) !important;
+            border-width: 1px;
+            border-style: solid;
+            border-color: var(--snippetor-border-color) !important;
+            font-family: var(--font-monospace);
+          }
+
+          input.task-list-item-checkbox[data]:not(:checked)::before,
+          input.task-list-item-checkbox[data]:checked::before {
+            font-family: var(--font-monospace);
+            position: absolute;
+            text-align: center;
+            font-weight: 500;
+            line-height: var(--snippetor-font-size);
+            font-size: var(--snippetor-font-size);
+            top: var(--snippetor-top);
+            left: var(--snippetor-left);
+            right: 1px;
+            color: var(--snippetor-fg-color);
+            content: attr(data);
+          }
+        }
+
+        .header {
+          flex-grow: 2;
+          font-weight: bold;
+          padding-top: 2px;
+          margin-right: 5px;
+        }
+
+        .header,
+        .snippetor-settings {
+          border-left: 1px solid var(--background-secondary);
+          border-right: 1px solid var(--background-secondary);
+          border-radius: 4px;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+
+        /* Flex container: rows */
+        .snippetor-settings {
+          flex-grow: 2;
+          display: flex;
+          flex-flow: column wrap;
+          align-items: stretch;
+          justify-content: flex-start;
+
+          /* Flex container of labels, groups */
+          .snippetor-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            border-radius: 2px;
+          }
+
+          .snippetor-group {
+            display: inline-flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            margin-right: 6px;
+          }
+
+          .snippetor-group.decorated {
+            border: none;
+            border-radius: 6px;
+            color: var(--text-normal);
+            background-color: var(--background-secondary);
+            padding: 2px 4px;
+
+            input[type="text"] {
+              background-color: var(--background-primary);
+              font-size: 14px;
+              height: 26px;
+              margin: 0 2px;
+              padding: 5px 5px;
+            }
+
+            input[type="range"] {
+              width: 50px;
+            }
+          }
+
+          label {
+            padding: 2px 4px;
+          }
+          .row-label {
+            margin-right: 6px;
+            padding: 2px 4px;
+          }
+
+          button,
+          .snippetor-group {
+            margin-bottom: 5px;
+          }
+          button.no-padding {
+            margin-bottom: 0px;
+          }
+          button.toggle-sync-color {
+            font-family: monospace !important;
+            padding: 0 12px !important;
+            font-size: 18px !important;
+            margin-right: 6px;
+          }
+          .hide-text-colors > .snippetor-group.color {
+            display: none;
+          }
+
+          button,
+          .row-label,
+          .snippetor-group.decorated {
+            height: 30px !important;
+          }
+
+          button.is-active {
+            background-color: var(--interactive-accent);
+            color: var(--text-on-accent);
+          }
+
+          label,
+          .row-label,
+          .source-mode-label {
+            white-space: nowrap;
+          }
+
+          .source-mode-label {
+            font-family: var(--font-monospace);
+          }
+
+          input.snippetor-data-task {
+            font-family: var(--font-monospace);
+            padding: 0 8px;
+            text-align: center;
+            position: relative;
+          }
+
+          input.snippetor-data-task.data-value-required {
+            border-color: var(--text-accent);
+          }
+
+          input.snippetor-data-task.data-value-error {
+            border-color: var(--text-error);
+            text-decoration: underline;
+          }
+        }
+
+        .snippetor-settings:hover {
+          border-right: 1px solid var(--interactive-accent);
+          border-left: 1px solid var(--interactive-accent);
+        }
+
+        .snippetor-li-actions {
+          display: flex;
+          flex-direction: row;
+          align-items: flex-start;
+          justify-content: stretch;
+
+          .settings-reset {
+            padding-top: 2px;
+          }
+          .toggle-extra:not(.is-active) {
+            display: none;
+          }
+          .toggle-extra.is-active {
+            display: inherit;
+          }
+
+          .checkbox-container.picker-toggle,
+          .checkbox-container.theme-toggle {
+            height: 22px;
+            width: 44px;
+            margin-right: 12px;
+            box-shadow: 0px 0px 0px 2px rgb(0 0 0 / 2%), 0px 0px 2px 1px rgb(0 0 0 / 5%) inset;
+          }
+          .theme-toggle::after {
+            content: "🌗";
+            line-height: 16px;
+            font-size: 16px;
+            height: 16px;
+            width: 16px;
+            background: none;
+            box-shadow: none;
+            border-radius: 9px;
+            transform: translate3d(3px, 0, 0);
+            display: block;
+          }
+          .picker-toggle::after {
+            content: "🎨";
+            line-height: 16px;
+            font-size: 16px;
+            height: 16px;
+            width: 16px;
+            background: none;
+            box-shadow: none;
+            border-radius: 9px;
+            transform: translate3d(3px, 0, 0);
+            display: block;
+          }
+          .theme-toggle.is-enabled::after,
+          .picker-toggle.is-enabled::after {
+            transform: translate3d(24px, 0, 0);
+            display: block;
+          }
+        }
+      }
+    }
   }
 }

@@ -21,3 +21,5 @@ data.json
 *dev.js
 main.js.LICENSE.txt
 .env
+
+*.ignore
