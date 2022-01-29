@@ -48,12 +48,6 @@ export class ModalHelper {
 
         ctx.fillStyle = getComputedStyle(this.content).backgroundColor;
         this.background = ctx.fillStyle;
-
-        console.log(
-            "Detected fg[%s] and bg[%s]",
-            this.foreground,
-            this.background
-        );
     }
 
     get isLightMode(): boolean {

@@ -98,7 +98,6 @@ export class Snippetor {
     }
 
     initTaskSettings(version: string, ts: Partial<TaskSettings>): void {
-        console.log("init task settings");
         this.initialize(ts, "cache");
         this.initialize(ts, "checkbox", "lightMode");
         this.initialize(ts, "checkbox", "darkMode");
@@ -171,7 +170,6 @@ export class Snippetor {
     }
 
     async generateCss(cfg: SnippetConfig): Promise<void> {
-        console.log("Create CSS file for snippet %o", cfg);
         if (!cfg.name) {
             new Notice("Unable to create snippet: Missing file name.");
             return Promise.reject();
@@ -193,6 +191,7 @@ export class Snippetor {
         const fileName = cfg.type + "-" + cfg.name;
         const path = this.app.customCss.getSnippetPath(fileName);
         const exists = await this.app.vault.adapter.exists(path);
+        console.log("Create CSS file %s for snippet %o", fileName, cfg);
 
         let update;
         if (exists) {
