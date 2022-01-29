@@ -13,7 +13,6 @@ if you want to view the source, please visit the github repository of this plugi
 `;
 
 const prod = (process.argv[2] === 'production');
-console.log(process.env.OUTDIR);
 const dir = prod || ! process.env.OUTDIR ? "./build" : process.env.OUTDIR ;
 
 esbuild.build({
@@ -27,8 +26,9 @@ esbuild.build({
     watch: !prod,
     target: 'es2016',
     logLevel: "info",
-    sourcemap: prod ? false : 'inline',
+    sourcemap: 'external',
     treeShaking: true,
+    minify: true,
     outdir: dir,
     plugins: [
         sassPlugin()
