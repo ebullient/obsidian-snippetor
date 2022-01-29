@@ -1,5 +1,4 @@
 import { App, Modal } from "obsidian";
-import { generateSlug } from "random-word-slugs";
 import { SnippetConfig } from "./@types";
 import { ModalHelper } from "./snippetor-ModalHelper";
 import { Snippetor } from "./snippetor-Snippetor";
@@ -15,12 +14,14 @@ export function openCreateTemplateModal(
         const modal = new CreateTemplateModal(app, snippetConfig, snippetor);
 
         modal.onClose = () => {
-            // make sure a name is set
-            if (!modal.cfg.name) {
-                modal.cfg.name = generateSlug(2);
+            try {
+                modal.finish();
+            } catch (error) {
+                console.log("Caught %o, rejecting promise", error);
+                Promise.reject();
             }
-            resolve(modal.cfg);
         };
+
         try {
             modal.open();
         } catch (error) {
@@ -46,7 +47,9 @@ class CreateTemplateModal extends Modal {
         // render panel
     }
 
-    onClose(): void {
-        // clean up
+    finish(): void {
+        // clean up; Make sure required settings exist
+
+        this.snippetor.initCommonConfig(this.cfg); // name + id + version
     }
 }

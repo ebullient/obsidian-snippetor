@@ -16,11 +16,7 @@ export class SnippetorPlugin extends Plugin {
 
     async onload(): Promise<void> {
         this.snippetor = new Snippetor(this.app);
-        console.debug(
-            "loaded Snippetor %s: %o",
-            this.manifest.version,
-            this.settings
-        );
+        console.debug("loaded Snippetor %s: %o", this.manifest.version);
         addIcon(LOCK, LOCK_ICON);
         addIcon(UNLOCK, UNLOCK_ICON);
         this.addSettingTab(new SnippetorSettingsTab(this.app, this));
@@ -44,20 +40,28 @@ export class SnippetorPlugin extends Plugin {
     }
 
     async removeSnippet(snippetCfg: SnippetConfig): Promise<void> {
-        console.log("Removing %o", snippetCfg);
-        delete this.settings.snippets[snippetCfg.name];
+        console.debug("Removing %o [%o]", snippetCfg.name, snippetCfg.id);
+
+        Object.entries(this.settings.snippets)
+            .filter(([k, v]) => v.id === snippetCfg.id)
+            .map(([k, v]) => k)
+            .forEach((k) => Reflect.deleteProperty(this.settings.snippets, k));
+
         return this.saveSettings().then(() =>
+            // delete file, too
             this.snippetor.deleteSnippet(snippetCfg)
         );
     }
 
     async setSnippet(snippetCfg: SnippetConfig): Promise<void> {
-        console.log("Updating %o with %o", this.settings, snippetCfg);
-        this.settings.snippets[snippetCfg.name] = snippetCfg;
+        Reflect.deleteProperty(this.settings.snippets, snippetCfg.name); // pre-0.1.8
+        this.settings.snippets[snippetCfg.id] = snippetCfg;
         return this.saveSettings();
     }
 
     get allSnippets(): SnippetConfig[] {
-        return Object.values(this.settings.snippets);
+        return Object.values(this.settings.snippets).sort((a, b) =>
+            a.name.localeCompare(b.name)
+        );
     }
 }

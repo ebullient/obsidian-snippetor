@@ -203,8 +203,9 @@ test("Mammoth", () => {
     }
 
     const expected: TaskSnippetConfig = {
-        version: "0.1.7",
+        version: "0.1.8",
         name: "name",
+        id: "generated", // added 0.1.8
         type: DEFAULT_TASK_SNIPPET_SETTINGS.type,
         baseFontSize: 14,
         uncheckedTask: {
@@ -356,5 +357,7 @@ test("Mammoth", () => {
 
     const actual = JSON.parse(JSON.stringify(initial));
     snippetor.initConfig(actual as Partial<TaskSnippetConfig>);
+    expect(actual.id).toBeDefined(); // 0.1.8: make sure the id was generated
+    expected.id = actual.id; // set to the same value so the rest can be compared
     expect(actual).toEqual(expected);
 });

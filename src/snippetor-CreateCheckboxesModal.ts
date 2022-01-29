@@ -13,7 +13,6 @@ import type {
     ConstructedElements,
     ColoredElement,
 } from "./@types";
-import { generateSlug } from "random-word-slugs";
 import { Snippetor } from "./snippetor-Snippetor";
 import { ModalHelper } from "./snippetor-ModalHelper";
 import { COLOR, LOCK, UNLOCK } from "./snippetor-Defaults";
@@ -27,12 +26,14 @@ export function openCreateCheckboxModal(
         const modal = new CreateCheckboxesModal(app, taskSnippetCfg, snippetor);
 
         modal.onClose = () => {
-            // make sure a name is set
-            if (!modal.cfg.name) {
-                modal.cfg.name = generateSlug(2);
+            try {
+                modal.finish();
+            } catch (error) {
+                console.log("Caught %o, rejecting promise", error);
+                Promise.reject();
             }
-            resolve(modal.cfg);
         };
+
         try {
             modal.open();
         } catch (error) {
@@ -60,7 +61,7 @@ class CreateCheckboxesModal extends Modal {
         this.containerEl.id = "snippetor-checkboxes-modal";
         this.cfg = taskSnippetCfg || snippetor.createNewTaskSnippetCfg();
 
-        // For now.. migrate old task data
+        // Ensure required config, migrate old task data
         this.snippetor.initConfig(this.cfg);
 
         // save snapshot of task settings
@@ -147,23 +148,27 @@ class CreateCheckboxesModal extends Modal {
             });
     }
 
-    onClose(): void {
+    finish(): void {
         this.contentEl.empty();
         this.elements = {};
         // do not persist the transient cache
-        Reflect.deleteProperty(this.cfg.uncheckedTask, "cache");
+        if (this.cfg.uncheckedTask) {
+            Reflect.deleteProperty(this.cfg.uncheckedTask, "cache");
+        }
         this.cfg.taskSettings.forEach((ts) =>
             Reflect.deleteProperty(ts, "cache")
         );
+        // make sure a name is set
+        this.snippetor.initCommonConfig(this.cfg);
     }
 
     showTasks(): void {
         this.elements.list.empty();
         this.cfg.taskSettings.forEach((ts) => {
-            this.initTaskElements(ts);
+            this.resetTaskElements(ts);
         });
         if (this.cfg.uncheckedTask) {
-            this.initTaskElements(this.cfg.uncheckedTask);
+            this.resetTaskElements(this.cfg.uncheckedTask);
         }
 
         // Create a header. Pass a callback to .
@@ -906,7 +911,7 @@ class CreateCheckboxesModal extends Modal {
         }
     }
 
-    initTaskElements(ts: TaskSettings): void {
+    resetTaskElements(ts: TaskSettings): void {
         for (const [key, value] of Object.entries(ts.cache)) {
             if (value instanceof HTMLElement) {
                 Reflect.deleteProperty(ts.cache, key);

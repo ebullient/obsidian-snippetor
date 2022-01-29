@@ -6,7 +6,6 @@ import {
     PluginSettingTab,
     Setting,
 } from "obsidian";
-import { generateSlug } from "random-word-slugs";
 import { SnippetConfig, TaskSnippetConfig } from "./@types";
 import SnippetorPlugin from "./main";
 import { openCreateCheckboxModal } from "./snippetor-CreateCheckboxesModal";
@@ -76,7 +75,6 @@ export class SnippetorSettingsTab extends PluginSettingTab {
         this.existingEl.empty(); // clear, used for refreshing
 
         for (const snippet of this.plugin.allSnippets) {
-            console.log(snippet);
             new Setting(this.existingEl)
                 .setName(snippet.name)
                 .setDesc(this.getDescription(snippet.type))
@@ -86,6 +84,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                         .setTooltip("Edit this Snippet")
                         .onClick(async () => {
                             await this.openModal(snippet.type, snippet);
+                            this.listExistingSnippets();
                         })
                 )
                 .addExtraButton((b: ExtraButtonComponent) =>
@@ -94,11 +93,11 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                         .setTooltip("Copy this Snippet")
                         .onClick(async () => {
                             const copy = JSON.parse(JSON.stringify(snippet));
-                            copy.name = generateSlug(2);
-                            new Notice(
-                                `Copied snippet '${snippet.name}' to '${copy.name}'`
-                            );
+                            delete copy.id;
+                            delete copy.name;
+                            new Notice(`Copied snippet '${snippet.name}'`);
                             await this.openModal(snippet.type, copy);
+                            this.listExistingSnippets();
                         })
                 )
                 .addExtraButton((b: ExtraButtonComponent) =>

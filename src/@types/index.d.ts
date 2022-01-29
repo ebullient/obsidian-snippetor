@@ -3,12 +3,13 @@ export interface SnippetorSettings {
 }
 
 export interface SnippetConfig {
+    version: string;
     name: string;
+    id: string;
     type: string;
 }
 
 export interface TaskSnippetConfig extends SnippetConfig {
-    version: string;
     taskSettings: TaskSettings[];
     baseFontSize: number;
     hideColorPicker?: boolean;

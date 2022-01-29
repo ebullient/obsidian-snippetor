@@ -10,6 +10,7 @@ import * as Eta from "eta";
 import { SIMPLE_TASK } from "./snippetor-Snippetor-Templates";
 import { generateSlug } from "random-word-slugs";
 import randomColor from "randomcolor";
+import { compare } from "compare-versions";
 
 export class Snippetor {
     constructor(private app: App) {
@@ -19,35 +20,25 @@ export class Snippetor {
         });
     }
 
-    get canUseTaskCollector(): boolean {
-        return (
-            this.app.plugins.plugins["obsidian-task-collector"] !== undefined
-        );
-    }
-
     get taskValues(): Set<string> {
-        let values =
-            this.app.plugins.plugins["obsidian-task-collector"].taskCollector
-                .settings.incompleteTaskValues;
-        if (
-            this.app.plugins.plugins["obsidian-task-collector"].taskCollector
-                .settings.supportCanceledTasks
-        ) {
-            values += "-";
+        const tcPlugin = this.app.plugins.plugins["obsidian-task-collector"];
+        if (tcPlugin) {
+            let values = tcPlugin.taskCollector.settings.incompleteTaskValues;
+            if (tcPlugin.taskCollector.settings.supportCanceledTasks) {
+                values += "-";
+            }
+            return new Set((values + "xX").replace(" ", "").split(""));
         }
-        return new Set((values + "xX").replace(" ", "").split(""));
+        return new Set(["x", "-", ">"]);
     }
 
     createNewTaskSnippetCfg(): TaskSnippetConfig {
         const result = Object.assign({}, DEFAULT_TASK_SNIPPET_SETTINGS, {
+            id: this.generateId(),
             name: generateSlug(2),
             taskSettings: [],
         });
-        let values = new Set(["x", "-", ">"]);
-        if (this.canUseTaskCollector) {
-            values = this.taskValues;
-        }
-        values.forEach((v) => {
+        this.taskValues.forEach((v) => {
             result.taskSettings.push(this.createNewTaskCfg(v));
         });
         return result;
@@ -78,21 +69,32 @@ export class Snippetor {
         };
     }
 
+    generateId(): string {
+        return generateSlug(3) + "-" + randomColor();
+    }
+
+    initCommonConfig(cfg: Partial<SnippetConfig>): void {
+        if (!cfg.id) {
+            cfg.id = this.generateId();
+        }
+        if (!cfg.name) {
+            cfg.name = generateSlug(2);
+        }
+        cfg.version = "0.1.8";
+    }
+
     initConfig(cfg: Partial<TaskSnippetConfig>): void {
         cfg.taskSettings.forEach((ts) => {
             this.initTaskSettings(cfg.version, ts);
         });
         if (cfg.uncheckedTask) {
             this.initTaskSettings(cfg.version, cfg.uncheckedTask);
-            if (cfg.version === null) {
-                this.convertTaskSettings(cfg.uncheckedTask);
-            }
         }
-        if (cfg.version !== "1.7") {
+        if (cfg.version === undefined || compare(cfg.version, "0.1.7", "<")) {
             Reflect.deleteProperty(cfg, "clearThemeBackground");
             cfg.baseFontSize = 14;
         }
-        cfg.version = "0.1.7";
+        this.initCommonConfig(cfg); // last, it bumps the version
     }
 
     initTaskSettings(version: string, ts: Partial<TaskSettings>): void {
