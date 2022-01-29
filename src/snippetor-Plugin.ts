@@ -16,7 +16,6 @@ export class SnippetorPlugin extends Plugin {
 
     async onload(): Promise<void> {
         this.snippetor = new Snippetor(this.app);
-        await this.loadSettings();
         console.debug(
             "loaded Snippetor %s: %o",
             this.manifest.version,
@@ -32,8 +31,11 @@ export class SnippetorPlugin extends Plugin {
     }
 
     async loadSettings(): Promise<void> {
-        const options = await this.loadData();
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, options);
+        if (!this.settings) {
+            console.debug("Snippetor: loading settings");
+            const options = await this.loadData();
+            this.settings = Object.assign({}, DEFAULT_SETTINGS, options);
+        }
     }
 
     async saveSettings(): Promise<void> {

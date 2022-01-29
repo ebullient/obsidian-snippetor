@@ -21,7 +21,9 @@ export class SnippetorSettingsTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
-    display(): void {
+    async display(): Promise<void> {
+        await this.plugin.loadSettings();
+
         this.containerEl.empty();
         this.containerEl.addClass("snippetor-plugin-settings");
 

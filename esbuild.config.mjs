@@ -24,11 +24,11 @@ esbuild.build({
     external: ['obsidian', 'electron', ...builtins],
     format: 'cjs',
     watch: !prod,
-    target: 'es2016',
+    target: 'es2020',
     logLevel: "info",
-    sourcemap: 'external',
+    sourcemap: prod ? false : 'inline',
     treeShaking: true,
-    minify: true,
+    minify: prod ? true : false,
     outdir: dir,
     plugins: [
         sassPlugin()
