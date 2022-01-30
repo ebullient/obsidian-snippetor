@@ -1,6 +1,6 @@
 {
   "name": "obsidian-snippetor",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Generate and tweak common snippets",
   "main": "main.js",
   "scripts": {
