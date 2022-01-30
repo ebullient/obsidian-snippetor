@@ -49,5 +49,7 @@ jobs:
         git config user.email github-actions@github.com
         git add .
         git commit -m "🔖 $VERSION"
+        git push
         git tag $VERSION
-        git push --follow-tags
+        git push --tags
+
