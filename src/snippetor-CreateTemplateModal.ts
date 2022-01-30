@@ -16,6 +16,7 @@ export function openCreateTemplateModal(
         modal.onClose = () => {
             try {
                 modal.finish();
+                resolve(modal.cfg);
             } catch (error) {
                 console.log("Caught %o, rejecting promise", error);
                 Promise.reject();
