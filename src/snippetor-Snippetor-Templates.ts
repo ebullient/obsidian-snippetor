@@ -63,8 +63,7 @@ function checkboxSettings(i, ts) {
     position: relative;
     -webkit-appearance: none;
     box-sizing: border-box;
-    background: unset !important;
-    background-color: var(--snippetor-checkbox-bg-<%= i %>) !important; /* override theme */
+    background: var(--snippetor-checkbox-bg-<%= i %>) !important; /* override theme */
     filter: none;
     color: var(--snippetor-checkbox-<%= i %>);
     font-family: var(--font-monospace);

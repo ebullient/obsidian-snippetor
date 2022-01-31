@@ -218,7 +218,7 @@ class CreateCheckboxesModal extends Modal {
         if (this.cfg.styleUncheckedTask) {
             // make the preview checkbox invisible
             checkbox.style.borderStyle = "hidden";
-            checkbox.style.backgroundColor = "inherit";
+            checkbox.style.background = "none";
             example.style.color = "transparent";
         }
         this.elements.defaultFontSize = Math.ceil(
