@@ -82,6 +82,21 @@ function checkboxSettings(i, ts) {
 <% }
 } // end checkboxSettings
 
+function marginSettings(cm6, preview) {
+%>
+body:not(.is-mobile) <%~ cm6 %>,
+body:not(.is-mobile) <%~ preview %> {
+    margin-top: 2px;
+    margin-bottom: 1px;
+}
+body.is-mobile <%~ cm6 %>,
+body.is-mobile <%~ preview %> {
+    margin-top: 1px;
+    margin-bottom: 0;
+}
+<%
+} // end margins
+
 function pseudoElementSettings(i, ts) {
 %>
     font-family: var(--font-monospace);
@@ -89,8 +104,8 @@ function pseudoElementSettings(i, ts) {
     position: absolute;
     text-align: center;
     font-weight: 500;
-    font-size: <%~ getFontSize(ts.li.format) %>px;
-    line-height: <%~ getFontSize(ts.li.format) %>px;
+    font-size: <%~ getFontSize(ts.checkbox.format) %>px;
+    line-height: <%~ getFontSize(ts.checkbox.format) %>px;
 <% if (ts.checkbox.top) { %>
     top: <%~ ts.checkbox.top %>px;
 <% } else { %>
@@ -131,6 +146,10 @@ if (it.cfg.styleUncheckedTask && it.cfg.uncheckedTask) {
 .markdown-preview-view ul.contains-task-list > li[data-task=""].task-list-item input[type=checkbox].task-list-item-checkbox:not(:checked) {
 <% checkboxSettings(i, ts); %>
 }
+<% marginSettings(
+  '.markdown-source-view.mod-cm6 .HyperMD-task-line[data-task=" "] input[type=checkbox][data-task=" "].task-list-item-checkbox:not(:checked)',
+  '.markdown-preview-view ul.contains-task-list > li[data-task=""].task-list-item input[type=checkbox].task-list-item-checkbox:not(:checked)'
+); %>
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task=" "],
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task=" "] input[type=checkbox].task-list-item-checkbox[data-task=" "] + span,
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task=" "] input[type=checkbox].task-list-item-checkbox[data-task=" "] + span + span,
@@ -152,6 +171,10 @@ for (let i = 0; i < list.length; i++) {
 .markdown-preview-view ul.contains-task-list > li[data-task="<%~ ts.data %>"].task-list-item input[type=checkbox].task-list-item-checkbox:checked {
 <% checkboxSettings(i, ts); %>
 }
+<% marginSettings(
+    '.markdown-source-view.mod-cm6  .HyperMD-task-line[data-task="' + ts.data + '"] input[type=checkbox][data-task="' + ts.data + '"].task-list-item-checkbox:checked',
+    '.markdown-preview-view ul.contains-task-list > li[data-task="' + ts.data + '"].task-list-item input[type=checkbox].task-list-item-checkbox:checked'
+); %>
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"],
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"] input[type=checkbox].task-list-item-checkbox[data-task="<%~ ts.data %>"] + span,
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"] input[type=checkbox].task-list-item-checkbox[data-task="<%~ ts.data %>"] + span + span,
@@ -169,7 +192,6 @@ for (let i = 0; i < list.length; i++) {
 const max = it.cfg.taskSettings.length - 1;
 for (let i = 0; i <= max; i++) {
    let ts = it.cfg.taskSettings[i];
-   console.log(i, ts);
 %>
 .markdown-source-view.mod-cm6  .HyperMD-task-line[data-task="<%~ ts.data %>"] input[type=checkbox][data-task="<%~ ts.data %>"].task-list-item-checkbox:checked:hover,
 .markdown-preview-view ul.contains-task-list > li[data-task="<%~ ts.data %>"].task-list-item input[type=checkbox].task-list-item-checkbox:checked:hover<% tR += (i < max) ? ',' : '{' %>
