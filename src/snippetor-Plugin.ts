@@ -16,7 +16,7 @@ export class SnippetorPlugin extends Plugin {
 
     async onload(): Promise<void> {
         this.snippetor = new Snippetor(this.app);
-        console.debug("loaded Snippetor %s: %o", this.manifest.version);
+        console.debug("loaded Snippetor %s", this.manifest.version);
         addIcon(LOCK, LOCK_ICON);
         addIcon(UNLOCK, UNLOCK_ICON);
         this.addSettingTab(new SnippetorSettingsTab(this.app, this));
