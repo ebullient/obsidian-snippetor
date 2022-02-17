@@ -100,6 +100,8 @@ body.is-mobile <%~ preview %> {
 function pseudoElementSettings(i, ts) {
 %>
     font-family: var(--font-monospace);
+    transform: !important; /* override theme */
+    -webkit-mask-image: !important; /* override theme */
     background: none;
     position: absolute;
     text-align: center;
