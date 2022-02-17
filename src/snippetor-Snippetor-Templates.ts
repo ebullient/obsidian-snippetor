@@ -71,6 +71,9 @@ function checkboxSettings(i, ts) {
     font-family: var(--font-monospace);
     border-width: 1px;
     border-style: solid;
+<% if (it.cfg.borderRadius) { %>
+    border-radius: <%~ it.cfg.borderRadius %>%;
+<% } %>
 <% if (ts.checkbox.preventClick) { %>
     pointer-events: none;
     cursor: not-allowed;

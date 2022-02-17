@@ -227,17 +227,29 @@ class CreateCheckboxesModal extends Modal {
 
         const actions = heading.createSpan("snippetor-li-actions");
 
+        const roundGroup = actions.createSpan("snippetor-checkbox-roundness");
+        const roundness = new SliderComponent(roundGroup)
+            .setValue(
+                this.cfg.borderRadius === undefined ? 0 : this.cfg.borderRadius
+            )
+            .setLimits(0, 50, 2)
+            .setDynamicTooltip()
+            .onChange((v) => {
+                const redraw = v != this.cfg.borderRadius;
+                this.cfg.borderRadius = v;
+                if (redraw) {
+                    this.showTasks();
+                }
+            });
+        roundness.sliderEl.title = "Checkbox roundness";
+        roundness.sliderEl.name = "snippetor-border-radius";
+
         const hidePicker = new ToggleComponent(actions)
             .setValue(this.cfg.hideColorPicker)
-            .setTooltip(
-                `${this.cfg.hideColorPicker ? "Show" : "Hide"} color picker`
-            )
+            .setTooltip("Toggle color picker")
             .onChange((v) => {
                 const redraw = v != this.cfg.hideColorPicker;
                 this.cfg.hideColorPicker = v;
-                hidePicker.setTooltip(
-                    `${this.cfg.hideColorPicker ? "Show" : "Hide"} color picker`
-                );
                 if (redraw) {
                     this.showTasks();
                 }
@@ -817,6 +829,7 @@ class CreateCheckboxesModal extends Modal {
             "--snippetor-left",
             (ts.checkbox.left ? ts.checkbox.left : 0) + "px"
         );
+        checkbox.style.borderRadius = (this.cfg.borderRadius ? this.cfg.borderRadius : 0) + "%";
 
         this.setCheckboxColors(ts);
     }

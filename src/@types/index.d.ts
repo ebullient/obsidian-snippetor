@@ -12,6 +12,7 @@ export interface SnippetConfig {
 export interface TaskSnippetConfig extends SnippetConfig {
     taskSettings: TaskSettings[];
     baseFontSize: number;
+    borderRadius?: number;
     hideColorPicker?: boolean;
     styleUncheckedTask?: boolean;
     uncheckedTask?: TaskSettings;
