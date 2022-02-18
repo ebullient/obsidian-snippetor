@@ -829,7 +829,8 @@ class CreateCheckboxesModal extends Modal {
             "--snippetor-left",
             (ts.checkbox.left ? ts.checkbox.left : 0) + "px"
         );
-        checkbox.style.borderRadius = (this.cfg.borderRadius ? this.cfg.borderRadius : 0) + "%";
+        checkbox.style.borderRadius =
+            (this.cfg.borderRadius ? this.cfg.borderRadius : 0) + "%";
 
         this.setCheckboxColors(ts);
     }
