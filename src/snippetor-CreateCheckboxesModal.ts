@@ -175,7 +175,7 @@ class CreateCheckboxesModal extends Modal {
             this.resetTaskElements(this.cfg.uncheckedTask);
         }
 
-        // Create a header. Pass a callback to .
+        // Create a header.
         this.createHeader();
 
         if (this.cfg.styleUncheckedTask) {
@@ -238,7 +238,12 @@ class CreateCheckboxesModal extends Modal {
                 const redraw = v != this.cfg.borderRadius;
                 this.cfg.borderRadius = v;
                 if (redraw) {
-                    this.showTasks();
+                    if (this.cfg.styleUncheckedTask) {
+                        this.applySettingsToCheckbox(this.cfg.uncheckedTask);
+                    }
+                    this.cfg.taskSettings.forEach((ts) => {
+                        this.applySettingsToCheckbox(ts);
+                    });
                 }
             });
         roundness.sliderEl.title = "Checkbox roundness";
