@@ -86,6 +86,23 @@ export interface OldTaskSettings extends TaskSettings {
     fontSize?: number /* deprecated */;
 }
 
+export interface FolderConfig extends ColoredElement {
+    target: string;
+    cache: {
+        folderEl: HTMLDivElement;
+    };
+}
+export interface FolderSnippetConfig extends SnippetConfig {
+    default: FolderConfig;
+    folders: FolderConfig[];
+    borderRadius: number;
+    hideCollapse: boolean;
+    folderIcon: boolean;
+    hideScrollbar: boolean;
+    hideTypes: boolean;
+    hoverDecoration: boolean;
+}
+
 declare module "obsidian" {
     interface App {
         customCss: {

@@ -1,13 +1,18 @@
 import { App, Notice } from "obsidian";
 import {
+    FolderConfig,
+    FolderSnippetConfig,
     OldTaskSettings,
     SnippetConfig,
     TaskSettings,
     TaskSnippetConfig,
 } from "./@types";
-import { DEFAULT_TASK_SNIPPET_SETTINGS } from "./snippetor-Defaults";
+import {
+    DEFAULT_FOLDER_SNIPPET_SETTINGS,
+    DEFAULT_TASK_SNIPPET_SETTINGS,
+} from "./snippetor-Defaults";
 import * as Eta from "eta";
-import { SIMPLE_TASK } from "./snippetor-Snippetor-Templates";
+import { COLORED_FOLDERS, SIMPLE_TASK } from "./snippetor-Snippetor-Templates";
 import { generateSlug } from "random-word-slugs";
 import randomColor from "randomcolor";
 import { compare } from "compare-versions";
@@ -43,6 +48,28 @@ export class Snippetor {
         });
         return result;
     }
+    createNewFolderSnippetCfg(): FolderSnippetConfig {
+        const result = Object.assign({}, DEFAULT_FOLDER_SNIPPET_SETTINGS, {
+            id: this.generateId(),
+            name: generateSlug(2),
+            folders: [],
+            default: {
+                cache: {
+                    folderEl: null,
+                },
+                target: "",
+                lightMode: {
+                    foreground: "var(--text-normal)",
+                    background: "transparent",
+                },
+                darkMode: {
+                    foreground: "var(--text-normal)",
+                    background: "transparent",
+                },
+            },
+        });
+        return result;
+    }
 
     createNewTaskCfg(v: string): TaskSettings {
         return {
@@ -65,6 +92,24 @@ export class Snippetor {
             },
             cache: {
                 expanded: false,
+            },
+        };
+    }
+    createNewFolderCfg(v: string): FolderConfig {
+        return {
+            lightMode: {
+                foreground: randomColor({
+                    luminosity: "dark",
+                }),
+            },
+            darkMode: {
+                foreground: randomColor({
+                    luminosity: "light",
+                }),
+            },
+            target: v,
+            cache: {
+                folderEl: null,
             },
         };
     }
@@ -175,11 +220,21 @@ export class Snippetor {
             return Promise.reject();
         }
         let snippet;
-        if (this.isTaskSnippetConfig(cfg)) {
-            snippet = Eta.render(SIMPLE_TASK, {
-                date: new Date(),
-                cfg,
-            });
+        switch (cfg.type) {
+            case DEFAULT_TASK_SNIPPET_SETTINGS.type: {
+                snippet = Eta.render(SIMPLE_TASK, {
+                    date: new Date(),
+                    cfg,
+                });
+                break;
+            }
+            case DEFAULT_FOLDER_SNIPPET_SETTINGS.type: {
+                snippet = Eta.render(COLORED_FOLDERS, {
+                    date: new Date(),
+                    cfg,
+                });
+                break;
+            }
         }
         if (!snippet) {
             new Notice(

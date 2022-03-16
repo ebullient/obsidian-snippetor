@@ -1,4 +1,4 @@
-#snippetor-checkboxes-modal {
+#snippetor-modal.snippetor-checkboxes-modal {
 
   /* disable strikethrough (it is inherited); will apply selectively to preview */
   ul > li.task-list-item.is-checked {
@@ -96,15 +96,6 @@
           padding-right: 5px;
         }
 
-        .snippetor-checkbox-roundness {
-          color: var(--text-normal);
-          padding: 2px 4px;
-
-          input[type="range"] {
-            width: 50px;
-          }
-        }
-
         /* Flex container: rows */
         .snippetor-settings {
           flex-grow: 2;
@@ -188,7 +179,6 @@
           .row-label,
           .source-mode-label {
             white-space: nowrap;
-            font-style: normal;
           }
 
           .source-mode-label {
