@@ -101,6 +101,7 @@ export interface FolderSnippetConfig extends SnippetConfig {
     hideScrollbar: boolean;
     hideTypes: boolean;
     hoverDecoration: boolean;
+    relationshipLines: boolean;
 }
 
 declare module "obsidian" {

@@ -30,6 +30,7 @@ export const DEFAULT_FOLDER_SNIPPET_SETTINGS: Partial<FolderSnippetConfig> = {
     hideCollapse: false,
     hideScrollbar: true,
     hideTypes: true,
+    relationshipLines: true,
     default: {
         cache: {
             folderEl: null,

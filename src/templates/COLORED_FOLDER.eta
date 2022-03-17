@@ -34,10 +34,6 @@ function defineColors(i, folder) {
 function folderSettings(i, folder) {
 %>
 
-.nav-folder.mod-root {
-    --<%~ root %>-border-radius: <%= it.cfg.borderRadius %>px;
-}
-
 /** Folder
 The Folder Name is stored in the data-path attribute.
 [data-path^="<%~ folder.target %>"] targets a path that *begins with* the content.
@@ -201,6 +197,40 @@ body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-f
     min-width: unset; /* Blue Topaz */
 }
 
+/** Hide Overflowing Text */
+.workspace-leaf-content[data-type="file-explorer"]
+    .nav-folder-title[data-path^="<%~ folder.target %>"] 
+    .nav-folder-title-content,
+.workspace-leaf-content[data-type="file-explorer"]
+    .nav-folder-title[data-path^="<%~ folder.target %>"]  + .nav-folder-children .nav-file-title,
+.workspace-leaf-content[data-type="file-explorer"]
+    .nav-folder-title[data-path^="<%~ folder.target %>"]  + .nav-folder-children .nav-file-title-content {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: break-word;
+    width: 100%;
+}
+
+<% if (it.cfg.relationshipLines) { %>
+
+/** Relationship lines */
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children
+    > .nav-folder
+    > .nav-folder-children
+    .nav-file {
+    border-left: 2px solid white;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children
+    > .nav-folder
+    > .nav-folder-children
+    .nav-folder {
+    border-left: 2px solid white;
+}
+
+<% } %>
+
 <%
 } //end folderSettings
 %>
@@ -214,64 +244,6 @@ body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-f
 }
 
 <% } %>
-
-
-
-/** Grid */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children {
-    display: grid;
-    gap: 7px;
-    grid-auto-rows: max-content;
-    grid-auto-columns: 100%;
-}
-
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root
-    > .nav-folder-children
-    > .nav-folder
-    > .nav-folder-title
-    + .nav-folder-children
-    > .nav-file:last-child {
-    border-right: 1px solid var(--<%~ root %>-folder-background);
-    border-left: 1px solid var(--<%~ root %>-folder-background);
-    border-bottom: 1px solid var(--<%~ root %>-folder-background);
-    border-bottom-left-radius: var(--<%~ root %>-border-radius);
-    border-bottom-right-radius: var(--<%~ root %>-border-radius);
-    padding-bottom: 1px;
-}
-
-/** Relationship lines */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root
-    > .nav-folder-children
-    > .nav-folder
-    > .nav-folder-children
-    .nav-folder
-    .nav-file {
-    border-left: 2px solid white;
-}
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root
-    > .nav-folder-children
-    > .nav-folder
-    > .nav-folder-children
-    .nav-folder
-    .nav-folder {
-    border-left: 2px solid white;
-}
-
-/** Animations */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title {
-    font-weight: bold;
-}
-
-/** Set Active File to Permanent */
-.workspace-leaf-content[data-type="file-explorer"] .nav-file.is-active > .nav-file-title,
-.workspace-leaf-content[data-type="file-explorer"] .nav-file.is-active > .nav-file-title:hover {
-    background-color: var(--background-primary);
-    font-weight: bold;
-    border-left: 2px solid var(--text-accent);
-    transition-duration: 0.25s;
-    transition-timing-function: ease;
-    transition-property: background-color, color;
-}
 
 <%
 

@@ -162,6 +162,14 @@ class CreateFolderModal extends Modal {
                 });
             });
         new Setting(content)
+            .setName("Show relationship lines")
+            .addToggle((t) => {
+                t.setValue(this.cfg.relationshipLines).onChange((v) => {
+                    this.cfg.relationshipLines = v;
+                    this.showFolders(folderEl);
+                });
+            });
+        new Setting(content)
             .setName("Show folder icon")
             .setDesc("A folder icon will be shown before folder names")
             .addToggle((t) => {
@@ -206,6 +214,7 @@ class CreateFolderModal extends Modal {
             Reflect.deleteProperty(this.cfg.default, "cache");
         }
         this.cfg.folders.forEach((ts) => Reflect.deleteProperty(ts, "cache"));
+        this.cfg.folders = this.cfg.folders.filter(f => f.target && f.target.length);
         // make sure a name is set
         this.snippetor.initCommonConfig(this.cfg);
     }
@@ -239,7 +248,7 @@ class CreateFolderModal extends Modal {
                     this.showFolders(folderEl);
                 }
             });
-        roundness.sliderEl.title = "Checkbox roundness";
+        roundness.sliderEl.title = "Folder roundness";
         roundness.sliderEl.name = "snippetor-border-radius";
 
         this.helper.createThemeToggleComponent(settingActions, () =>
