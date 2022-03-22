@@ -206,3 +206,8 @@ for (let i = 0; i <= max; i++) {
     border-color: var(--text-on-accent) !important;
 }
 `;
+
+
+import FOLDER_TEMPLATE from "./templates/COLORED_FOLDER.eta";
+
+export const COLORED_FOLDERS = FOLDER_TEMPLATE;

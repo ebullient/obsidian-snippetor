@@ -1,4 +1,8 @@
-import type { SnippetorSettings, TaskSnippetConfig } from "./@types";
+import type {
+    FolderSnippetConfig,
+    SnippetorSettings,
+    TaskSnippetConfig,
+} from "./@types";
 
 export const LOCK = "lock";
 export const LOCK_ICON =
@@ -15,6 +19,32 @@ export const DEFAULT_SETTINGS: SnippetorSettings = {
 export const DEFAULT_TASK_SNIPPET_SETTINGS: Partial<TaskSnippetConfig> = {
     type: "simple-task",
     taskSettings: [],
+};
+
+export const DEFAULT_FOLDER_SNIPPET_SETTINGS: Partial<FolderSnippetConfig> = {
+    type: "folder",
+    folders: [],
+    borderRadius: 6,
+    hoverDecoration: true,
+    folderIcon: true,
+    hideCollapse: false,
+    hideScrollbar: true,
+    hideTypes: true,
+    relationshipLines: true,
+    default: {
+        cache: {
+            folderEl: null,
+        },
+        target: "",
+        lightMode: {
+            foreground: "var(--text-normal)",
+            background: "transparent",
+        },
+        darkMode: {
+            foreground: "var(--text-normal)",
+            background: "transparent",
+        },
+    },
 };
 
 export enum COLOR {

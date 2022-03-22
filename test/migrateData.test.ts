@@ -6,10 +6,10 @@ import {
 } from "../src/@types";
 import { DEFAULT_TASK_SNIPPET_SETTINGS } from "../src/snippetor-Defaults";
 import { Snippetor } from "../src/snippetor-Snippetor";
-
 jest.mock("obsidian", () => ({
     App: jest.fn().mockImplementation(),
 }));
+jest.mock("../src/templates/COLORED_FOLDER.eta", () => "");
 
 const snippetor = new Snippetor(new App());
 
@@ -199,8 +199,8 @@ test("Mammoth", () => {
                 taskColorLight: "#b55e0c",
                 taskColorDark: "#b37ae8",
             },
-        ]
-    }
+        ],
+    };
 
     const expected: TaskSnippetConfig = {
         version: "0.1.8",
@@ -214,106 +214,13 @@ test("Mammoth", () => {
             cache: {},
             checkbox: {
                 lightMode: {
-                    foreground: "#9b11c1"
-                },
-                darkMode: {
-                    foreground: "#b6ed78"
-                },
-                format: {
-                    fontSize: 12
-                }
-            },
-            li: {
-                lightMode: {},
-                darkMode: {},
-            }
-        },
-        taskSettings: [
-        {
-            data: ">",
-            cache: {},
-            li: {
-                lightMode: {},
-                darkMode: {},
-                format: {
-                    strikethrough: true,
-                },
-            },
-            checkbox: {
-                lightMode: {
                     foreground: "#9b11c1",
                 },
                 darkMode: {
                     foreground: "#b6ed78",
                 },
-            },
-        },
-        {
-            data: "?",
-            cache: {},
-            checkbox: {
-                lightMode: {
-                    foreground: "#a5260d",
-                },
-                darkMode: {
-                    foreground: "#a9ff91",
-                },
-            },
-            li: {
-                lightMode: {},
-                darkMode: {},
-                syncTaskColor: true,
-            },
-        },
-        {
-            data: "!",
-            cache: {},
-            checkbox: {
-                lightMode: {
-                    foreground: "#060e6b",
-                },
-                darkMode: {
-                    foreground: "#d3b936",
-                },
-                hideBorder: true,
-            },
-            li: {
-                lightMode: {},
-                darkMode: {},
-            },
-        },
-        {
-            data: "i",
-            cache: {},
-            checkbox: {
-                lightMode: {
-                    foreground: "#a82906",
-                },
-                darkMode: {
-                    foreground: "#a5f477",
-                    background: "#a05454",
-                },
-            },
-            li: {
-                lightMode: {},
-                darkMode: {},
-                syncTaskColor: true,
-            },
-        },
-        {
-            data: "-",
-            cache: {},
-            checkbox: {
-                lightMode: {
-                    foreground: "#0c6d00",
-                },
-                darkMode: {
-                    foreground: "#d4f9a7",
-                },
-                readModeData: "🌸",
-                hideBorder: true,
                 format: {
-                    fontSize: 16,
+                    fontSize: 12,
                 },
             },
             li: {
@@ -321,39 +228,133 @@ test("Mammoth", () => {
                 darkMode: {},
             },
         },
-        {
-            data: "x",
-            cache: {},
-            checkbox: {
-                lightMode: {
-                    foreground: "#0c5e7a",
+        taskSettings: [
+            {
+                data: ">",
+                cache: {},
+                li: {
+                    lightMode: {},
+                    darkMode: {},
+                    format: {
+                        strikethrough: true,
+                    },
                 },
-                darkMode: {
-                    foreground: "#a0ffd1",
-                },
-            },
-            li: {
-                lightMode: {},
-                darkMode: {},
-            },
-        },
-        {
-            data: "X",
-            cache: {},
-            checkbox: {
-                lightMode: {
-                    foreground: "#b55e0c",
-                },
-                darkMode: {
-                    foreground: "#b37ae8",
+                checkbox: {
+                    lightMode: {
+                        foreground: "#9b11c1",
+                    },
+                    darkMode: {
+                        foreground: "#b6ed78",
+                    },
                 },
             },
-            li: {
-                lightMode: {},
-                darkMode: {},
+            {
+                data: "?",
+                cache: {},
+                checkbox: {
+                    lightMode: {
+                        foreground: "#a5260d",
+                    },
+                    darkMode: {
+                        foreground: "#a9ff91",
+                    },
+                },
+                li: {
+                    lightMode: {},
+                    darkMode: {},
+                    syncTaskColor: true,
+                },
             },
-        },
-    ]};
+            {
+                data: "!",
+                cache: {},
+                checkbox: {
+                    lightMode: {
+                        foreground: "#060e6b",
+                    },
+                    darkMode: {
+                        foreground: "#d3b936",
+                    },
+                    hideBorder: true,
+                },
+                li: {
+                    lightMode: {},
+                    darkMode: {},
+                },
+            },
+            {
+                data: "i",
+                cache: {},
+                checkbox: {
+                    lightMode: {
+                        foreground: "#a82906",
+                    },
+                    darkMode: {
+                        foreground: "#a5f477",
+                        background: "#a05454",
+                    },
+                },
+                li: {
+                    lightMode: {},
+                    darkMode: {},
+                    syncTaskColor: true,
+                },
+            },
+            {
+                data: "-",
+                cache: {},
+                checkbox: {
+                    lightMode: {
+                        foreground: "#0c6d00",
+                    },
+                    darkMode: {
+                        foreground: "#d4f9a7",
+                    },
+                    readModeData: "🌸",
+                    hideBorder: true,
+                    format: {
+                        fontSize: 16,
+                    },
+                },
+                li: {
+                    lightMode: {},
+                    darkMode: {},
+                },
+            },
+            {
+                data: "x",
+                cache: {},
+                checkbox: {
+                    lightMode: {
+                        foreground: "#0c5e7a",
+                    },
+                    darkMode: {
+                        foreground: "#a0ffd1",
+                    },
+                },
+                li: {
+                    lightMode: {},
+                    darkMode: {},
+                },
+            },
+            {
+                data: "X",
+                cache: {},
+                checkbox: {
+                    lightMode: {
+                        foreground: "#b55e0c",
+                    },
+                    darkMode: {
+                        foreground: "#b37ae8",
+                    },
+                },
+                li: {
+                    lightMode: {},
+                    darkMode: {},
+                },
+            },
+        ],
+    };
 
     const actual = JSON.parse(JSON.stringify(initial));
     snippetor.initConfig(actual as Partial<TaskSnippetConfig>);

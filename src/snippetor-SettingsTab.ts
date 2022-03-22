@@ -6,10 +6,18 @@ import {
     PluginSettingTab,
     Setting,
 } from "obsidian";
-import { SnippetConfig, TaskSnippetConfig } from "./@types";
+import {
+    FolderSnippetConfig,
+    SnippetConfig,
+    TaskSnippetConfig,
+} from "./@types";
 import SnippetorPlugin from "./main";
 import { openCreateCheckboxModal } from "./snippetor-CreateCheckboxesModal";
-import { DEFAULT_TASK_SNIPPET_SETTINGS } from "./snippetor-Defaults";
+import { openCreateFolderModal } from "./snippetor-CreateFoldersModal";
+import {
+    DEFAULT_FOLDER_SNIPPET_SETTINGS,
+    DEFAULT_TASK_SNIPPET_SETTINGS,
+} from "./snippetor-Defaults";
 
 export class SnippetorSettingsTab extends PluginSettingTab {
     plugin: SnippetorPlugin;
@@ -57,6 +65,12 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                     "Custom checkboxes"
                 );
                 d.setValue(DEFAULT_TASK_SNIPPET_SETTINGS.type);
+
+                d.addOption(
+                    DEFAULT_FOLDER_SNIPPET_SETTINGS.type,
+                    "Colored folders"
+                );
+
                 d.onChange((v) => {
                     selector.type = v;
                 });
@@ -114,7 +128,18 @@ export class SnippetorSettingsTab extends PluginSettingTab {
 
     getDescription(type: string): string {
         // Some day --- more types.
-        return "simple checkboxes";
+        let description: string;
+        switch (type) {
+            case "simple-task": {
+                description = "simple checkboxes";
+                break;
+            }
+            case "folder": {
+                description = "colored folders";
+                break;
+            }
+        }
+        return description;
     }
 
     async openModal(type: string, snippet: SnippetConfig): Promise<void> {
@@ -123,6 +148,17 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             const taskCfg = await openCreateCheckboxModal(
                 this.app,
                 snippet as TaskSnippetConfig,
+                this.plugin.snippetor
+            );
+            if (taskCfg) {
+                console.debug("Snippetor: modal closed with %o", taskCfg);
+                await this.plugin.setSnippet(taskCfg);
+            }
+            this.listExistingSnippets();
+        } else if (type === DEFAULT_FOLDER_SNIPPET_SETTINGS.type) {
+            const taskCfg = await openCreateFolderModal(
+                this.app,
+                snippet as FolderSnippetConfig,
                 this.plugin.snippetor
             );
             if (taskCfg) {

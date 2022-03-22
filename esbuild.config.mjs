@@ -30,6 +30,9 @@ esbuild.build({
     treeShaking: true,
     minify: prod ? true : false,
     outdir: dir,
+    loader: {
+        '.eta': 'text'
+    },
     plugins: [
         sassPlugin()
     ]

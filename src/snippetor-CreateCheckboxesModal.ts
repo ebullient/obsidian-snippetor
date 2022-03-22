@@ -59,7 +59,8 @@ class CreateCheckboxesModal extends Modal {
     ) {
         super(app);
         this.snippetor = snippetor;
-        this.containerEl.id = "snippetor-checkboxes-modal";
+        this.containerEl.addClass("snippetor-checkboxes-modal");
+        this.containerEl.id = "snippetor-modal";
         this.cfg = taskSnippetCfg || snippetor.createNewTaskSnippetCfg();
 
         // Ensure required config, migrate old task data
