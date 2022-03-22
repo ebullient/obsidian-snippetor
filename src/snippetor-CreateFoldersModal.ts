@@ -214,7 +214,9 @@ class CreateFolderModal extends Modal {
             Reflect.deleteProperty(this.cfg.default, "cache");
         }
         this.cfg.folders.forEach((ts) => Reflect.deleteProperty(ts, "cache"));
-        this.cfg.folders = this.cfg.folders.filter(f => f.target && f.target.length);
+        this.cfg.folders = this.cfg.folders.filter(
+            (f) => f.target && f.target.length
+        );
         // make sure a name is set
         this.snippetor.initCommonConfig(this.cfg);
     }
