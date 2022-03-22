@@ -6,10 +6,12 @@ import {
 } from "../src/@types";
 import { DEFAULT_TASK_SNIPPET_SETTINGS } from "../src/snippetor-Defaults";
 import { Snippetor } from "../src/snippetor-Snippetor";
+
 jest.mock("obsidian", () => ({
     App: jest.fn().mockImplementation(),
 }));
 jest.mock("../src/templates/COLORED_FOLDER.eta", () => "");
+jest.mock("../src/templates/CHECKBOXES.eta", () => "");
 
 const snippetor = new Snippetor(new App());
 
@@ -24,6 +26,7 @@ test("Migrate data, unchecked, foreground", () => {
     const expected: TaskSettings = {
         data: "=",
         unchecked: true,
+        cache: {},
         checkbox: {
             lightMode: {
                 foreground: "fgLight",
@@ -40,6 +43,7 @@ test("Migrate data, unchecked, foreground", () => {
 
     const actual = JSON.parse(JSON.stringify(initial));
     snippetor.initTaskSettings(undefined, actual);
+    expect(actual).toEqual(expected);
 });
 
 test("Migrate foreground, applyToText", () => {
@@ -70,6 +74,7 @@ test("Migrate foreground, applyToText", () => {
 
     const actual = JSON.parse(JSON.stringify(initial));
     snippetor.initTaskSettings(undefined, actual);
+    expect(actual).toEqual(expected);
 });
 
 test("Migrate background, strikethrough, hideBorder, fontSize", () => {
@@ -108,6 +113,7 @@ test("Migrate background, strikethrough, hideBorder, fontSize", () => {
 
     const actual = JSON.parse(JSON.stringify(initial));
     snippetor.initTaskSettings(undefined, actual);
+    expect(actual).toEqual(expected);
 });
 
 test("Migrate background, applyToText, reader", () => {
