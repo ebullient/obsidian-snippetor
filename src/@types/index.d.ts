@@ -118,6 +118,7 @@ declare module "obsidian" {
                         settings?: {
                             supportCanceledTasks: boolean;
                             incompleteTaskValues: string;
+                            onlyLowercaseX: boolean;
                         };
                     };
                 };

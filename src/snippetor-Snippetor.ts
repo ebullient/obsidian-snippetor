@@ -32,7 +32,11 @@ export class Snippetor {
             if (tcPlugin.taskCollector.settings.supportCanceledTasks) {
                 values += "-";
             }
-            return new Set((values + "xX").replace(" ", "").split(""));
+            values += "x";
+            if (!tcPlugin.taskCollector.settings.onlyLowercaseX) {
+                values += "X";
+            }
+            return new Set(values.replace(" ", "").split(""));
         }
         return new Set(["x", "-", ">"]);
     }
