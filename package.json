@@ -46,7 +46,7 @@
   "auto-changelog": {
     "backfillLimit": false,
     "commitLimit": false,
-    "ignoreCommitPattern": "(🔖|🔨|🧹|⬆️|changelog|release|Update README).*"
+    "ignoreCommitPattern": "(🔖|🔨|🧹|changelog|release|Update README).*"
   },
   "dependencies": {
     "compare-versions": "^4.1.3",
