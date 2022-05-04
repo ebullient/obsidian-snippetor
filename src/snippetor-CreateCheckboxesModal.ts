@@ -917,8 +917,12 @@ class CreateCheckboxesModal extends Modal {
                 "Another task uses the same value"
             );
             this.cfg.taskSettings.forEach((ts) => {
-                const e = ts.cache.dataEl;
-                if (e.value === input.value && !e.hasAttribute("conflict")) {
+                const e = ts.cache?.dataEl;
+                if (
+                    e &&
+                    e.value === input.value &&
+                    !e.hasAttribute("conflict")
+                ) {
                     this.verifyDataValue(e);
                 }
             });
