@@ -28,16 +28,22 @@ export class Snippetor {
     get taskValues(): Set<string> {
         const tcPlugin = this.app.plugins.plugins["obsidian-task-collector"];
         if (tcPlugin) {
-            let values = tcPlugin.taskCollector.settings.incompleteTaskValues;
-            if (tcPlugin.taskCollector.settings.supportCanceledTasks) {
-                values += "-";
-            }
-            values += "x";
-            if (!tcPlugin.taskCollector.settings.onlyLowercaseX) {
-                values += "X";
+            let values = "";
+            if (tcPlugin.api) {
+                values += tcPlugin.api.getCompletedTaskValues();
+                values += tcPlugin.api.getIncompleteTaskValues();
+            } else {
+                values += tcPlugin.taskCollector.settings.onlyLowercaseX
+                    ? "x"
+                    : "xX";
+                values += tcPlugin.taskCollector.settings.supportCanceledTasks
+                    ? "-"
+                    : "";
+                values += tcPlugin.taskCollector.settings.incompleteTaskValues;
             }
             return new Set(values.replace(" ", "").split(""));
         }
+        // return a few as examples
         return new Set(["x", "-", ">"]);
     }
 

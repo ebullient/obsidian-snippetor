@@ -114,6 +114,10 @@ declare module "obsidian" {
         plugins: {
             plugins: {
                 "obsidian-task-collector"?: {
+                    api?: {
+                        getCompletedTaskValues(): string;
+                        getIncompleteTaskValues(): string;
+                    };
                     taskCollector?: {
                         settings?: {
                             supportCanceledTasks: boolean;
