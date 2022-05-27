@@ -43,9 +43,13 @@
           text-overflow: ellipsis;
 
           /* Task list item settings */
-          font-weight: var(--snippetor-weight);
-          font-style: var(--snippetor-text-style);
-          text-decoration: var(--snippetor-decoration);
+          .example {
+            font-size: var(--snippetor-font-size);
+            font-family: var(--snippetor-font);
+            font-weight: var(--snippetor-weight);
+            font-style: var(--snippetor-text-style);
+            text-decoration: var(--snippetor-decoration);
+          }
 
           input.task-list-item-checkbox {
             margin-left: 0px; /* Override themes so always visible */
@@ -66,7 +70,7 @@
 
           input.task-list-item-checkbox[data]:not(:checked)::before,
           input.task-list-item-checkbox[data]:checked::before {
-            font-family: var(--font-monospace);
+            font-family: var(--snippetor-font);
             position: absolute;
             text-align: center;
             font-weight: 500;
@@ -103,6 +107,7 @@
           flex-flow: column wrap;
           align-items: stretch;
           justify-content: flex-start;
+          font-family: var(--font-text);
 
           /* Flex container of labels, groups */
           .snippetor-row {
@@ -119,26 +124,6 @@
             margin-right: 6px;
           }
 
-          .snippetor-group.decorated {
-            border: none;
-            border-radius: 6px;
-            color: var(--text-normal);
-            background-color: var(--background-secondary);
-            padding: 2px 4px;
-
-            input[type="text"] {
-              background-color: var(--background-primary);
-              font-size: 14px;
-              height: 26px;
-              margin: 0 2px;
-              padding: 5px 5px;
-            }
-
-            input[type="range"] {
-              width: 50px;
-            }
-          }
-
           label {
             padding: 2px 4px;
           }
@@ -153,13 +138,16 @@
           }
           button.no-padding {
             margin-bottom: 0px;
+            margin-right: 6px;
           }
+          button.toggle-sync-font,
           button.toggle-sync-color {
             font-family: monospace !important;
             padding: 0 12px !important;
             font-size: 18px !important;
             margin-right: 6px;
           }
+          .hide-text-font > .snippetor-group.li-font,
           .hide-text-colors > .snippetor-group.color {
             display: none;
           }
@@ -184,6 +172,10 @@
 
           .source-mode-label {
             font-family: var(--font-monospace);
+          }
+
+          input[type='text'].snippetor-font-setting {
+            width: 10em;
           }
 
           input.snippetor-data-task {

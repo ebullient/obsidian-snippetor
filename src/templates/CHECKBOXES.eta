@@ -5,7 +5,9 @@ This file will be overwritten if you push the button again...
 */
 <%
 const root = it.cfg.name;
-
+if (it.cfg.cssFontImport) { %>
+<%~ it.cfg.cssFontImport %>
+<% }
 function getForeground(e, light) {
     value = light ? e.lightMode.foreground : e.darkMode.foreground;
     return value ? value : '"inherit"'
@@ -37,6 +39,12 @@ function getFontSize(format) {
         return format.fontSize;
     }
     return 14;
+}
+function getFont(format, fallback) {
+    if ( format && format.font ) {
+        return format.font;
+    }
+    return fallback;
 }
 
 function defineColors(i, ts) {
@@ -101,7 +109,6 @@ body.is-mobile <%~ preview %> {
 
 function pseudoElementSettings(i, ts) {
 %>
-    font-family: var(--font-monospace);
     transform: !important; /* override theme */
     -webkit-mask-image: !important; /* override theme */
     background: none;
@@ -109,6 +116,7 @@ function pseudoElementSettings(i, ts) {
     text-align: center;
     font-weight: 500;
     font-size: <%~ getFontSize(ts.checkbox.format) %>px;
+    font-family: <%~ getFont(ts.checkbox.format, "var(--font-monospace)") %>;
     line-height: <%~ getFontSize(ts.checkbox.format) %>px;
 <% if (ts.checkbox.top) { %>
     top: <%~ ts.checkbox.top %>px;
@@ -131,6 +139,8 @@ function listElementSettings(i, ts) {
     text-decoration: <%~ getTextDecoration(ts.li.format) %> !important; /* override theme */
     font-weight: <%~ getFontWeight(ts.li.format) %>;
     font-style: <%~ getFontStyle(ts.li.format) %>;
+    font-size: <%~ getFontSize(ts.li.format) %>px;
+    font-family: <%~ getFont(ts.li.format, "inherit") %>;
     color: var(--<%~ root %>-li-<%= i %>);
     background-color: var(--<%~ root %>-li-bg-<%= i %>);
 <%

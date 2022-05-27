@@ -16,6 +16,7 @@ export interface TaskSnippetConfig extends SnippetConfig {
     hideColorPicker?: boolean;
     styleUncheckedTask?: boolean;
     uncheckedTask?: TaskSettings;
+    cssFontImport?: string;
 }
 
 export interface TaskSettings {
@@ -43,6 +44,7 @@ export interface CheckboxSettings extends ColoredElement, FormattedElement {
 
 export interface TaskListItemSettings extends ColoredElement, FormattedElement {
     syncTaskColor?: boolean;
+    syncTaskFont?: boolean;
 }
 
 export interface ColoredElement {
@@ -61,6 +63,7 @@ export interface FormattedElement {
 export interface TextSettings {
     bold?: boolean;
     italics?: boolean;
+    font?: string;
     fontSize?: number;
     fontWeight?: number;
     strikethrough?: boolean;
