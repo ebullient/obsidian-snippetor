@@ -34,21 +34,53 @@ Snippetor helps you create common CSS snippets with a few button clicks:
 
 1. Open `Settings` -> `Snippetor`
 2. Create a new snippet
-    1. Right now, you can only choose "Custom Checkboxes"
+    1. Choose the type of snippet you want to create: 
+        - "Custom Checkboxes" for create a custom checkbox snippet, or 
+        - "Colored folders" to create a snippet that customizes the display of folders in the navigation pane.
     2. Click `+`
     
 This will open a modal dialog for editing settings associated with the snippet. 
 
 All modal dialogs have a field at the top for specifying the name of the generated snippet file. This name is automatically populated with a `kebeb-case` string. Feel free to replace it with something you like better.
 
+### To use the snippet you create: 
+
+1. Generate (or update) the snippet by pressing the "magic wand" button: 
+    <img width="750" alt="image" src="https://user-images.githubusercontent.com/808713/170642467-fa1994aa-b4ab-4e83-a03e-6c94a843be16.png">
+
+2. Enable the Snippet
+    - Settings -> Appearance, scroll down to the bottom and ensure the snippet is present and enabled
+    - Use a plugin like [MySnippets](https://github.com/chetachiezikeuzor/MySnippets-Plugin) to list and toggle snippets.
+
+
 ### Custom Checkboxes
 
 The configuration for custom checkboxes are presented in the format of a task list. Each line begins with a preview of what the rendered task will look like, along with some sample text. The rest of the line has settings that will toggle the appearance of that item.
 
-- The first text field allows you to specify the value you will use when completing the task. `x` is the default. 
-- The color picker allows you to change the foreground color for the checkbox.
-- A small moon phase icon is next. There is a toggle that has the same icon. The toggle alows you to switcth the settings panel between light and dark modes. The icon next to the picker allows you to copy the color from the other mode. For example: if you start in dark mode, and choose a bright red for x, you can use the toggle to flip to light mode, use this small icon to copy that bright red, and then adjust the color so that your task looks good in light mode, too.
-- There is an icon at the end of the row that will expand to show... even more settings! All of these should explain themselves if you mess with them for a bit.
+<img width="991" alt="image" src="https://user-images.githubusercontent.com/808713/170642901-c702e999-6279-4910-b7bb-f0413bfa3e3e.png">
+
+There is a lot going on here. It is literally a Wall of Toggles!
+
+The top row has a few things going on: 
+
+<img width="583" alt="image" src="https://user-images.githubusercontent.com/808713/170643652-1f796dca-0daa-4d1c-bd1a-c42cd9482beb.png">
+
+- The slider is used to adjust the roundness of corners for all checkboxes.
+- The palette allows you to toggle between color pickers and text controls for working with colors. For example, you can use the text field input to reference a CSS variable.
+- A moon-phase icon is next, and this allows toggling the entire panel between light mode and dark mode so you can see the impact your settings will have.
+- Finally, there is a reset button that is useful when you want to scrap changes and return to a previously saved state.
+
+#### In the simple / single row view, each task has only a few values: 
+
+- Some preview text, to show what the rendered checkbox and text will look like (with some amount of approximation).
+- An example of what the checkbox looks like in edit mode, along with a field to define a new task value (`x` is the default).
+- Two color pickers follow: one for the foreground, and one for the background. Each has three elements: 
+    - A color picker for selection OR a text-box for manual entry.
+    - A small moon phase icon, which allows you to copy the color from the opposite (light/dark) mode. For example: if you start in dark mode, and choose a bright red for x, you can use the toggle in the top row to flip to light mode, and then use this small icon in the row to copy that bright red, and then adjust the color so that your task looks good in light mode, too.
+- There is a button to hide the checkbox border
+- And another to disallow mouse actions (keyboard would still work), to make it harder to accidentally change a value in reading mode.
+- There is an icon at the end of the row that will expand to show... even more settings!
+- And finally, we have a trashcan, so you can delete this snippet creator if you want.
 
 Use the `+` and `trashcan` buttons to add and remove custom tasks from the list.
 
@@ -60,7 +92,9 @@ Open `Settings` -> `Appearance`, scroll down to `CSS Snippets`. If your snippet 
 
 #### My tasks look weird!
 
-Some themes do a lot of customization for task lists. The way Snippetor works, you should be able to tell, just from the configuration settings, if you're going to have a conflict with your theme. There is a toggle at the bottom of the settings pane that will try to apply some known fixes, but you may need to check the theme settings (using [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) or something theme-specific) to see if task list formatting can be disabled or modified to work better with this snippet.
+Some themes do a lot of customization for task lists. If there is a conflict, ask in the #appearance channel in Slack, or raise an issue in this github channel, but please be specific about what themes and snippets you are using, and what exactly doesn't look right.
+
+
 
 ## Acknowledgements
 
