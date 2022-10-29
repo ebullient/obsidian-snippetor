@@ -40,7 +40,7 @@ class CreateTemplateModal extends Modal {
     constructor(app: App, cfg: SnippetConfig, snippetor: Snippetor) {
         super(app);
         this.snippetor = snippetor;
-        this.containerEl.id = "snippetor-checkboxes-modal";
+        this.containerEl.id = "snippetor-modal";
         this.cfg = cfg /* || snippetor.createNew..SnippetCfg() */; // create new initial value?
     }
 

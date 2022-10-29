@@ -1,9 +1,10 @@
 import {
     ButtonComponent,
     ExtraButtonComponent,
+    Setting,
     ToggleComponent,
 } from "obsidian";
-import { ColoredElement, FormattedElement } from "./@types";
+import { ColoredElement, FormattedElement, SnippetConfig } from "./@types";
 import { COLOR } from "./snippetor-Defaults";
 import { Snippetor } from "./snippetor-Snippetor";
 
@@ -273,16 +274,16 @@ export class ModalHelper {
             .setIcon("enlarge-glyph")
             .setTooltip("Show additional options")
             .onClick(() => {
-                showExtra.extraSettingsEl.removeClass("is-active");
-                hideExtra.extraSettingsEl.addClass("is-active");
+                showExtra.extraSettingsEl.removeClass("is-visible");
+                hideExtra.extraSettingsEl.addClass("is-visible");
                 callback(true);
             });
         const hideExtra = new ExtraButtonComponent(container)
             .setIcon("compress-glyph")
-            .setTooltip("Show additional options")
+            .setTooltip("Hide additional options")
             .onClick(() => {
-                showExtra.extraSettingsEl.addClass("is-active");
-                hideExtra.extraSettingsEl.removeClass("is-active");
+                showExtra.extraSettingsEl.addClass("is-visible");
+                hideExtra.extraSettingsEl.removeClass("is-visible");
                 callback(false);
             });
         showExtra.extraSettingsEl.addClass("toggle-extra");
@@ -290,11 +291,11 @@ export class ModalHelper {
 
         // initial state
         if (expanded) {
-            showExtra.extraSettingsEl.removeClass("is-active");
-            hideExtra.extraSettingsEl.addClass("is-active");
+            showExtra.extraSettingsEl.removeClass("is-visible");
+            hideExtra.extraSettingsEl.addClass("is-visible");
         } else {
-            showExtra.extraSettingsEl.addClass("is-active");
-            hideExtra.extraSettingsEl.removeClass("is-active");
+            showExtra.extraSettingsEl.addClass("is-visible");
+            hideExtra.extraSettingsEl.removeClass("is-visible");
         }
     }
 
@@ -385,5 +386,63 @@ export class ModalHelper {
 
         element.addClass("is-active");
         return true;
+    }
+
+    createFilenameSetting(content: HTMLDivElement, cfg: SnippetConfig) {
+        new Setting(content)
+            .setName("Name of generated snippet (filename)")
+            .setClass("snippet-filename")
+            .addText((text) => {
+                text.setPlaceholder("trigger")
+                    .setValue(cfg.name)
+                    .onChange((value) => {
+                        cfg.name = value;
+                    });
+            })
+            .addButton((button) =>
+                button
+                    .setIcon("wand-glyph")
+                    .setClass("generate-css")
+                    .setTooltip("Generate CSS Snippet")
+                    .onClick(async () => {
+                        button.buttonEl.addClass("is-active");
+                        button.disabled = true;
+                        await this.snippetor.generateCss(cfg);
+                        button.buttonEl.removeClass("is-active");
+                        button.disabled = false;
+                    })
+            );
+    }
+
+    createHtmlStyleElement(cfg: SnippetConfig): HTMLStyleElement {
+        let style = document.createElement("style");
+        if (cfg.cssFontImport) {
+            style.replaceChildren(document.createTextNode(cfg.cssFontImport));
+        }
+        document.getElementsByTagName("head")[0].appendChild(style);
+        return style;
+    }
+
+    createImportFontSetting(
+        content: HTMLDivElement,
+        cfg: SnippetConfig,
+        style: HTMLStyleElement
+    ) {
+        new Setting(content)
+            .setName("Import (CSS) additional fonts")
+            .setDesc(
+                "Cut/paste a CSS @import statement to add an additional font to your snippet. Only do this if you don't have the font you want already installed from another snippet."
+            )
+            .addTextArea((t) =>
+                t.setValue(cfg.cssFontImport).onChange((v) => {
+                    const redraw = v != cfg.cssFontImport;
+                    cfg.cssFontImport = v;
+                    if (redraw) {
+                        style.replaceChildren(
+                            document.createTextNode(cfg.cssFontImport)
+                        );
+                    }
+                })
+            );
     }
 }

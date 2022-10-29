@@ -138,7 +138,7 @@ export class Snippetor {
         cfg.version = "0.1.8";
     }
 
-    initConfig(cfg: Partial<TaskSnippetConfig>): void {
+    initTaskSnippetConfig(cfg: Partial<TaskSnippetConfig>): void {
         cfg.taskSettings.forEach((ts) => {
             this.initTaskSettings(cfg.version, ts);
         });
@@ -284,7 +284,7 @@ export class Snippetor {
                 }
             );
         }
-        return update.then(() => this.app.customCss.readCssFolders()); // refresh snippets
+        return update.then(() => this.app.customCss.readSnippets()); // refresh snippets
     }
 
     isTaskSnippetConfig(cfg: SnippetConfig): cfg is TaskSnippetConfig {

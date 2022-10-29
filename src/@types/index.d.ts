@@ -1,3 +1,4 @@
+
 export interface SnippetorSettings {
     snippets: Record<string, SnippetConfig>;
 }
@@ -7,6 +8,7 @@ export interface SnippetConfig {
     name: string;
     id: string;
     type: string;
+    cssFontImport?: string;
 }
 
 export interface TaskSnippetConfig extends SnippetConfig {
@@ -16,7 +18,6 @@ export interface TaskSnippetConfig extends SnippetConfig {
     hideColorPicker?: boolean;
     styleUncheckedTask?: boolean;
     uncheckedTask?: TaskSettings;
-    cssFontImport?: string;
 }
 
 export interface TaskSettings {
@@ -26,6 +27,7 @@ export interface TaskSettings {
     li: TaskListItemSettings;
     cache?: {
         // not persisted
+        i: number;
         expanded?: boolean;
         textEl?: HTMLSpanElement;
         itemEl?: HTMLLIElement;
@@ -91,8 +93,14 @@ export interface OldTaskSettings extends TaskSettings {
 
 export interface FolderConfig extends ColoredElement {
     target: string;
+    font?: string;
+    fontSize?: number;
+    content?: string;
     cache: {
+        // not persisted
+        expanded?: boolean;
         folderEl: HTMLDivElement;
+        titleEl: HTMLDivElement;
     };
 }
 export interface FolderSnippetConfig extends SnippetConfig {
@@ -110,9 +118,8 @@ export interface FolderSnippetConfig extends SnippetConfig {
 declare module "obsidian" {
     interface App {
         customCss: {
-            snippets: string[];
             getSnippetPath(file?: string): string;
-            readCssFolders(): Promise<void>;
+            readSnippets(): Promise<void>;
         };
         plugins: {
             plugins: {

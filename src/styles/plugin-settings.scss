@@ -15,3 +15,201 @@
     }
   }
 }
+
+#snippetor-modal .modal {
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  width: 80vw;
+  max-width: 90vw;
+
+  --toggle-thumb-color: white;
+  --slider-track-background: var(--background-modifier-border);
+  --background-modifier-border-hover: var(--background-modifier-border);
+
+  input[type="text"] {
+    background-color: var(--background-primary);
+  }
+
+  .setting-item.snippet-filename {
+    button.generate-css:active:after {
+      content: "⚙️";
+      position: absolute;
+      right: 15px;
+      top: 25px;
+      display: block;
+    }
+  }
+
+  /* Flex container: row settings */
+  .snippetor-settings {
+    flex-grow: 2;
+    display: flex;
+    flex-flow: column wrap;
+    align-items: stretch;
+    justify-content: flex-start;
+
+    /* Flex container of labels, groups */
+    .snippetor-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      border-radius: 2px;
+    }
+
+    .snippetor-group {
+      display: inline-flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      margin-right: 6px;
+    }
+
+    .snippetor-group.decorated {
+      border: none;
+      border-radius: 6px;
+      color: var(--text-normal);
+      background-color: var(--background-secondary);
+      padding: 2px 4px;
+
+      input[type="text"] {
+        font-size: 14px;
+        height: 26px;
+        margin: 0 2px;
+        padding: 5px 5px;
+      }
+
+      input[type="range"] {
+        width: 50px;
+      }
+    }
+
+    label {
+      padding: 2px 4px;
+    }
+    .row-label {
+      margin-right: 6px;
+      padding: 2px 4px;
+    }
+
+    button,
+    .snippetor-group {
+      margin-bottom: 5px;
+    }
+    button.no-padding {
+      margin-bottom: 0px;
+    }
+    button.toggle-sync-font,
+    button.toggle-sync-color {
+      font-family: monospace !important;
+      padding: 0 12px !important;
+      font-size: 18px !important;
+      margin-right: 6px;
+    }
+    .hide-text-colors > .snippetor-group.color {
+      display: none;
+    }
+
+    button,
+    .row-label,
+    .snippetor-group.decorated {
+      height: 30px !important;
+    }
+
+    button.is-active {
+      background-color: var(--interactive-accent);
+      color: var(--text-on-accent);
+    }
+
+    label,
+    .row-label,
+    .source-mode-label {
+      white-space: nowrap;
+      font-style: normal;
+    }
+
+    .source-mode-label {
+      font-family: var(--font-monospace);
+    }
+
+    input.snippetor-data-task {
+      font-family: var(--font-monospace);
+      padding: 0 8px;
+      text-align: center;
+      position: relative;
+    }
+
+    input.snippetor-data-task.data-value-required {
+      border-color: var(--text-accent);
+    }
+
+    input.snippetor-data-task.data-value-error {
+      border-color: var(--text-error);
+      text-decoration: underline;
+    }
+
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
+    padding: 0 2px;
+
+    &:hover {
+      border-right: 1px solid var(--interactive-accent);
+      border-left: 1px solid var(--interactive-accent);
+    }
+  }
+
+  /* Flex container: row/item settings (expand/collapse, remove) */
+  .snippetor-li-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: stretch;
+
+    .settings-reset {
+      padding-top: 2px;
+    }
+    .toggle-extra:not(.is-visible) {
+      display: none;
+    }
+    .toggle-extra.is-visible {
+      display: inherit;
+    }
+  }
+
+  /* Color and theme toggle decorations */
+  .picker-toggle,
+  .theme-toggle {
+    height: 22px;
+    width: 44px;
+    margin-right: 12px;
+    box-shadow: 0px 0px 0px 2px rgb(0 0 0 / 2%),
+      0px 0px 2px 1px rgb(0 0 0 / 5%) inset;
+  }
+  .theme-toggle::after {
+    content: "🌗";
+    line-height: 16px;
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    background: none;
+    box-shadow: none;
+    border-radius: 9px;
+    transform: translate3d(3px, 0, 0);
+    display: block;
+  }
+  .picker-toggle::after {
+    content: "🎨";
+    line-height: 16px;
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    background: none;
+    box-shadow: none;
+    border-radius: 9px;
+    transform: translate3d(3px, 0, 0);
+    display: block;
+  }
+  .theme-toggle.is-enabled::after,
+  .picker-toggle.is-enabled::after {
+    transform: translate3d(24px, 0, 0);
+    display: block;
+  }
+}

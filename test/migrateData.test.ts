@@ -363,7 +363,7 @@ test("Mammoth", () => {
     };
 
     const actual = JSON.parse(JSON.stringify(initial));
-    snippetor.initConfig(actual as Partial<TaskSnippetConfig>);
+    snippetor.initTaskSnippetConfig(actual as Partial<TaskSnippetConfig>);
     expect(actual.id).toBeDefined(); // 0.1.8: make sure the id was generated
     expected.id = actual.id; // set to the same value so the rest can be compared
     expect(actual).toEqual(expected);
