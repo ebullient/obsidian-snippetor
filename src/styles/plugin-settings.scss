@@ -40,6 +40,14 @@
     }
   }
 
+  .setting-item-control.font-import {
+    display: block;
+
+    textarea {
+      width: 100%;
+    }
+  }
+
   /* Flex container: row settings */
   .snippetor-settings {
     flex-grow: 2;

@@ -66,7 +66,7 @@ class CreateCheckboxesModal extends Modal {
         this.cfg = taskSnippetCfg || snippetor.createNewTaskSnippetCfg();
 
         // Ensure required config, migrate old task data
-        this.snippetor.initConfig(this.cfg);
+        this.snippetor.initTaskSnippetConfig(this.cfg);
 
         // save snapshot of task settings
         this.origTaskSettings = JSON.parse(
@@ -79,11 +79,6 @@ class CreateCheckboxesModal extends Modal {
 
     onOpen(): void {
         this.titleEl.createSpan({ text: "Snippetor: Tasks" });
-        this.style = document.createElement("style");
-        this.style.replaceChildren(
-            document.createTextNode(this.cfg.cssFontImport)
-        );
-        document.getElementsByTagName("head")[0].appendChild(this.style);
 
         const content = this.contentEl.createDiv(
             "snippetor-content markdown-preview-view"
@@ -94,37 +89,16 @@ class CreateCheckboxesModal extends Modal {
             this.containerEl,
             content
         );
-
-        new Setting(content)
-            .setName("Name of generated snippet (filename)")
-            .setClass("snippet-filename")
-            .addText((text) => {
-                text.setPlaceholder("trigger")
-                    .setValue(this.cfg.name)
-                    .onChange((value) => {
-                        this.cfg.name = value;
-                    });
-            })
-            .addButton((button) =>
-                button
-                    .setIcon("wand-glyph")
-                    .setClass("generate-css")
-                    .setTooltip("Generate CSS Snippet")
-                    .onClick(async () => {
-                        button.buttonEl.addClass("is-active");
-                        button.disabled = true;
-                        await this.snippetor.generateCss(this.cfg);
-                        button.buttonEl.removeClass("is-active");
-                        button.disabled = false;
-                    })
-            );
+        this.style = this.helper.createHtmlStyleElement(this.cfg);
+        this.helper.createFilenameSetting(content, this.cfg);
 
         content.createEl("h3", {
             text: "Custom Task Values",
         });
 
-        this.elements.list = content.createEl("ul");
-        this.elements.list.addClass("contains-task-list");
+        this.elements.list = content.createEl("ul", {
+            cls: "contains-task-list has-list-bullet"
+        });
 
         this.showTasks();
 
@@ -159,22 +133,7 @@ class CreateCheckboxesModal extends Modal {
                 });
             });
 
-        new Setting(content)
-            .setName("Import (CSS) additional fonts")
-            .setDesc(
-                "Cut/paste a CSS @import statement to add an additional font to your snippet. Only do this if you don't have the font you want already installed from another snippet."
-            )
-            .addTextArea((t) =>
-                t.setValue(this.cfg.cssFontImport).onChange((v) => {
-                    const redraw = v != this.cfg.cssFontImport;
-                    this.cfg.cssFontImport = v;
-                    if (redraw) {
-                        this.style.replaceChildren(
-                            document.createTextNode(this.cfg.cssFontImport)
-                        );
-                    }
-                })
-            );
+        this.helper.createImportFontSetting(content, this.cfg, this.style);
     }
 
     finish(): void {
@@ -250,6 +209,7 @@ class CreateCheckboxesModal extends Modal {
         this.elements.defaultFontSize = Math.ceil(
             Number(getComputedStyle(checkbox).fontSize.replace("px", ""))
         );
+        console.log("defaultFontSize", this.elements.defaultFontSize);
 
         const actions = heading.createSpan("snippetor-li-actions");
 
@@ -265,10 +225,10 @@ class CreateCheckboxesModal extends Modal {
                 this.cfg.borderRadius = v;
                 if (redraw) {
                     if (this.cfg.styleUncheckedTask) {
-                        this.applySettingsToCheckbox(this.cfg.uncheckedTask);
+                        this.applySettingsToElements(this.cfg.uncheckedTask);
                     }
                     this.cfg.taskSettings.forEach((ts) => {
-                        this.applySettingsToCheckbox(ts);
+                        this.applySettingsToElements(ts);
                     });
                 }
             });
@@ -306,19 +266,19 @@ class CreateCheckboxesModal extends Modal {
         const itemEl = this.elements.list.createEl("li");
         const textEl = itemEl.createSpan("snippetor-preview");
         const checkboxEl = textEl.createEl("input", {
-            cls: "task-list-item-checkbox snippetor",
+            cls: "task-list-item-checkbox",
             attr: {
                 type: "checkbox",
                 checked: "",
             },
         });
 
+        taskSettings.cache.i = this.id++;
         taskSettings.cache.itemEl = itemEl;
         taskSettings.cache.textEl = textEl;
         taskSettings.cache.checkboxEl = checkboxEl;
 
-        this.applySettingsToCheckbox(taskSettings);
-        this.applySettingsToListItem(taskSettings);
+        this.applySettingsToElements(taskSettings);
 
         // Sample text -- attributes will be updated
         textEl.createSpan({ text: "example", cls: "example" });
@@ -358,23 +318,23 @@ class CreateCheckboxesModal extends Modal {
         }
     }
 
-    drawSettings(ts: TaskSettings, parent: HTMLSpanElement): void {
-        const i = this.id++;
+    drawSettings(taskSettings: TaskSettings, parent: HTMLSpanElement): void {
         parent.empty();
 
-        this.drawCheckboxSettings(ts, parent, i);
-        if (ts.cache.expanded) {
-            this.drawReadingModeCheckboxSettings(ts, parent, i);
-            this.drawTextSettings(ts, parent, i);
+        this.drawCheckboxSettings(taskSettings, parent);
+        if (taskSettings.cache.expanded) {
+            this.drawReadingModeCheckboxSettings(taskSettings, parent);
+            this.drawTextSettings(taskSettings, parent);
+            this.drawFontSettings(taskSettings, parent);
         }
     }
 
     drawCheckboxSettings(
         ts: TaskSettings,
-        parent: HTMLSpanElement,
-        i: number
+        parent: HTMLSpanElement
     ): void {
         const settings = parent.createSpan("snippetor-row");
+        const i = ts.cache.i;
 
         // Input box for the task character: UNLESS unchecked
         if (!ts.unchecked) {
@@ -382,7 +342,7 @@ class CreateCheckboxesModal extends Modal {
                 "snippetor-group decorated"
             );
             const dataTaskLabel = sourceGroup.createEl("label", {
-                text: `- [${ts.data}]`,
+                text: `- `,
                 cls: "source-mode-label",
                 attr: { for: `task-${i}` },
             });
@@ -401,8 +361,7 @@ class CreateCheckboxesModal extends Modal {
                 () => {
                     ts.data = dataTask.value;
                     dataTaskLabel.setText(`- [${dataTask.value}]`);
-                    this.applySettingsToCheckbox(ts);
-                    this.applySettingsToListItem(ts);
+                    this.applySettingsToElements(ts);
                     this.verifyDataValue(dataTask);
                 },
                 false
@@ -419,10 +378,7 @@ class CreateCheckboxesModal extends Modal {
             "fg:",
             (value) => {
                 this.helper.setColor(ts.checkbox, value, COLOR.FOREGROUND);
-                this.applySettingsToCheckbox(ts);
-                if (ts.li.syncTaskColor) {
-                    this.applySettingsToListItem(ts);
-                }
+                this.applySettingsToElements(ts);
             }
         );
 
@@ -434,10 +390,7 @@ class CreateCheckboxesModal extends Modal {
             "bg:",
             (value) => {
                 this.helper.setColor(ts.checkbox, value, COLOR.BACKGROUND);
-                this.applySettingsToCheckbox(ts);
-                if (ts.li.syncTaskColor) {
-                    this.applySettingsToListItem(ts);
-                }
+                this.applySettingsToElements(ts);
             }
         );
 
@@ -447,7 +400,7 @@ class CreateCheckboxesModal extends Modal {
             ts.checkbox.hideBorder,
             (enabled) => {
                 ts.checkbox.hideBorder = enabled;
-                this.applySettingsToCheckbox(ts);
+                this.applySettingsToElements(ts);
             }
         );
         hideBorder.setIcon("fullscreen").setTooltip("Toggle: Hide border");
@@ -458,7 +411,7 @@ class CreateCheckboxesModal extends Modal {
             (enabled) => {
                 ts.checkbox.preventClick = enabled;
                 lockMode.setIcon(ts.checkbox.preventClick ? LOCK : UNLOCK);
-                this.applySettingsToCheckbox(ts);
+                this.applySettingsToElements(ts);
             }
         );
         lockMode
@@ -468,9 +421,10 @@ class CreateCheckboxesModal extends Modal {
 
     drawReadingModeCheckboxSettings(
         ts: TaskSettings,
-        parent: HTMLSpanElement,
-        i: number
+        parent: HTMLSpanElement
     ): void {
+        const i = ts.cache.i;
+
         const settings = parent.createSpan("snippetor-row");
         settings.createEl("label", {
             cls: "row-label",
@@ -495,28 +449,9 @@ class CreateCheckboxesModal extends Modal {
             },
         });
 
-        const chkboxGroup = settings.createSpan("snippetor-group decorated");
-        chkboxGroup.createEl("label", {
-            text: "Font:",
-            attr: { for: `checkbox-font-${i}` },
-        });
-        new TextComponent(chkboxGroup)
-            .setValue(
-                ts.checkbox.format === undefined ||
-                    ts.checkbox.format.font === undefined
-                    ? ""
-                    : ts.checkbox.format.font
-            )
-            .onChange((v) => {
-                this.snippetor.initialize(ts, "checkbox", "format");
-                ts.checkbox.format.font = v;
-                this.applySettingsToCheckbox(ts);
-            })
-            .inputEl.addClass("snippetor-font-setting");
-
         const sizeGroup = settings.createSpan("snippetor-group decorated");
         const sizeLabel = sizeGroup.createEl("label", {
-            text: `[${initalValue}] size: `,
+            text: `size: `,
             attr: { for: "size-" + i },
         });
         const fontSize = new SliderComponent(sizeGroup)
@@ -531,16 +466,16 @@ class CreateCheckboxesModal extends Modal {
             .onChange((v) => {
                 this.snippetor.initialize(ts, "checkbox", "format");
                 ts.checkbox.format.fontSize = v;
-                this.applySettingsToCheckbox(ts);
+                this.applySettingsToElements(ts);
             });
         fontSize.sliderEl.name = "size-" + i;
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
-            .setTooltip("Reset font size to default")
+            .setTooltip("Reset font size to default: " + this.elements.defaultFontSize)
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
                 Reflect.deleteProperty(ts.checkbox.format, "fontSize");
-                this.applySettingsToCheckbox(ts);
+                this.applySettingsToElements(ts);
             })
             .extraSettingsEl.addClass("no-padding");
 
@@ -555,8 +490,7 @@ class CreateCheckboxesModal extends Modal {
                 } else {
                     sizeLabel.setText(`[${ts.data}] size: `);
                 }
-                this.applySettingsToCheckbox(ts);
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
             },
             false
         );
@@ -573,7 +507,7 @@ class CreateCheckboxesModal extends Modal {
                 } else {
                     Reflect.deleteProperty(ts.checkbox, "left");
                 }
-                this.applySettingsToCheckbox(ts);
+                this.applySettingsToElements(ts);
             }
         );
 
@@ -589,16 +523,17 @@ class CreateCheckboxesModal extends Modal {
                 } else {
                     Reflect.deleteProperty(ts.checkbox, "top");
                 }
-                this.applySettingsToCheckbox(ts);
+                this.applySettingsToElements(ts);
             }
         );
     }
 
     drawTextSettings(
         ts: TaskSettings,
-        parent: HTMLSpanElement,
-        i: number
+        parent: HTMLSpanElement
     ): void {
+        const i = ts.cache.i;
+
         const settings = parent.createSpan("snippetor-row text-settings");
         settings.createSpan({
             cls: "row-label",
@@ -611,27 +546,27 @@ class CreateCheckboxesModal extends Modal {
             .createBoldButton(styleGroup, ts.li, (enabled) => {
                 this.snippetor.initialize(ts, "li", "format");
                 ts.li.format.bold = enabled;
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
             })
             .buttonEl.addClass("no-padding");
         this.helper
             .createItalicButton(styleGroup, ts.li, (enabled) => {
                 this.snippetor.initialize(ts, "li", "format");
                 ts.li.format.italics = enabled;
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
             })
             .buttonEl.addClass("no-padding");
         this.helper
             .createStrikethroughButton(styleGroup, ts.li, (enabled) => {
                 this.snippetor.initialize(ts, "li", "format");
                 ts.li.format.strikethrough = enabled;
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
             })
             .buttonEl.addClass("no-padding");
 
         const sizeGroup = settings.createSpan("snippetor-group decorated");
         sizeGroup.createEl("label", {
-            text: `Font size: `,
+            text: `Text size: `,
             attr: { for: "size-" + i },
         });
         const fontSize = new SliderComponent(sizeGroup)
@@ -646,66 +581,18 @@ class CreateCheckboxesModal extends Modal {
             .onChange((v) => {
                 this.snippetor.initialize(ts, "li", "format");
                 ts.li.format.fontSize = v;
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
             });
         fontSize.sliderEl.name = "size-" + i;
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
-            .setTooltip("Reset font size to default")
+            .setTooltip("Reset font size to default: " + this.elements.defaultFontSize)
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
                 Reflect.deleteProperty(ts.checkbox.format, "fontSize");
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
             })
             .extraSettingsEl.addClass("no-padding");
-
-        // Sync List item font?
-        const useTaskFont = "🔡 = ☑︎";
-        const useTextFont = "🔡 ≠ ☑︎";
-        const textFontMode = this.helper.createToggleButton(
-            settings,
-            ts.li.syncTaskFont,
-            (enabled) => {
-                ts.li.syncTaskFont = enabled;
-                textFontMode.buttonEl.setText(
-                    ts.li.syncTaskFont ? useTaskFont : useTextFont
-                );
-                this.applySettingsToListItem(ts);
-                if (ts.li.syncTaskFont) {
-                    settings.addClass("hide-text-font");
-                } else {
-                    settings.removeClass("hide-text-font");
-                }
-            }
-        );
-        textFontMode.buttonEl.addClass("toggle-sync-font");
-        textFontMode.setTooltip("Toggle: Sync text with task font");
-        textFontMode.setButtonText(
-            ts.li.syncTaskFont ? useTaskFont : useTextFont
-        );
-        if (ts.li.syncTaskFont) {
-            settings.addClass("hide-text-font");
-        }
-        // List Item font
-        const liGroup = settings.createSpan(
-            "snippetor-group decorated li-font"
-        );
-        liGroup.createEl("label", {
-            text: "Font:",
-            attr: { for: `li-font-${i}` },
-        });
-        this.snippetor.initialize(ts, "li", "format");
-        const textFont = new TextComponent(liGroup)
-            .setValue(
-                ts.li.format === undefined || ts.li.format.font === undefined
-                    ? ""
-                    : ts.li.format.font
-            )
-            .onChange((v) => {
-                ts.li.format.font = v;
-                this.applySettingsToListItem(ts);
-            });
-        textFont.inputEl.addClass("snippetor-font-setting");
 
         // Sync List item color?
         const useTaskColors = "🎨 = ☑︎";
@@ -718,7 +605,7 @@ class CreateCheckboxesModal extends Modal {
                 textColorMode.buttonEl.setText(
                     ts.li.syncTaskColor ? useTaskColors : useTextColors
                 );
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
                 if (ts.li.syncTaskColor) {
                     settings.addClass("hide-text-colors");
                 } else {
@@ -742,10 +629,9 @@ class CreateCheckboxesModal extends Modal {
             "fg:",
             (value) => {
                 this.helper.setColor(ts.li, value, COLOR.FOREGROUND);
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
             }
         );
-
         // the checkbox background
         this.backgroundColorPicker(
             settings,
@@ -754,9 +640,65 @@ class CreateCheckboxesModal extends Modal {
             "bg:",
             (value) => {
                 this.helper.setColor(ts.li, value, COLOR.BACKGROUND);
-                this.applySettingsToListItem(ts);
+                this.applySettingsToElements(ts);
             }
         );
+    }
+
+    drawFontSettings(
+        ts: TaskSettings,
+        parent: HTMLSpanElement
+    ): void {
+        const i = ts.cache.i;
+
+        const settings = parent.createSpan("snippetor-row text-settings");
+        settings.createSpan({
+            cls: "row-label",
+            text: "Fonts: ",
+        });
+
+        // List Item font
+        const liGroup = settings.createSpan(
+            "snippetor-group decorated li-font"
+        );
+        liGroup.createEl("label", {
+            text: "Text:",
+            attr: { for: `li-font-${i}` },
+        });
+        this.snippetor.initialize(ts, "li", "format");
+        const textFont = new TextComponent(liGroup)
+            .setValue(
+                ts.li.format === undefined || ts.li.format.font === undefined
+                    ? ""
+                    : ts.li.format.font
+            )
+            .onChange((v) => {
+                ts.li.format.font = v;
+                this.applySettingsToElements(ts);
+            });
+        textFont.inputEl.addClass("snippetor-font-setting");
+
+
+        // List Item font
+        const chkboxGroup = settings.createSpan(
+            "snippetor-group decorated checkbox-font"
+        );
+        chkboxGroup.createEl("label", {
+            text: "Checkbox:",
+            attr: { for: `checkbox-font-${i}` },
+        });
+        this.snippetor.initialize(ts, "checkbox", "format");
+        const boxFont = new TextComponent(chkboxGroup)
+            .setValue(
+                ts.checkbox.format === undefined || ts.checkbox.format.font === undefined
+                    ? ""
+                    : ts.checkbox.format.font
+            )
+            .onChange((v) => {
+                ts.checkbox.format.font = v;
+                this.applySettingsToElements(ts);
+            });
+        boxFont.inputEl.addClass("snippetor-font-setting");
     }
 
     foregroundColorPicker(
@@ -896,20 +838,27 @@ class CreateCheckboxesModal extends Modal {
             .extraSettingsEl.addClass("no-padding");
     }
 
-    applySettingsToListItem(taskSettings: TaskSettings): void {
-        const textEl = taskSettings.cache.textEl;
+    applySettingsToElements(taskSettings: TaskSettings): void {
         const itemEl = taskSettings.cache.itemEl;
+        const checkboxEl = taskSettings.cache.checkboxEl;
+        const textEl = taskSettings.cache.textEl;
 
+        // data-line attribute
+        itemEl.setAttribute("data-line", taskSettings.cache.i + "");
+        checkboxEl.setAttribute("data-line", taskSettings.cache.i + "");
+
+        // data-task attribute
         itemEl.setAttr("data-task", taskSettings.data);
         itemEl.className =
             "task-list-item" + (taskSettings.data == " " ? "" : " is-checked");
-        this.setListItemColors(taskSettings);
 
-        textEl.style.removeProperty("--snippetor-decoration");
-        textEl.style.removeProperty("--snippetor-font");
-        textEl.style.removeProperty("--snippetor-font-size");
-        textEl.style.removeProperty("--snippetor-text-style");
-        textEl.style.removeProperty("--snippetor-weight");
+        this.setColors(taskSettings);
+        this.setCheckboxStyles(taskSettings);
+        this.setTextStyles(taskSettings);
+    }
+
+    setTextStyles(taskSettings: TaskSettings): void {
+        const textEl = taskSettings.cache.textEl;
 
         let decoration = "none";
         let font = "var(--font-text)";
@@ -929,113 +878,89 @@ class CreateCheckboxesModal extends Modal {
             }
         }
 
-        if (
-            taskSettings.li.syncTaskFont &&
-            taskSettings.checkbox.format &&
-            taskSettings.checkbox.format.font
-        ) {
-            font = taskSettings.checkbox.format.font;
-        } else if (taskSettings.li.format && taskSettings.li.format.font) {
-            font = taskSettings.li.format.font;
-        }
-
         if (taskSettings.li.format && taskSettings.li.format.fontSize) {
             fontSize = taskSettings.li.format.fontSize + "px";
         }
 
-        textEl.style.setProperty("--snippetor-decoration", decoration);
-        textEl.style.setProperty("--snippetor-font", font);
-        textEl.style.setProperty("--snippetor-font-size", fontSize);
+        textEl.style.setProperty("--snippetor-text-decoration", decoration);
+        textEl.style.setProperty("--snippetor-text-font", font);
+        textEl.style.setProperty("--snippetor-text-font-size", fontSize);
         textEl.style.setProperty("--snippetor-text-style", style);
-        textEl.style.setProperty("--snippetor-weight", weight);
+        textEl.style.setProperty("--snippetor-text-weight", weight);
     }
 
-    applySettingsToCheckbox(ts: TaskSettings): void {
-        const checkbox = ts.cache.checkboxEl;
-        checkbox.removeAttribute("data");
+    setColors(taskSettings: TaskSettings): void {
+        const li = taskSettings.cache.itemEl;
 
-        checkbox.style.removeProperty("--snippetor-font");
-        checkbox.style.removeProperty("--snippetor-font-size");
-        checkbox.style.removeProperty("--snippetor-left");
-        checkbox.style.removeProperty("--snippetor-top");
+        const boxFgColor = this.helper.getColor(
+            taskSettings.checkbox,
+            COLOR.FOREGROUND
+        );
+        const boxBgColor = this.helper.getColor(
+            taskSettings.checkbox,
+            COLOR.BACKGROUND
+        );
 
-        const data = ts.checkbox.readModeData
-            ? ts.checkbox.readModeData
-            : ts.data;
-        checkbox.setAttribute("data", data);
+        const textFgColor = this.helper.getColor(
+            taskSettings.li.syncTaskColor
+                ? taskSettings.checkbox
+                : taskSettings.li,
+            COLOR.FOREGROUND
+        );
+        const textBgColor = this.helper.getColor(
+            taskSettings.li.syncTaskColor
+                ? taskSettings.checkbox
+                : taskSettings.li,
+            COLOR.BACKGROUND
+        );
+
+        li.style.setProperty("--checkbox-color",
+            boxFgColor === "inherit" ? "var(--text-normal)" : boxFgColor
+        );
+
+        li.style.setProperty("--checkbox-bg", boxBgColor);
+        li.style.setProperty("--checkbox-border-color",
+            taskSettings.checkbox.hideBorder ? "transparent" : boxFgColor
+        );
+
+        if (this.cfg.borderRadius) {
+            li.style.setProperty("--checkbox-radius", this.cfg.borderRadius + "%");
+        } else {
+            li.style.removeProperty("--checkbox-radius");
+        }
+
+        li.style.setProperty("--snippetor-fg", textFgColor);
+        li.style.setProperty("--snippetor-bg", textBgColor);
+    }
+
+    setCheckboxStyles(taskSettings: TaskSettings): void {
+        const li = taskSettings.cache.itemEl;
+        const checkbox = taskSettings.cache.checkboxEl;
+
+        // content value for snippetor
+        const content = taskSettings.checkbox.readModeData
+            ? taskSettings.checkbox.readModeData
+            : taskSettings.data;
+        checkbox.setAttribute("data", content);
 
         let font = "var(--font-monospace)";
         let fontSize = this.elements.defaultFontSize + "px";
 
-        if (ts.checkbox.format && ts.checkbox.format.font) {
-            font = ts.checkbox.format.font;
+        if (taskSettings.checkbox.format && taskSettings.checkbox.format.font) {
+            font = taskSettings.checkbox.format.font;
         }
-        if (ts.checkbox.format && ts.checkbox.format.fontSize) {
-            fontSize = ts.checkbox.format.fontSize + "px";
+        if (taskSettings.checkbox.format && taskSettings.checkbox.format.fontSize) {
+            fontSize = taskSettings.checkbox.format.fontSize + "px";
         }
 
-        checkbox.style.setProperty("--snippetor-font", font);
-        checkbox.style.setProperty("--snippetor-font-size", fontSize);
+        checkbox.style.setProperty("--snippetor-box-font", font);
+        checkbox.style.setProperty("--snippetor-box-font-size", fontSize);
 
-        checkbox.style.setProperty(
-            "--snippetor-top",
-            (ts.checkbox.top ? ts.checkbox.top : 0) + "px"
+        checkbox.style.setProperty("--snippetor-box-top",
+            (taskSettings.checkbox.top ? taskSettings.checkbox.top : 0) + "px"
         );
-        checkbox.style.setProperty(
-            "--snippetor-left",
-            (ts.checkbox.left ? ts.checkbox.left : 0) + "px"
-        );
-
-        checkbox.style.borderRadius =
-            (this.cfg.borderRadius ? this.cfg.borderRadius : 0) + "%";
-
-        this.setCheckboxColors(ts);
-    }
-
-    setListItemColors(taskSettings: TaskSettings): void {
-        const itemEl = taskSettings.cache.itemEl;
-        const fgColor = this.helper.getColor(
-            taskSettings.li.syncTaskColor
-                ? taskSettings.checkbox
-                : taskSettings.li,
-            COLOR.FOREGROUND
-        );
-        const bgColor = this.helper.getColor(
-            taskSettings.li.syncTaskColor
-                ? taskSettings.checkbox
-                : taskSettings.li,
-            COLOR.BACKGROUND
-        );
-        itemEl.style.color = fgColor;
-        itemEl.style.backgroundColor = bgColor;
-    }
-
-    setCheckboxColors(taskSettings: TaskSettings): void {
-        const checkboxEl = taskSettings.cache.checkboxEl;
-        const fgColor = this.helper.getColor(
-            taskSettings.checkbox,
-            COLOR.FOREGROUND
-        );
-        const bgColor = this.helper.getColor(
-            taskSettings.checkbox,
-            COLOR.BACKGROUND
-        );
-
-        // doing this the hard way because we have to override at least
-        // one !important from themes
-        checkboxEl.style.removeProperty("--snippetor-fg-color");
-        checkboxEl.style.removeProperty("--snippetor-bg-color");
-        checkboxEl.style.removeProperty("--snippetor-border-color");
-
-        checkboxEl.style.setProperty(
-            "--snippetor-fg-color",
-            fgColor === "inherit" ? "var(--text-normal)" : fgColor
-        );
-        checkboxEl.style.setProperty("--snippetor-bg-color", bgColor);
-
-        checkboxEl.style.setProperty(
-            "--snippetor-border-color",
-            taskSettings.checkbox.hideBorder ? "transparent" : fgColor
+        checkbox.style.setProperty("--snippetor-box-left",
+            (taskSettings.checkbox.left ? taskSettings.checkbox.left : 0) + "px"
         );
     }
 

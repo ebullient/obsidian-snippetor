@@ -428,10 +428,10 @@ export class ModalHelper {
         cfg: SnippetConfig,
         style: HTMLStyleElement
     ) {
-        new Setting(content)
+        let result = new Setting(content)
             .setName("Import (CSS) additional fonts")
             .setDesc(
-                "Cut/paste a CSS @import statement to add an additional font to your snippet. Only do this if you don't have the font you want already installed from another snippet."
+                "Cut/paste a CSS @import statement to add an additional font to this snippet."
             )
             .addTextArea((t) =>
                 t.setValue(cfg.cssFontImport).onChange((v) => {
@@ -444,5 +444,7 @@ export class ModalHelper {
                     }
                 })
             );
+        result.controlEl.addClass("font-import");
+        result.infoEl.addClass("font-import");
     }
 }
