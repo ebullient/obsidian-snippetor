@@ -388,7 +388,7 @@ export class ModalHelper {
         return true;
     }
 
-    createFilenameSetting(content: HTMLDivElement, cfg: SnippetConfig) {
+    createFilenameSetting(content: HTMLDivElement, cfg: SnippetConfig): void {
         new Setting(content)
             .setName("Name of generated snippet (filename)")
             .setClass("snippet-filename")
@@ -415,7 +415,7 @@ export class ModalHelper {
     }
 
     createHtmlStyleElement(cfg: SnippetConfig): HTMLStyleElement {
-        let style = document.createElement("style");
+        const style = document.createElement("style");
         if (cfg.cssFontImport) {
             style.replaceChildren(document.createTextNode(cfg.cssFontImport));
         }
@@ -427,8 +427,8 @@ export class ModalHelper {
         content: HTMLDivElement,
         cfg: SnippetConfig,
         style: HTMLStyleElement
-    ) {
-        let result = new Setting(content)
+    ): void {
+        const result = new Setting(content)
             .setName("Import (CSS) additional fonts")
             .setDesc(
                 "Cut/paste a CSS @import statement to add an additional font to this snippet."

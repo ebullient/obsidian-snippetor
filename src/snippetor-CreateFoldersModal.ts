@@ -68,10 +68,11 @@ class CreateFolderModal extends Modal {
         this.snippetor = snippetor;
         this.containerEl.addClass("snippetor-folders-modal");
         this.containerEl.id = "snippetor-modal";
-        this.cfg = folderSnippetCfg || snippetor.createNewFolderSnippetCfg();
 
         // Ensure required config, migrate old data
-        this.snippetor.initCommonConfig(this.cfg);
+        this.cfg = this.snippetor.initFolderSnippetConfig(
+            folderSnippetCfg || snippetor.createNewFolderSnippetCfg()
+        );
 
         // save snapshot of settings
         this.original = JSON.parse(JSON.stringify(this.cfg));
@@ -119,7 +120,7 @@ class CreateFolderModal extends Modal {
             .createDiv("nav-folder-children");
 
         // this will be cleared/emptied with showFolders
-        let basicFolderTitle = folderEl
+        const basicFolderTitle = folderEl
             .createDiv("nav-folder")
             .createDiv("nav-folder-title")
             .createDiv("nav-folder-title-content");

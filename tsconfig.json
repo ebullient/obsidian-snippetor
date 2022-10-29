@@ -16,6 +16,10 @@
       "es5",
       "scripthost",
       "es2019"
+    ],
+    "types": [
+      "mocha",
+      "jest"
     ]
   },
   "include": [

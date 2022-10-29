@@ -1,4 +1,3 @@
-
 export interface SnippetorSettings {
     snippets: Record<string, SnippetConfig>;
 }
@@ -13,7 +12,7 @@ export interface SnippetConfig {
 
 export interface TaskSnippetConfig extends SnippetConfig {
     taskSettings: TaskSettings[];
-    baseFontSize: number;
+    baseFontSize?: number;
     borderRadius?: number;
     hideColorPicker?: boolean;
     styleUncheckedTask?: boolean;
@@ -27,7 +26,7 @@ export interface TaskSettings {
     li: TaskListItemSettings;
     cache?: {
         // not persisted
-        i: number;
+        i?: number;
         expanded?: boolean;
         textEl?: HTMLSpanElement;
         itemEl?: HTMLLIElement;

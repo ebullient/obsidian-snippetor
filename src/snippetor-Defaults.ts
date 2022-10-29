@@ -34,6 +34,7 @@ export const DEFAULT_FOLDER_SNIPPET_SETTINGS: Partial<FolderSnippetConfig> = {
     default: {
         cache: {
             folderEl: null,
+            titleEl: null,
         },
         target: "",
         lightMode: {

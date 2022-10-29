@@ -48,8 +48,10 @@
     "ignoreCommitPattern": "(🔖|🔨|🧹|changelog|release|Update README).*"
   },
   "dependencies": {
+    "@types/jest": "^29.2.0",
     "compare-versions": "^4.1.3",
     "eta": "^1.12.3",
+    "jest-environment-jsdom": "^29.2.2",
     "random-word-slugs": "^0.1.6",
     "randomcolor": "^0.6.2"
   }

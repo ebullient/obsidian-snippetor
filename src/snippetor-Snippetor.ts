@@ -47,7 +47,7 @@ export class Snippetor {
         return new Set(["x", "-", ">"]);
     }
 
-    createNewTaskSnippetCfg(): TaskSnippetConfig {
+    createNewTaskSnippetCfg(): Partial<TaskSnippetConfig> {
         const result = Object.assign({}, DEFAULT_TASK_SNIPPET_SETTINGS, {
             id: this.generateId(),
             name: generateSlug(2),
@@ -58,7 +58,7 @@ export class Snippetor {
         });
         return result;
     }
-    createNewFolderSnippetCfg(): FolderSnippetConfig {
+    createNewFolderSnippetCfg(): Partial<FolderSnippetConfig> {
         const result = Object.assign({}, DEFAULT_FOLDER_SNIPPET_SETTINGS, {
             id: this.generateId(),
             name: generateSlug(2),
@@ -120,6 +120,7 @@ export class Snippetor {
             target: v,
             cache: {
                 folderEl: null,
+                titleEl: null,
             },
         };
     }
@@ -138,7 +139,14 @@ export class Snippetor {
         cfg.version = "0.1.8";
     }
 
-    initTaskSnippetConfig(cfg: Partial<TaskSnippetConfig>): void {
+    initFolderSnippetConfig(
+        cfg: Partial<FolderSnippetConfig>
+    ): FolderSnippetConfig {
+        this.initCommonConfig(cfg); // last, it bumps the version
+        return cfg as FolderSnippetConfig;
+    }
+
+    initTaskSnippetConfig(cfg: Partial<TaskSnippetConfig>): TaskSnippetConfig {
         cfg.taskSettings.forEach((ts) => {
             this.initTaskSettings(cfg.version, ts);
         });
@@ -150,6 +158,8 @@ export class Snippetor {
             cfg.baseFontSize = 14;
         }
         this.initCommonConfig(cfg); // last, it bumps the version
+
+        return cfg as TaskSnippetConfig;
     }
 
     initTaskSettings(version: string, ts: Partial<TaskSettings>): void {

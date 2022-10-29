@@ -63,10 +63,11 @@ class CreateCheckboxesModal extends Modal {
         this.snippetor = snippetor;
         this.containerEl.addClass("snippetor-checkboxes-modal");
         this.containerEl.id = "snippetor-modal";
-        this.cfg = taskSnippetCfg || snippetor.createNewTaskSnippetCfg();
 
         // Ensure required config, migrate old task data
-        this.snippetor.initTaskSnippetConfig(this.cfg);
+        this.cfg = this.snippetor.initTaskSnippetConfig(
+            taskSnippetCfg || snippetor.createNewTaskSnippetCfg()
+        );
 
         // save snapshot of task settings
         this.origTaskSettings = JSON.parse(
@@ -97,7 +98,7 @@ class CreateCheckboxesModal extends Modal {
         });
 
         this.elements.list = content.createEl("ul", {
-            cls: "contains-task-list has-list-bullet"
+            cls: "contains-task-list has-list-bullet",
         });
 
         this.showTasks();
@@ -329,10 +330,7 @@ class CreateCheckboxesModal extends Modal {
         }
     }
 
-    drawCheckboxSettings(
-        ts: TaskSettings,
-        parent: HTMLSpanElement
-    ): void {
+    drawCheckboxSettings(ts: TaskSettings, parent: HTMLSpanElement): void {
         const settings = parent.createSpan("snippetor-row");
         const i = ts.cache.i;
 
@@ -471,7 +469,9 @@ class CreateCheckboxesModal extends Modal {
         fontSize.sliderEl.name = "size-" + i;
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
-            .setTooltip("Reset font size to default: " + this.elements.defaultFontSize)
+            .setTooltip(
+                "Reset font size to default: " + this.elements.defaultFontSize
+            )
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
                 Reflect.deleteProperty(ts.checkbox.format, "fontSize");
@@ -528,10 +528,7 @@ class CreateCheckboxesModal extends Modal {
         );
     }
 
-    drawTextSettings(
-        ts: TaskSettings,
-        parent: HTMLSpanElement
-    ): void {
+    drawTextSettings(ts: TaskSettings, parent: HTMLSpanElement): void {
         const i = ts.cache.i;
 
         const settings = parent.createSpan("snippetor-row text-settings");
@@ -586,7 +583,9 @@ class CreateCheckboxesModal extends Modal {
         fontSize.sliderEl.name = "size-" + i;
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
-            .setTooltip("Reset font size to default: " + this.elements.defaultFontSize)
+            .setTooltip(
+                "Reset font size to default: " + this.elements.defaultFontSize
+            )
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
                 Reflect.deleteProperty(ts.checkbox.format, "fontSize");
@@ -645,10 +644,7 @@ class CreateCheckboxesModal extends Modal {
         );
     }
 
-    drawFontSettings(
-        ts: TaskSettings,
-        parent: HTMLSpanElement
-    ): void {
+    drawFontSettings(ts: TaskSettings, parent: HTMLSpanElement): void {
         const i = ts.cache.i;
 
         const settings = parent.createSpan("snippetor-row text-settings");
@@ -678,7 +674,6 @@ class CreateCheckboxesModal extends Modal {
             });
         textFont.inputEl.addClass("snippetor-font-setting");
 
-
         // List Item font
         const chkboxGroup = settings.createSpan(
             "snippetor-group decorated checkbox-font"
@@ -690,7 +685,8 @@ class CreateCheckboxesModal extends Modal {
         this.snippetor.initialize(ts, "checkbox", "format");
         const boxFont = new TextComponent(chkboxGroup)
             .setValue(
-                ts.checkbox.format === undefined || ts.checkbox.format.font === undefined
+                ts.checkbox.format === undefined ||
+                    ts.checkbox.format.font === undefined
                     ? ""
                     : ts.checkbox.format.font
             )
@@ -841,7 +837,6 @@ class CreateCheckboxesModal extends Modal {
     applySettingsToElements(taskSettings: TaskSettings): void {
         const itemEl = taskSettings.cache.itemEl;
         const checkboxEl = taskSettings.cache.checkboxEl;
-        const textEl = taskSettings.cache.textEl;
 
         // data-line attribute
         itemEl.setAttribute("data-line", taskSettings.cache.i + "");
@@ -881,6 +876,9 @@ class CreateCheckboxesModal extends Modal {
         if (taskSettings.li.format && taskSettings.li.format.fontSize) {
             fontSize = taskSettings.li.format.fontSize + "px";
         }
+        if (taskSettings.li.format && taskSettings.li.format.font) {
+            font = taskSettings.li.format.font;
+        }
 
         textEl.style.setProperty("--snippetor-text-decoration", decoration);
         textEl.style.setProperty("--snippetor-text-font", font);
@@ -914,17 +912,22 @@ class CreateCheckboxesModal extends Modal {
             COLOR.BACKGROUND
         );
 
-        li.style.setProperty("--checkbox-color",
+        li.style.setProperty(
+            "--checkbox-color",
             boxFgColor === "inherit" ? "var(--text-normal)" : boxFgColor
         );
 
         li.style.setProperty("--checkbox-bg", boxBgColor);
-        li.style.setProperty("--checkbox-border-color",
+        li.style.setProperty(
+            "--checkbox-border-color",
             taskSettings.checkbox.hideBorder ? "transparent" : boxFgColor
         );
 
         if (this.cfg.borderRadius) {
-            li.style.setProperty("--checkbox-radius", this.cfg.borderRadius + "%");
+            li.style.setProperty(
+                "--checkbox-radius",
+                this.cfg.borderRadius + "%"
+            );
         } else {
             li.style.removeProperty("--checkbox-radius");
         }
@@ -934,7 +937,6 @@ class CreateCheckboxesModal extends Modal {
     }
 
     setCheckboxStyles(taskSettings: TaskSettings): void {
-        const li = taskSettings.cache.itemEl;
         const checkbox = taskSettings.cache.checkboxEl;
 
         // content value for snippetor
@@ -949,17 +951,22 @@ class CreateCheckboxesModal extends Modal {
         if (taskSettings.checkbox.format && taskSettings.checkbox.format.font) {
             font = taskSettings.checkbox.format.font;
         }
-        if (taskSettings.checkbox.format && taskSettings.checkbox.format.fontSize) {
+        if (
+            taskSettings.checkbox.format &&
+            taskSettings.checkbox.format.fontSize
+        ) {
             fontSize = taskSettings.checkbox.format.fontSize + "px";
         }
 
         checkbox.style.setProperty("--snippetor-box-font", font);
         checkbox.style.setProperty("--snippetor-box-font-size", fontSize);
 
-        checkbox.style.setProperty("--snippetor-box-top",
+        checkbox.style.setProperty(
+            "--snippetor-box-top",
             (taskSettings.checkbox.top ? taskSettings.checkbox.top : 0) + "px"
         );
-        checkbox.style.setProperty("--snippetor-box-left",
+        checkbox.style.setProperty(
+            "--snippetor-box-left",
             (taskSettings.checkbox.left ? taskSettings.checkbox.left : 0) + "px"
         );
     }
