@@ -53,10 +53,11 @@ export function openCreateFolderModal(
 class CreateFolderModal extends Modal {
     cfg: FolderSnippetConfig;
     original: FolderSnippetConfig[];
-    /* id: number; */
-    /* elements: ConstructedElements; */
+    id: number;
     helper: ModalHelper;
     snippetor: Snippetor;
+    style: HTMLStyleElement;
+    defaultFontSize: number;
 
     constructor(
         app: App,
@@ -74,69 +75,66 @@ class CreateFolderModal extends Modal {
 
         // save snapshot of settings
         this.original = JSON.parse(JSON.stringify(this.cfg));
+        this.id = 0;
     }
 
     onOpen(): void {
         this.titleEl.createSpan({ text: "Snippetor: Folders" });
 
-        const content = this.contentEl.createDiv(
-            "snippetor-content markdown-preview-view"
-        );
+        const content = this.contentEl.createDiv("snippetor-content");
 
         this.helper = new ModalHelper(
             this.snippetor,
             this.containerEl,
             content
         );
-
-        new Setting(content)
-            .setName("Name of generated snippet (filename)")
-            .setClass("snippet-filename")
-            .addText((text) => {
-                text.setPlaceholder("trigger")
-                    .setValue(this.cfg.name)
-                    .onChange((value) => {
-                        this.cfg.name = value;
-                    });
-            })
-            .addButton((button) =>
-                button
-                    .setIcon("wand-glyph")
-                    .setClass("generate-css")
-                    .setTooltip("Generate CSS Snippet")
-                    .onClick(async () => {
-                        button.buttonEl.addClass("is-active");
-                        button.disabled = true;
-                        await this.snippetor.generateCss(this.cfg);
-                        button.buttonEl.removeClass("is-active");
-                        button.disabled = false;
-                    })
-            );
+        this.style = this.helper.createHtmlStyleElement(this.cfg);
+        this.helper.createFilenameSetting(content, this.cfg);
 
         content.createEl("h3", {
             text: "Custom Folder Values",
         });
 
         const tableEl = content.createDiv("folders-content-container");
-
         const headerEl = tableEl.createDiv("folders-header");
-        /*  Build File Nav structure here.
-            .nav-files-container
-                .nav-folder.mod-root
-                    .nav-folder-children
-                        .nav-folder.is-collapsed
-                        .nav-file
+
+        /* folderEl == Build File Nav structure here.
+            .workspace-leaf-content data-type="file-explorer"
+                .nav-files-container
+                    .nav-folder.mod-root
+                        .nav-folder-children
+                            .nav-folder.is-collapsed
+                            .nav-file
         */
         const folderEl = tableEl
+            .createDiv("folders")
+            .createDiv({
+                cls: "workspace-leaf-content",
+                attr: {
+                    "data-type": "file-explorer",
+                },
+            })
             .createDiv("nav-files-container")
             .createDiv("nav-folder mod-root")
             .createDiv("nav-folder-children");
+
+        // this will be cleared/emptied with showFolders
+        let basicFolderTitle = folderEl
+            .createDiv("nav-folder")
+            .createDiv("nav-folder-title")
+            .createDiv("nav-folder-title-content");
+
+        this.defaultFontSize = Math.ceil(
+            Number(
+                getComputedStyle(basicFolderTitle).fontSize.replace("px", "")
+            )
+        );
 
         this.createHeader(headerEl, folderEl);
         this.showFolders(folderEl);
 
         new Setting(content)
-            .setClass("snippetor-create-task")
+            .setClass("snippetor-create-folder")
             .addButton((button: ButtonComponent) =>
                 button
                     .setTooltip("Add a folder")
@@ -154,7 +152,7 @@ class CreateFolderModal extends Modal {
         });
         new Setting(content)
             .setName("Use hover animations")
-            .setDesc("Folders will show a hover transition")
+            .setDesc("Snippet will include a customized hover transition")
             .addToggle((t) => {
                 t.setValue(this.cfg.hoverDecoration).onChange((v) => {
                     this.cfg.hoverDecoration = v;
@@ -170,8 +168,8 @@ class CreateFolderModal extends Modal {
                 });
             });
         new Setting(content)
-            .setName("Show folder icon")
-            .setDesc("A folder icon will be shown before folder names")
+            .setName("Use folder icons")
+            .setDesc("A common folder icon will be shown before folder names")
             .addToggle((t) => {
                 t.setValue(this.cfg.folderIcon).onChange((v) => {
                     this.cfg.folderIcon = v;
@@ -205,6 +203,8 @@ class CreateFolderModal extends Modal {
                     this.showFolders(folderEl);
                 });
             });
+
+        this.helper.createImportFontSetting(content, this.cfg, this.style);
     }
 
     finish(): void {
@@ -225,18 +225,17 @@ class CreateFolderModal extends Modal {
         headerEl.empty();
         headerEl.createSpan({
             cls: "snippetor-preview",
-            text: "Preview",
+            text: "Folder preview",
         });
 
-        const settings = headerEl.createDiv("header");
-
-        settings.createSpan({
+        headerEl.createSpan({
             text: "Settings",
+            cls: "header",
         });
-        const settingActions = settings.createDiv("header-actions");
-        const roundGroup = settingActions.createSpan(
-            "snippetor-checkbox-roundness"
-        );
+
+        const actions = headerEl.createDiv("snippetor-li-actions");
+
+        const roundGroup = actions.createSpan("snippetor-folder-roundness");
         const roundness = new SliderComponent(roundGroup)
             .setValue(
                 this.cfg.borderRadius === undefined ? 0 : this.cfg.borderRadius
@@ -250,13 +249,12 @@ class CreateFolderModal extends Modal {
                     this.showFolders(folderEl);
                 }
             });
-        roundness.sliderEl.title = "Folder roundness";
+        roundness.sliderEl.title = "Folder background roundness";
         roundness.sliderEl.name = "snippetor-border-radius";
 
-        this.helper.createThemeToggleComponent(settingActions, () =>
+        this.helper.createThemeToggleComponent(actions, () =>
             this.showFolders(folderEl)
         );
-        const actions = headerEl.createSpan("snippetor-li-actions");
 
         const reset = new ExtraButtonComponent(actions)
             .setIcon("reset")
@@ -268,8 +266,10 @@ class CreateFolderModal extends Modal {
         reset.extraSettingsEl.addClass("no-padding");
         reset.extraSettingsEl.addClass("settings-reset");
     }
+
     showFolders(folderEl: HTMLElement) {
         folderEl.empty();
+
         /* this.createFolderItem(this.cfg.default, true); */
         for (const folder of this.cfg.folders) {
             this.createFolderItem(folderEl, folder);
@@ -289,6 +289,7 @@ class CreateFolderModal extends Modal {
             } ${this.cfg.hoverDecoration ? "hover" : ""}`
         );
         preview.addEventListener("click", () => {
+            folderSettings.cache.expanded = !preview.hasClass("is-collapsed");
             preview.toggleClass(
                 "is-collapsed",
                 !preview.hasClass("is-collapsed")
@@ -301,7 +302,8 @@ class CreateFolderModal extends Modal {
         });
         setIcon(
             title.createDiv("nav-folder-collapse-indicator collapse-icon"),
-            "right-triangle"
+            "right-triangle",
+            8
         );
         const content = title.createDiv({
             cls: "nav-folder-title-content",
@@ -312,11 +314,51 @@ class CreateFolderModal extends Modal {
         if (!folderSettings.cache) {
             folderSettings.cache = {
                 folderEl: null,
+                titleEl: null,
             };
         }
         folderSettings.cache.folderEl = preview;
+        folderSettings.cache.titleEl = content;
 
-        const settings = containerEl.createDiv("snippetor-settings");
+        const settings = containerEl.createDiv({
+            cls: "snippetor-settings",
+            attr: {
+                style: `font-weight: normal; font-size: ${this.defaultFontSize}px`,
+            },
+        });
+        this.drawSettings(folderSettings, settings, content);
+
+        const actions = containerEl.createSpan("snippetor-li-actions");
+        this.helper.createExpandCollapseComponents(
+            actions,
+            folderSettings.cache.expanded,
+            (expanded) => {
+                folderSettings.cache.expanded = expanded;
+                this.drawSettings(folderSettings, settings, content);
+            }
+        );
+        new ExtraButtonComponent(actions)
+            .setIcon("trash")
+            .setTooltip("Delete this Task")
+            .onClick(async () => {
+                console.log("Delete %o", containerEl);
+                this.cfg.folders.remove(folderSettings);
+                this.showFolders(folderEl);
+            });
+
+        this.setFolderColors(folderSettings);
+    }
+
+    drawSettings(
+        folderSettings: FolderConfig,
+        parent: HTMLSpanElement,
+        content: HTMLDivElement,
+        isDefault = false
+    ): void {
+        const i = this.id++;
+        parent.empty();
+
+        const settings = parent.createSpan("snippetor-row");
         if (!isDefault) {
             const folders = this.app.vault
                 .getRoot()
@@ -325,6 +367,7 @@ class CreateFolderModal extends Modal {
                         f instanceof TFolder &&
                         !this.cfg.folders.find((t) => t.target == f.path)
                 ) as TFolder[];
+
             const text = new TextComponent(settings)
                 .onChange((v) => {
                     folderSettings.target = v;
@@ -343,34 +386,122 @@ class CreateFolderModal extends Modal {
                 content.setText(folderSettings.target);
             };
         }
+
         const colors = settings.createDiv();
         this.foregroundColorPicker(
             colors,
             folderSettings,
-            "Text",
-            "Text",
+            `folder-color-fg-${i}`,
+            "text:",
             (v) => {
                 this.helper.setColor(folderSettings, v, COLOR.FOREGROUND);
                 this.setFolderColors(folderSettings);
             }
         );
-        this.backgroundColorPicker(colors, folderSettings, "BG", "BG", (v) => {
-            this.helper.setColor(folderSettings, v, COLOR.BACKGROUND);
-            this.setFolderColors(folderSettings);
+        this.backgroundColorPicker(
+            colors,
+            folderSettings,
+            `folder-color-bg-${i}`,
+            "bg:",
+            (v) => {
+                this.helper.setColor(folderSettings, v, COLOR.BACKGROUND);
+                this.setFolderColors(folderSettings);
+            }
+        );
+
+        if (folderSettings.cache.expanded) {
+            this.drawFolderFontSettings(folderSettings, parent, i);
+            this.drawFolderIconSettings(folderSettings, parent, i);
+        }
+    }
+
+    drawFolderIconSettings(
+        folderSettings: FolderConfig,
+        parent: HTMLSpanElement,
+        i: number
+    ): void {
+        const settings = parent.createSpan("snippetor-row");
+        const initalValue = this.helper.valueOrDefault(
+            folderSettings.content,
+            ""
+        );
+
+        const iconGroup = settings.createSpan("snippetor-group aligned-1");
+        iconGroup.createEl("label", {
+            text: "Icon:",
+            attr: { for: `folder-icon-${i}` },
         });
+        const folderContent = iconGroup.createEl("input", {
+            cls: "snippetor-folder-content",
+            attr: {
+                type: "text",
+                name: `folder-icon-${i}`,
+                size: "1",
+                value: initalValue,
+                title: "Emoji to display in front of folder name",
+            },
+        });
+        folderContent.addEventListener(
+            "input",
+            () => {
+                folderSettings.content = folderContent.value;
+                this.setFolderColors(folderSettings);
+            },
+            false
+        );
+    }
 
-        const actions = containerEl.createSpan("snippetor-li-actions");
+    drawFolderFontSettings(
+        folderSettings: FolderConfig,
+        parent: HTMLSpanElement,
+        i: number
+    ): void {
+        const settings = parent.createSpan("snippetor-row");
 
-        new ExtraButtonComponent(actions)
-            .setIcon("trash")
-            .setTooltip("Delete this Task")
-            .onClick(async () => {
-                console.log("Delete %o", containerEl);
-                this.cfg.folders.remove(folderSettings);
-                this.showFolders(folderEl);
+        const fontGroup = settings.createSpan("snippetor-group aligned-1");
+        fontGroup.createEl("label", {
+            text: "Font:",
+            attr: { for: `folder-font-${i}` },
+        });
+        const font = new TextComponent(fontGroup)
+            .setValue(
+                folderSettings.font === undefined ? "" : folderSettings.font
+            )
+            .onChange((v) => {
+                folderSettings.font = v;
+                this.setFolderColors(folderSettings);
             });
+        font.inputEl.addClass("snippetor-font-setting");
+        font.inputEl.name = `folder-font-${i}`;
 
-        this.setFolderColors(folderSettings);
+        const sizeGroup = settings.createSpan("snippetor-group decorated");
+        sizeGroup.createEl("label", {
+            text: "size: ",
+            attr: { for: `folder-size-${i}` },
+        });
+        const fontSize = new SliderComponent(sizeGroup)
+            .setValue(
+                folderSettings.fontSize === undefined
+                    ? this.defaultFontSize
+                    : folderSettings.fontSize
+            )
+            .setLimits(6, 30, 1)
+            .setDynamicTooltip()
+            .onChange((v) => {
+                folderSettings.fontSize = v;
+                this.setFolderColors(folderSettings);
+            });
+        fontSize.sliderEl.name = `folder-size-${i}`;
+
+        new ExtraButtonComponent(sizeGroup)
+            .setIcon("reset")
+            .setTooltip("Reset font size to default")
+            .onClick(async () => {
+                fontSize.setValue(this.defaultFontSize);
+                Reflect.deleteProperty(folderSettings, "fontSize");
+                this.setFolderColors(folderSettings);
+            })
+            .extraSettingsEl.addClass("no-padding");
     }
 
     setFolderColors(folderSettings: FolderConfig) {
@@ -385,12 +516,30 @@ class CreateFolderModal extends Modal {
 
         const folderEl = folderSettings.cache.folderEl;
 
-        folderEl.style.setProperty("--snippetor-fg-color", textColor);
+        let font = "var(--font-text)";
+        let fontSize = this.defaultFontSize + "px";
+        if (folderSettings.font) {
+            font = folderSettings.font;
+        }
+        if (folderSettings.fontSize) {
+            fontSize = folderSettings.fontSize + "px";
+        }
+
+        folderEl.style.setProperty(
+            "--snippetor-fg-color",
+            textColor === "inherit" ? "var(--text-normal)" : textColor
+        );
         folderEl.style.setProperty("--snippetor-bg-color", backgroundColor);
         folderEl.style.setProperty(
             "--snippetor-border-radius",
             `${this.cfg.borderRadius}px`
         );
+        folderEl.style.setProperty("--snippetor-font", font);
+        folderEl.style.setProperty("--snippetor-font-size", fontSize);
+
+        folderSettings.cache.titleEl.removeAttribute("data");
+        const data = folderSettings.content ? folderSettings.content + " " : "";
+        folderSettings.cache.titleEl.setAttribute("data", data);
     }
 
     foregroundColorPicker(

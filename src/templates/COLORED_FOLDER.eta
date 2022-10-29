@@ -13,20 +13,35 @@ function getBackground(e, light) {
     value = light ? e.lightMode.background : e.darkMode.background;
     return value ? value : '"transparent"'
 }
-
+function getFontSize(folder) {
+    if ( folder && folder.fontSize ) {
+        return folder.fontSize;
+    }
+    return 14;
+}
+function getFont(folder, fallback) {
+    if ( folder && folder.font ) {
+        return folder.font;
+    }
+    return fallback;
+}
 function defineColors(i, folder) {
 %>
 /* for folder <%~ folder.target %> */
-.theme-light {    
+.theme-light {
     /** Setup Custom Colors */
     --<%~ root %>-folder-text-<%= i %>: <% tR += getForeground(folder, true) %>;
     --<%~ root %>-folder-<%= i %>: <% tR += getBackground(folder, true) %>;
+    --<%~ root %>-folder-alpha2-<%= i %>: <% tR += getBackground(folder, true) %>04;
+    --<%~ root %>-folder-alpha4-<%= i %>: <% tR += getBackground(folder, true) %>06;
     --<%~ root %>-folder-radius: 5px;
 }
-.theme-dark {    
+.theme-dark {
     /** Setup Custom Colors */
     --<%~ root %>-folder-text-<%= i %>: <% tR += getForeground(folder, false) %>;
     --<%~ root %>-folder-<%= i %>: <% tR += getBackground(folder, false) %>;
+    --<%~ root %>-folder-alpha2-<%= i %>: <% tR += getBackground(folder, false) %>CC;
+    --<%~ root %>-folder-alpha4-<%= i %>: <% tR += getBackground(folder, false) %>EE;
     --<%~ root %>-folder-radius: 5px;
 }
 <%
@@ -38,67 +53,62 @@ function folderSettings(i, folder) {
 The Folder Name is stored in the data-path attribute.
 [data-path^="<%~ folder.target %>"] targets a path that *begins with* the content.
 */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"],
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] {
+    background-color: var(--<%~ root %>-folder-<%= i %>);
+    color: var(--<%~ root %>-folder-text-<%= i %>);
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
+    .nav-folder-title-content,
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
+    .nav-folder-collapse-indicator {
+    color: var(--<%~ root %>-folder-text-<%= i %>);
+}
+body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-file-title[data-path^="<%~ folder.target %>"]:hover,
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"].is-being-dragged,
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]:hover,
+body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]:hover,
+.workspace-leaf-content[data-type="file-explorer"] .nav-file-title[data-path^="<%~ folder.target %>"].is-being-dragged,
+.workspace-leaf-content[data-type="file-explorer"] .nav-file-title[data-path^="<%~ folder.target %>"]:hover {
+    background-color: var(--<%~ root %>-folder-alpha2-<%= i %>) !important;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-file-title[data-path*="<%~ folder.target %>"].is-active,
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path*="<%~ folder.target %>"].is-active {
+    background-color: var(--<%~ root %>-folder-alpha4-<%= i %>) !important;
+    font-style: italic;
+}
+<% if (folder.includeChildren) { %>
 .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
     + .nav-folder-children {
     background-color: var(--<%~ root %>-folder-<%= i %>);
     color: var(--<%~ root %>-folder-text-<%= i %>);
 }
-
 .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    .nav-folder-title-content,
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    + .nav-folder-children .nav-folder-title-content, 
+    + .nav-folder-children .nav-folder-title-content,
 .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
     + .nav-folder-children .nav-file-title {
     color: var(--<%~ root %>-folder-text-<%= i %>);
 }
-
-/** Set the background color of folder and file icons */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children .nav-file-title::before {
-    background-color: var(--<%~ root %>-folder-text-<%= i %>) !important;
+body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
+    + .nav-folder-children .nav-folder-title:hover,
+body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
+    + .nav-folder-children .nav-file-title:hover {
+    background-color: var(--<%~ root %>-folder-alpha2-<%= i %>) !important;
 }
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before {
-    background-color: var(--<%~ root %>-folder-text-<%= i %>) !important;
-}
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-collapse-indicator.collapse-icon > svg.right-triangle {
-    color: var(--<%~ root %>-folder-text-<%= i %>);
-}
-
-<% if (it.cfg.hideCollapse) { console.log(it.cfg); %>
-    .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-collapse-indicator.collapse-icon {
-        display: none;
-    }
 <% } %>
-
-
-
-<% if (it.cfg.hoverDecoration) { %>
-
-/** When hovered, transition */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-file-title.is-active,
-body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]:hover,
-body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children .nav-folder-title:hover, 
-body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children .nav-file-title:hover {
-    background-color: var(--background-primary);
-    color: var(--text-normal);
-    transition-duration: 0.25s;
-    transition-timing-function: ease;
-    transition-property: background-color, color;
+<% if (folder.font || folder.fontSize) { %>
+/* Folder title font */
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content {
+    font-family: <%~ getFont(folder, "var(--text-normal)") %>;
+    font-size: <%~ getFontSize(folder) %>px;
+    line-height: <%~ getFontSize(folder) %>px;
 }
-
-body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]:hover .nav-folder-title-content {
-    color: var(--text-normal);
-}
-/** Transition hovered collapse icons */
-    .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]:hover
-        .nav-folder-collapse-indicator.collapse-icon
-    > svg.right-triangle {
-    color: var(--text-normal);
-}
-
 <% } %>
-
+<% if (it.cfg.hideCollapse) { %>
+/** Hide the collapse icon */
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-collapse-indicator.collapse-icon {
+    display: none;
+}
+<% } %>
 
 <% if (it.cfg.hideTypes) { %>
 /** Hide File Tags */
@@ -108,6 +118,10 @@ body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-f
 <% } %>
 
 <% if (it.cfg.folderIcon) { %>
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before,
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children .nav-file-title::before {
+    background-color: var(--<%~ root %>-folder-text-<%= i %>) !important;
+}
 /** Show a folder icon before folder titles. */
 .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content {
     display: flex;
@@ -146,60 +160,16 @@ body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-f
     margin-right: 4px !important;
 }
 
-<% } %>
-
-/** Rounded borders */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children > .nav-folder >  .nav-folder-title[data-path^="<%~ folder.target %>"] {
-    border-radius: var(--<%~ root %>-border-radius) var(--<%~ root %>-border-radius) 0px 0px;
-}
-
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root
-    > .nav-folder-children
-    > .nav-folder.is-collapsed
-    > .nav-folder-title[data-path^="<%~ folder.target %>"] {
-    border-radius: var(--<%~ root %>-border-radius);
-}
-
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root
-    > .nav-folder-children
-    > .nav-folder
-    > .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children {
-    border-radius: 0px 0px var(--<%~ root %>-border-radius) var(--<%~ root %>-border-radius);
-}
-
-/** Increase Nav File Spacing for Hover Effect to look good */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-file {
-    margin-left: 0;
-    padding: 0 4px;
-}
-
-/** Remove some padding from file titles to align icons */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-file-title {
-    padding-left: 8px;
-}
-
-
-/** Center the Folder and Collapse Icons */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-file-title::before,
+<% } else if (folder.content) { %>
+/* Folder icon  */
 .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before {
-    display: flex;
-    align-self: center;
-    justify-self: center;
+    content: "<%~ folder.content %> "
 }
-
-/** Margin Control */
-/** This is to override Minimal */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"], .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children {
-    margin-left: 6px;
-    margin-right: 6px;
-    border-left: 0;
-    width: auto;
-    min-width: unset; /* Blue Topaz */
-}
+<% } %>
 
 /** Hide Overflowing Text */
 .workspace-leaf-content[data-type="file-explorer"]
-    .nav-folder-title[data-path^="<%~ folder.target %>"] 
+    .nav-folder-title[data-path^="<%~ folder.target %>"]
     .nav-folder-title-content,
 .workspace-leaf-content[data-type="file-explorer"]
     .nav-folder-title[data-path^="<%~ folder.target %>"]  + .nav-folder-children .nav-file-title,
