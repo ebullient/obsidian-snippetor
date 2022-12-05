@@ -500,7 +500,7 @@ class CreateCheckboxesModal extends Modal {
             `pos-x-${i}`,
             "x: ",
             1,
-            ts.checkbox.left ? ts.checkbox.left : 1,
+            ts.checkbox.left ? ts.checkbox.left : -1,
             (v) => {
                 if (v) {
                     ts.checkbox.left = v;
@@ -946,7 +946,8 @@ class CreateCheckboxesModal extends Modal {
         checkbox.setAttribute("data", content);
 
         let font = "var(--font-monospace)";
-        let fontSize = this.elements.defaultFontSize + "px";
+        let fontSize = this.elements.defaultFontSize;
+        const top = taskSettings.checkbox.top ? taskSettings.checkbox.top : 0;
 
         if (taskSettings.checkbox.format && taskSettings.checkbox.format.font) {
             font = taskSettings.checkbox.format.font;
@@ -955,20 +956,30 @@ class CreateCheckboxesModal extends Modal {
             taskSettings.checkbox.format &&
             taskSettings.checkbox.format.fontSize
         ) {
-            fontSize = taskSettings.checkbox.format.fontSize + "px";
+            fontSize = taskSettings.checkbox.format.fontSize;
         }
 
         checkbox.style.setProperty("--snippetor-box-font", font);
-        checkbox.style.setProperty("--snippetor-box-font-size", fontSize);
+        checkbox.style.setProperty(
+            "--snippetor-box-font-size",
+            fontSize + "px"
+        );
 
-        checkbox.style.setProperty(
-            "--snippetor-box-top",
-            (taskSettings.checkbox.top ? taskSettings.checkbox.top : 0) + "px"
-        );
-        checkbox.style.setProperty(
-            "--snippetor-box-left",
-            (taskSettings.checkbox.left ? taskSettings.checkbox.left : 0) + "px"
-        );
+        checkbox.style.setProperty("--snippetor-box-top", top + "px");
+
+        if (taskSettings.checkbox.left) {
+            checkbox.style.setProperty(
+                "--snippetor-box-left",
+                taskSettings.checkbox.left + "px"
+            );
+            checkbox.style.setProperty("--snippetor-box-margin-left", "0");
+        } else {
+            checkbox.style.setProperty("--snippetor-box-left", "50%");
+            checkbox.style.setProperty(
+                "--snippetor-box-margin-left",
+                "-" + fontSize / 2 + "px"
+            );
+        }
     }
 
     verifyDataValue(input: HTMLInputElement) {

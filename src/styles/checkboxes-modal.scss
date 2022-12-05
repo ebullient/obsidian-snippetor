@@ -54,7 +54,7 @@
           line-height: var(--snippetor-box-font-size);
           top: var(--snippetor-box-top);
           left: var(--snippetor-box-left);
-          right: 1px;
+          margin-left: var(--snippetor-box-margin-left);
           color: var(--checkbox-color);
           content: attr(data);
         }

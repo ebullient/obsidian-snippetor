@@ -71,12 +71,14 @@ function customTask(i, ts) {
 div[data-task="<%~ ts.data %>"],
 li[data-task="<%~ ts.data %>"] {
   --checkbox-color: var(--<%~ root %>-checkbox-<%= i %>);
-  --checkbox-border-color: var(--<%~ root %>-checkbox-<%= i %>);
   --checkbox-marker-color: transparent;
+  --checklist-done-decoration: <% tR += getTextDecoration(ts.checkbox.format) %>;
   <% if (ts.borderRadius) { %>
   --checkbox-radius: <%~ ts.borderRadius %>%;
   <% } %>
-
+  <% if (!ts.checkbox.hideBorder) { %>
+  --checkbox-border-color: var(--<%~ root %>-checkbox-<%= i %>);
+  <% } %>
   color: var(--<%~ root %>-li-<%= i %>);
   background-color: var(--<%~ root %>-li-bg-<%= i %>);
 }
@@ -84,6 +86,13 @@ div[data-task="<%~ ts.data %>"] input[type=checkbox]:checked,
 li[data-task="<%~ ts.data %>"] input[type=checkbox]:checked {
   color: var(--checkbox-color);
   background: var(--<%~ root %>-checkbox-bg-<%= i %>);
+  <% if (ts.checkbox.preventClick) { %>
+  pointer-events: none;
+  cursor: not-allowed;
+  <% } %>
+  <% if (ts.checkbox.hideBorder) { %>
+  border: 0px;
+  <% } %>
 }
 div[data-task="<%~ ts.data %>"] input[type=checkbox]:checked:after,
 li[data-task="<%~ ts.data %>"] input[type=checkbox]:checked:after {
@@ -103,10 +112,11 @@ li[data-task="<%~ ts.data %>"] input[type=checkbox]:checked:after {
 <% }
    if (ts.checkbox.left) { %>
     left: <%~ ts.checkbox.left %>px;
-<% } else { %>
-    left: 1px;
-<% } %>
     right: 1px;
+<% } else { %>
+    left: 50%;
+    margin-left: -<%~ getFontSize(ts.checkbox.format) / 2 %>px;
+<% } %>
     color: var(--checkbox-color);
     content: '<% tR += ts.checkbox.readModeData ? ts.checkbox.readModeData : ts.data %>';
 }
