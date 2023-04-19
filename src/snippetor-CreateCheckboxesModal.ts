@@ -170,7 +170,6 @@ class CreateCheckboxesModal extends Modal {
                 this.cfg.uncheckedTask = this.snippetor.createNewTaskCfg(" ");
                 this.cfg.uncheckedTask.unchecked = true;
             }
-            console.log(this.cfg.uncheckedTask);
             this.createTaskItem(this.cfg.uncheckedTask, true);
         }
 
