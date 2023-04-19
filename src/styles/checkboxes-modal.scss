@@ -42,7 +42,7 @@
           background: var(--checkbox-bg);
         }
 
-        input[type=checkbox]:checked:after {
+        input[type=checkbox]:checked::after {
           transform: none;
           -webkit-mask-image: none;
           background: unset;

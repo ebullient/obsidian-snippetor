@@ -82,8 +82,10 @@ li[data-task="<%~ ts.data %>"] {
   color: var(--<%~ root %>-li-<%= i %>);
   background-color: var(--<%~ root %>-li-bg-<%= i %>);
 }
-div[data-task="<%~ ts.data %>"] input[type=checkbox]:checked,
-li[data-task="<%~ ts.data %>"] input[type=checkbox]:checked {
+div[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked,
+div[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked,
+li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked,
+li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked {
   color: var(--checkbox-color);
   background: var(--<%~ root %>-checkbox-bg-<%= i %>);
   <% if (ts.checkbox.preventClick) { %>
@@ -94,8 +96,10 @@ li[data-task="<%~ ts.data %>"] input[type=checkbox]:checked {
   border: 0px;
   <% } %>
 }
-div[data-task="<%~ ts.data %>"] input[type=checkbox]:checked:after,
-li[data-task="<%~ ts.data %>"] input[type=checkbox]:checked:after {
+div[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked::after,
+div[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked::after,
+li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked::after
+li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked::after {
     transform: none;
     -webkit-mask-image: none;
     background: unset;
