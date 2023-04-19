@@ -19,19 +19,26 @@
 #snippetor-modal .modal {
   background-color: var(--background-primary);
   color: var(--text-normal);
-  width: 80vw;
-  max-width: 90vw;
 
   --toggle-thumb-color: white;
   --slider-track-background: var(--background-modifier-border);
   --background-modifier-border-hover: var(--background-modifier-border);
+
+  // Max width for narrow displays
+  width: 100vw;
+  max-width: 100vw;
+
+  // remove padding for narrow displays
+  .snippetor-content.markdown-preview-view {
+    padding: 0;
+  }
 
   input[type="text"] {
     background-color: var(--background-primary);
   }
 
   .setting-item.snippet-filename {
-    button.generate-css:active:after {
+    button.generate-css:active::after {
       content: "⚙️";
       position: absolute;
       right: 15px;
@@ -219,5 +226,17 @@
   .picker-toggle.is-enabled::after {
     transform: translate3d(24px, 0, 0);
     display: block;
+  }
+}
+
+// For wider displays, fix the width (float center) and use standard padding
+@media (min-width: 800px) {
+  #snippetor-modal .modal {
+    width: 90vw;
+    max-width: 1000px;
+
+    .snippetor-content.markdown-preview-view {
+      padding: var(--file-margins);
+    }
   }
 }
