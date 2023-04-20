@@ -95,6 +95,7 @@ export interface FolderConfig extends ColoredElement {
     font?: string;
     fontSize?: number;
     content?: string;
+    includeChildren?: boolean;
     cache: {
         // not persisted
         expanded?: boolean;
@@ -111,7 +112,7 @@ export interface FolderSnippetConfig extends SnippetConfig {
     hideScrollbar: boolean;
     hideTypes: boolean;
     hoverDecoration: boolean;
-    relationshipLines: boolean;
+    relationshipLines?: boolean; // ignored
 }
 
 declare module "obsidian" {

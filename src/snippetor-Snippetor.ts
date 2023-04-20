@@ -62,21 +62,6 @@ export class Snippetor {
         const result = Object.assign({}, DEFAULT_FOLDER_SNIPPET_SETTINGS, {
             id: this.generateId(),
             name: generateSlug(2),
-            folders: [],
-            default: {
-                cache: {
-                    folderEl: null,
-                },
-                target: "",
-                lightMode: {
-                    foreground: "var(--text-normal)",
-                    background: "transparent",
-                },
-                darkMode: {
-                    foreground: "var(--text-normal)",
-                    background: "transparent",
-                },
-            },
         });
         return result;
     }

@@ -45,6 +45,7 @@ export const DEFAULT_FOLDER_SNIPPET_SETTINGS: Partial<FolderSnippetConfig> = {
             foreground: "var(--text-normal)",
             background: "transparent",
         },
+        includeChildren: false,
     },
 };
 

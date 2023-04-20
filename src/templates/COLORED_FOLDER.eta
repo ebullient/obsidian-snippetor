@@ -29,7 +29,6 @@ function defineColors(i, folder) {
 %>
 /* for folder <%~ folder.target %> */
 .theme-light {
-    /** Setup Custom Colors */
     --<%~ root %>-folder-text-<%= i %>: <% tR += getForeground(folder, true) %>;
     --<%~ root %>-folder-<%= i %>: <% tR += getBackground(folder, true) %>;
     --<%~ root %>-folder-alpha2-<%= i %>: <% tR += getBackground(folder, true) %>04;
@@ -37,7 +36,6 @@ function defineColors(i, folder) {
     --<%~ root %>-folder-radius: 5px;
 }
 .theme-dark {
-    /** Setup Custom Colors */
     --<%~ root %>-folder-text-<%= i %>: <% tR += getForeground(folder, false) %>;
     --<%~ root %>-folder-<%= i %>: <% tR += getBackground(folder, false) %>;
     --<%~ root %>-folder-alpha2-<%= i %>: <% tR += getBackground(folder, false) %>CC;
@@ -48,174 +46,66 @@ function defineColors(i, folder) {
 } // end defineColors
 function folderSettings(i, folder) {
 %>
-
 /** Folder
 The Folder Name is stored in the data-path attribute.
-[data-path^="<%~ folder.target %>"] targets a path that *begins with* the content.
 */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] {
-    background-color: var(--<%~ root %>-folder-<%= i %>);
-    color: var(--<%~ root %>-folder-text-<%= i %>);
+.nav-folder-title[data-path="<%~ folder.target %>"] {
+  --nav-item-color: var(--<%~ root %>-folder-text-<%= i %>);
+  --nav-item-color-hover: var(--<%~ root %>-folder-alpha2-<%= i %>);
+  --nav-item-size: <%~ getFontSize(folder) %>px;
+  font-family: <%~ getFont(folder, "var(--text-normal)") %>;
+  font-size: <%~ getFontSize(folder) %>px;
+  line-height: <%~ getFontSize(folder) %>px;
+  background-color: var(--<%~ root %>-folder-<%= i %>);
 }
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    .nav-folder-title-content,
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    .nav-folder-collapse-indicator {
-    color: var(--<%~ root %>-folder-text-<%= i %>);
+.nav-folder-title[data-path^="<%~ folder.target %>"],
+.nav-file-title[data-path^="<%~ folder.target %>"],
+body:not(.is-grabbing) .nav-folder-title[data-path^="<%~ folder.target %>"]:hover,
+body:not(.is-grabbing) .nav-file-title[data-path^="<%~ folder.target %>"]:hover,
+.nav-folder-title[data-path^="<%~ folder.target %>"].is-being-dragged,
+.nav-file-title[data-path^="<%~ folder.target %>"].is-being-dragged,
+.nav-folder-title[data-path^="<%~ folder.target %>"]:hover,
+.nav-file-title[data-path^="<%~ folder.target %>"]:hover {
+  color: var(--<%~ root %>-folder-text-<%= i %>);
 }
-body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-file-title[data-path^="<%~ folder.target %>"]:hover,
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"].is-being-dragged,
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]:hover,
-body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]:hover,
-.workspace-leaf-content[data-type="file-explorer"] .nav-file-title[data-path^="<%~ folder.target %>"].is-being-dragged,
-.workspace-leaf-content[data-type="file-explorer"] .nav-file-title[data-path^="<%~ folder.target %>"]:hover {
-    background-color: var(--<%~ root %>-folder-alpha2-<%= i %>) !important;
+.nav-file-title[data-path*="<%~ folder.target %>"].is-active,
+.nav-folder-title[data-path*="<%~ folder.target %>"].is-active {
+  color: var(--<%~ root %>-folder-text-<%= i %>);
+  font-style: italic;
 }
-.workspace-leaf-content[data-type="file-explorer"] .nav-file-title[data-path*="<%~ folder.target %>"].is-active,
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path*="<%~ folder.target %>"].is-active {
-    background-color: var(--<%~ root %>-folder-alpha4-<%= i %>) !important;
-    font-style: italic;
+.nav-folder.mod-root .nav-folder >  .nav-folder-children > .nav-folder > .nav-folder-title[data-path^="<%~ folder.target %>"] {
+    border-radius: var(--<%~ root %>-border-radius) var(--<%~ root %>-border-radius) 0px 0px;
 }
-<% if (folder.includeChildren) { %>
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    + .nav-folder-children {
-    background-color: var(--<%~ root %>-folder-<%= i %>);
-    color: var(--<%~ root %>-folder-text-<%= i %>);
+.nav-folder.mod-root .nav-folder > .nav-folder-children > .nav-folder.is-collapsed > .nav-folder-title[data-path^="<%~ folder.target %>"] {
+    border-radius: var(--<%~ root %>-border-radius);
 }
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    + .nav-folder-children .nav-folder-title-content,
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    + .nav-folder-children .nav-file-title {
-    color: var(--<%~ root %>-folder-text-<%= i %>);
-}
-body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    + .nav-folder-children .nav-folder-title:hover,
-body:not(.is-grabbing) .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"]
-    + .nav-folder-children .nav-file-title:hover {
-    background-color: var(--<%~ root %>-folder-alpha2-<%= i %>) !important;
-}
-<% } %>
-<% if (folder.font || folder.fontSize) { %>
-/* Folder title font */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content {
-    font-family: <%~ getFont(folder, "var(--text-normal)") %>;
-    font-size: <%~ getFontSize(folder) %>px;
-    line-height: <%~ getFontSize(folder) %>px;
-}
-<% } %>
-<% if (it.cfg.hideCollapse) { %>
-/** Hide the collapse icon */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-collapse-indicator.collapse-icon {
-    display: none;
-}
-<% } %>
-
-<% if (it.cfg.hideTypes) { %>
-/** Hide File Tags */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children .nav-file-tag {
-    display: none;
-}
-<% } %>
-
-<% if (it.cfg.folderIcon) { %>
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before,
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children .nav-file-title::before {
-    background-color: var(--<%~ root %>-folder-text-<%= i %>) !important;
-}
-/** Show a folder icon before folder titles. */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content {
-    display: flex;
-}
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-file-title::before,
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before {
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-self: center;
-    justify-self: center;
-}
-
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder.is-collapsed .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before {
-    background-image: unset !important;
-    background-size: 24px 24px !important;
-    background-color: var(--text-normal);
-    content: "";
-    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Cpath d='M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8c0-1.11-.9-2-2-2h-8l-2-2z'/%3E%3C/svg%3E")
-        no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' %3E%3Cpath d='M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8c0-1.11-.9-2-2-2h-8l-2-2z'/%3E%3C/svg%3E")
-        no-repeat;
-    margin-right: 4px !important;
-}
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before {
-    background-image: unset !important;
-    width: 17px;
-    height: 17px;
-    background-size: 24px 24px !important;
-    background-color: var(--text-normal);
-    content: "";
-    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Cpath d='M19 20H4c-1.11 0-2-.9-2-2V6c0-1.11.89-2 2-2h6l2 2h7a2 2 0 0 1 2 2H4v10l2.14-8h17.07l-2.28 8.5c-.23.87-1.01 1.5-1.93 1.5z'/%3E%3C/svg%3E")
-        no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'  %3E%3Cpath d='M19 20H4c-1.11 0-2-.9-2-2V6c0-1.11.89-2 2-2h6l2 2h7a2 2 0 0 1 2 2H4v10l2.14-8h17.07l-2.28 8.5c-.23.87-1.01 1.5-1.93 1.5z'/%3E%3C/svg%3E")
-        no-repeat;
-    margin-right: 4px !important;
-}
-
-<% } else if (folder.content) { %>
-/* Folder icon  */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before {
+<%
+if (folder.content) {
+%>
+.nav-folder-title[data-path^="<%~ folder.target %>"] .nav-folder-title-content::before {
     content: "<%~ folder.content %> "
 }
-<% } %>
-
-/** Hide Overflowing Text */
-.workspace-leaf-content[data-type="file-explorer"]
-    .nav-folder-title[data-path^="<%~ folder.target %>"]
-    .nav-folder-title-content,
-.workspace-leaf-content[data-type="file-explorer"]
-    .nav-folder-title[data-path^="<%~ folder.target %>"]  + .nav-folder-children .nav-file-title,
-.workspace-leaf-content[data-type="file-explorer"]
-    .nav-folder-title[data-path^="<%~ folder.target %>"]  + .nav-folder-children .nav-file-title-content {
-    overflow-x: hidden;
-    overflow-y: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    word-wrap: break-word;
-    width: 100%;
-}
-
-<% if (it.cfg.relationshipLines) { %>
-
-/** Relationship lines */
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children
-    > .nav-folder
-    > .nav-folder-children
-    .nav-file {
-    border-left: 2px solid white;
-}
-.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children
-    > .nav-folder
-    > .nav-folder-children
-    .nav-folder {
-    border-left: 2px solid white;
-}
-
-<% } %>
-
 <%
+} // end if folder.content
+if (folder.includeChildren) {
+%>
+.nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children .nav-folder-title,
+.nav-folder-title[data-path^="<%~ folder.target %>"] + .nav-folder-children {
+  color: var(--<%~ root %>-folder-text-<%= i %>);
+  background-color: var(--<%~ root %>-folder-<%= i %>);
+}
+<%
+} // end if includeChildren
 } //end folderSettings
 %>
-
 <% if (it.cfg.hideScrollbar) { %>
-
 /** Scrollbars eliminated */
 .workspace-leaf-content[data-type="file-explorer"] ::-webkit-scrollbar {
     width: 0px;
     height: 0px;
 }
-
-<% } %>
-
 <%
+} // end if hideScrollbar
 
 for (let i = 0; i<it.cfg.folders.length; i++) {
     const folder = it.cfg.folders[i];

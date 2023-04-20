@@ -8,6 +8,7 @@ import {
     SliderComponent,
     TextComponent,
     TFolder,
+    ToggleComponent,
 } from "obsidian";
 import type {
     ColoredElement,
@@ -157,14 +158,6 @@ class CreateFolderModal extends Modal {
             .addToggle((t) => {
                 t.setValue(this.cfg.hoverDecoration).onChange((v) => {
                     this.cfg.hoverDecoration = v;
-                    this.showFolders(folderEl);
-                });
-            });
-        new Setting(content)
-            .setName("Show relationship lines")
-            .addToggle((t) => {
-                t.setValue(this.cfg.relationshipLines).onChange((v) => {
-                    this.cfg.relationshipLines = v;
                     this.showFolders(folderEl);
                 });
             });
@@ -340,7 +333,7 @@ class CreateFolderModal extends Modal {
         );
         new ExtraButtonComponent(actions)
             .setIcon("trash")
-            .setTooltip("Delete this Task")
+            .setTooltip("Delete this Folder configuration")
             .onClick(async () => {
                 console.log("Delete %o", containerEl);
                 this.cfg.folders.remove(folderSettings);
@@ -369,7 +362,10 @@ class CreateFolderModal extends Modal {
                         !this.cfg.folders.find((t) => t.target == f.path)
                 ) as TFolder[];
 
-            const text = new TextComponent(settings)
+            const folderNameGroup = settings.createSpan(
+                "snippetor-group aligned-1"
+            );
+            const text = new TextComponent(folderNameGroup)
                 .onChange((v) => {
                     folderSettings.target = v;
                     content.setText(folderSettings.target);
@@ -409,6 +405,18 @@ class CreateFolderModal extends Modal {
                 this.setFolderColors(folderSettings);
             }
         );
+
+        const subfolder = this.helper.createToggleButton(
+            settings,
+            folderSettings.includeChildren,
+            (enabled) => {
+                folderSettings.includeChildren = enabled;
+                this.setFolderColors(folderSettings);
+            }
+        );
+        subfolder
+            .setIcon("stacked-levels")
+            .setTooltip("Toggle: Apply background color to subfolders");
 
         if (folderSettings.cache.expanded) {
             this.drawFolderFontSettings(folderSettings, parent, i);
