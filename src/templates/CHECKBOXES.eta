@@ -69,7 +69,20 @@ function defineColors(i, ts) {
 function customTask(i, ts) {
 %>
 div[data-task="<%~ ts.data %>"],
-li[data-task="<%~ ts.data %>"] {
+li[data-task="<%~ ts.data %>"],
+li[data-task="<%~ ts.data %>"] > p {
+  color: var(--<%~ root %>-li-<%= i %>);
+  background-color: var(--<%~ root %>-li-bg-<%= i %>);
+  text-decoration: <%~ getTextDecoration(ts.li.format) %>;
+  font-weight: <%~ getFontWeight(ts.li.format) %>;
+  font-style: <%~ getFontStyle(ts.li.format) %>;
+  font-size: <%~ getFontSize(ts.li.format) %>px;
+  font-family: <%~ getFont(ts.li.format, "inherit") %>;
+}
+div[data-task="<%~ ts.data %>"] > label.task-list-label,
+li[data-task="<%~ ts.data %>"],
+li[data-task="<%~ ts.data %>"] > p,
+.markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"] {
   --checkbox-color: var(--<%~ root %>-checkbox-<%= i %>);
   --checkbox-marker-color: transparent;
   --checklist-done-decoration: <% tR += getTextDecoration(ts.checkbox.format) %>;
@@ -79,14 +92,10 @@ li[data-task="<%~ ts.data %>"] {
   <% if (!ts.checkbox.hideBorder) { %>
   --checkbox-border-color: var(--<%~ root %>-checkbox-<%= i %>);
   <% } %>
-  color: var(--<%~ root %>-li-<%= i %>);
-  background-color: var(--<%~ root %>-li-bg-<%= i %>);
 }
-div[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked,
-div[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked,
+input[type=checkbox][data-task="<%~ ts.data %>"]:checked,
 li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked,
 li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked {
-  color: var(--checkbox-color);
   background: var(--<%~ root %>-checkbox-bg-<%= i %>);
   <% if (ts.checkbox.preventClick) { %>
   pointer-events: none;
@@ -96,8 +105,7 @@ li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked {
   border: 0px;
   <% } %>
 }
-div[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked:after,
-div[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked:after,
+input[type=checkbox][data-task="<%~ ts.data %>"]:checked:after,
 li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked:after,
 li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked:after {
     transform: none;
