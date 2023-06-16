@@ -23,7 +23,7 @@
   "repository": "github.com:ebullient/obsidian-snippetor",
   "license": "AGPL-3.0-only",
   "devDependencies": {
-    "@popperjs/core": "^2.11.2",
+    "@popperjs/core": "^2.11.8",
     "@types/chroma-js": "^2.4.0",
     "@types/node": "^14.17.21",
     "@types/randomcolor": "^0.5.6",
