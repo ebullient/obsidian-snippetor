@@ -28,9 +28,10 @@ jobs:
         fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
 
     - name: Use Node.js
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: '16.7'
+        cache: 'npm'
 
     # Build the plugin
     - name: Build and Tag

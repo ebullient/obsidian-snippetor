@@ -105,9 +105,10 @@ li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked {
   border: 0px;
   <% } %>
 }
-input[type=checkbox][data-task="<%~ ts.data %>"]:checked:after,
-li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked:after,
-li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked:after {
+input[type=checkbox][data-task="<%~ ts.data %>"]:checked::after,
+li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked::after,
+li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked::after {
+    display: block;
     transform: none;
     -webkit-mask-image: none;
     background: unset;
