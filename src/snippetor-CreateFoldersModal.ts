@@ -8,7 +8,6 @@ import {
     SliderComponent,
     TextComponent,
     TFolder,
-    ToggleComponent,
 } from "obsidian";
 import type {
     ColoredElement,

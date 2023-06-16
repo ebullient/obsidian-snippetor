@@ -5,12 +5,14 @@ on:
     paths:
       - '**.ts'
       - '**.json'
+      - '**.scss'
       - '**.css'
   pull_request:
     branches: [ main ]
     paths:
       - '**.ts'
       - '**.json'
+      - '**.scss'
       - '**.css'
 
 jobs:
@@ -30,5 +32,9 @@ jobs:
       id: build
       run: |
         npm install
+
+        echo "Run build"
         npm run build
+
+        echo "Run tests"
         npm run test

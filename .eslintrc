@@ -1,7 +1,9 @@
 {
     "root": true,
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint"],
+    "plugins": [
+        "@typescript-eslint"
+    ],
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",
@@ -11,8 +13,13 @@
         "sourceType": "module"
     },
     "rules": {
-        "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": ["warn", { "args": "none" }],
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "args": "none",
+                "varsIgnorePattern": "_"
+            }
+        ],
         "@typescript-eslint/ban-ts-comment": "off",
         "no-prototype-builtins": "off",
         "@typescript-eslint/no-empty-function": "off",
@@ -20,7 +27,9 @@
             "error",
             {
                 "allowDestructuring": false, // Disallow `const { props, state } = this`; true by default
-                "allowedNames": ["self"] // Allow `const self = this`; `[]` by default
+                "allowedNames": [
+                    "self"
+                ] // Allow `const self = this`; `[]` by default
             }
         ]
     }

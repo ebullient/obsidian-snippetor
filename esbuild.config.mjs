@@ -21,13 +21,16 @@ esbuild.build({
     },
     entryPoints: ['src/main.ts', 'src/styles.scss'],
     bundle: true,
-    external: ['obsidian', 'electron', ...builtins],
+    external: [
+        'obsidian',
+        'electron',
+        ...builtins
+    ],
     format: 'cjs',
-    watch: !prod,
+    logLevel: 'info',
     target: 'es2020',
-    logLevel: "info",
-    sourcemap: prod ? false : 'inline',
     treeShaking: true,
+    sourcemap: prod ? false : 'inline',
     minify: prod ? true : false,
     outdir: dir,
     loader: {
@@ -36,4 +39,16 @@ esbuild.build({
     plugins: [
         sassPlugin()
     ]
-}).catch(() => process.exit(1));
+  }).then(context => {
+    if (!prod) {
+      // Enable watch mode
+      context.watch()
+    }
+}).catch((x) => {
+    if (x.errors) {
+        console.error(x.errors);
+    } else {
+        console.error(x);
+    }
+    process.exit(1)
+});

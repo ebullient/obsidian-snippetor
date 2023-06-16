@@ -8,10 +8,21 @@ on:
         description: 'New version or major, minor, patch'
         default: 'patch'
         required: true
-      update-manifest:
+      update_manifest:
         description: 'Update manifest.json'
-        default: "true"
+        default: true
         required: true
+        type: boolean
+      update_brat:
+        description: 'Update brat manifest'
+        default: true
+        required: true
+        type: boolean
+      retry:
+        description: "Retry release (clear created tag)"
+        default: false
+        required: true
+        type: boolean
 
 env:
   GH_BOT_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
@@ -39,20 +50,38 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "${{ github.event.inputs.version }}"
-        echo "${{ github.event.inputs.update-manifest }}"
+        echo "version: ${{ github.event.inputs.version }}"
+        echo "retry: ${{ github.event.inputs.retry }}"
+        echo "update_manifest: ${{ github.event.inputs.update_manifest }}"
+        echo "update_brat: ${{ github.event.inputs.update_brat }}"
+
         git config user.name ${{ env.GH_BOT_NAME }}
         git config user.email ${{ env.GH_BOT_EMAIL }}
 
         npm install
-        npm version ${{ github.event.inputs.version }} --no-git-tag-version
+        if [[ "${{ github.event.inputs.retry }}" = "true" ]]; then
+          npm run preversion
+        else
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+        fi
         VERSION=$(grep '^  "version"' package.json | cut -d'"' -f4)
         echo $VERSION
 
-        if [ "${{ github.event.inputs.update-manifest }}" = "true" ]; then
+        if git rev-parse "refs/tags/$VERSION" > /dev/null 2>&1; then
+          if [[ "${{ github.event.inputs.retry }}" = "true" ]]; then
+            gh release delete $VERSION --cleanup-tag --yes
+          else
+            echo "🛑 Tag $VERSION already exists"
+            exit 1
+          fi
+        fi
+
+        if [ "${{ github.event.inputs.update_manifest }}" = "true" ]; then
           sed -i 's|\(version":\) "[0-9\.]*"|\1 "'$VERSION'"|' manifest.json
         fi
-        sed -i 's|\(version":\) "[0-9\.]*"|\1 "'$VERSION'"|' manifest-beta.json
+        if [ "${{ github.event.inputs.update_brat }}" = "true"]; then
+          sed -i 's|\(version":\) "[0-9\.]*"|\1 "'$VERSION'"|' manifest-beta.json
+        fi
 
         git add .
         git status
@@ -79,7 +108,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         prerelease=true
-        if [ "${{ github.event.inputs.update-manifest }}" = "true" ]; then
+        if [ ${{ github.event.inputs.update_manifest }} ]; then
             prerelease=false
         fi
 

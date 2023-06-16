@@ -1,4 +1,4 @@
-import { App } from "obsidian";
+import { App, PluginManifest } from "obsidian";
 import {
     OldTaskSettings,
     TaskSettings,
@@ -7,9 +7,30 @@ import {
 import { DEFAULT_TASK_SNIPPET_SETTINGS } from "../src/snippetor-Defaults";
 import { Snippetor } from "../src/snippetor-Snippetor";
 
-jest.mock("obsidian", () => ({
+const MANIFEST: PluginManifest = {
+    id: "obsidian-snippetor",
+	name: "Snippetor",
+    author: "",
+    version: "1.0.0",
+    minAppVersion: "",
+    description: ""
+}
+
+jest.mock('obsidian', () => ({
     App: jest.fn().mockImplementation(),
+    Plugin: jest.fn().mockImplementation(() => {
+        return {
+            manifest: MANIFEST,
+            saveData: () => Promise.resolve(),
+            // debug: (message: string, ...optionalParams: any[]) => {
+            //     console.debug(message, ...optionalParams); // tests
+            // }
+        };
+      }),
+    PluginSettingTab: jest.fn().mockImplementation(),
+    Modal: jest.fn().mockImplementation()
 }));
+
 jest.mock("../src/templates/COLORED_FOLDER.eta", () => "");
 jest.mock("../src/templates/CHECKBOXES.eta", () => "");
 
