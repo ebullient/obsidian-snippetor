@@ -11,19 +11,18 @@ import {
     DEFAULT_FOLDER_SNIPPET_SETTINGS,
     DEFAULT_TASK_SNIPPET_SETTINGS,
 } from "./snippetor-Defaults";
-import * as Eta from "eta";
 import { COLORED_FOLDERS, SIMPLE_TASK } from "./snippetor-Snippetor-Templates";
 import { generateSlug } from "random-word-slugs";
 import randomColor from "randomcolor";
 import { compare } from "compare-versions";
 
+import { Eta } from "eta";
+const eta = new Eta({
+    cache: true, // Make Eta cache templates
+});
+
 export class Snippetor {
-    constructor(private app: App) {
-        Eta.configure({
-            cache: true, // Make Eta cache templates
-            async: false,
-        });
-    }
+    constructor(private app: App) {}
 
     get taskValues(): Set<string> {
         const tcPlugin = this.app.plugins.plugins["obsidian-task-collector"];
@@ -227,14 +226,14 @@ export class Snippetor {
         let snippet;
         switch (cfg.type) {
             case DEFAULT_TASK_SNIPPET_SETTINGS.type: {
-                snippet = Eta.render(SIMPLE_TASK, {
+                snippet = eta.render(SIMPLE_TASK, {
                     date: new Date(),
                     cfg,
                 });
                 break;
             }
             case DEFAULT_FOLDER_SNIPPET_SETTINGS.type: {
-                snippet = Eta.render(COLORED_FOLDERS, {
+                snippet = eta.render(COLORED_FOLDERS, {
                     date: new Date(),
                     cfg,
                 });
