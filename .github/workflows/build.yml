@@ -33,8 +33,8 @@ jobs:
       run: |
         npm install
 
-        echo "Run build"
-        npm run build
-
         echo "Run tests"
         npm run test
+
+        echo "Run build"
+        npm run build

@@ -10,7 +10,7 @@
     "postbuild": "cp -v manifest.json README.md build",
     "test": "npx jest",
     "prettier": "prettier -w 'src/**/*.ts'",
-    "preversion": "npm run build && npm run test",
+    "preversion": "npm run test && npm run build",
     "version": "auto-changelog -p",
     "brat-notes": "run() { auto-changelog --stdout --hide-credit --hide-empty-releases --template .github/changelog.hbs -v $1 --starting-version $1  > release-notes.md; }; run"
   },
