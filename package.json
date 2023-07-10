@@ -29,7 +29,7 @@
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.0",
     "@types/randomcolor": "^0.5.6",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^5.60.0",
     "auto-changelog": "^2.4.0",
     "builtin-modules": "^3.3.0",
