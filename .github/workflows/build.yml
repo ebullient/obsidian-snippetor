@@ -15,6 +15,8 @@ on:
       - '**.scss'
       - '**.css'
 
+permissions: read-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,7 +27,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16.7'
+        node-version: '18.5'
         cache: 'npm'
 
     - name: Build and Test
