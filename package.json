@@ -25,7 +25,7 @@
   "license": "AGPL-3.0-only",
   "devDependencies": {
     "@popperjs/core": "^2.11.2",
-    "@types/chroma-js": "^2.4.0",
+    "@types/chroma-js": "^2.4.1",
     "@types/jest": "^29.5.3",
     "@types/node": "^20.5.7",
     "@types/randomcolor": "^0.5.6",
