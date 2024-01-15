@@ -30,7 +30,7 @@
     "@types/node": "^20.11.2",
     "@types/randomcolor": "^0.5.9",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.18.1",
+    "@typescript-eslint/parser": "^6.19.0",
     "auto-changelog": "^2.4.0",
     "builtin-modules": "^3.3.0",
     "dotenv": "^16.3.1",
