@@ -92,9 +92,7 @@ Open `Settings` -> `Appearance`, scroll down to `CSS Snippets`. If your snippet 
 
 #### My tasks look weird!
 
-Some themes do a lot of customization for task lists. If there is a conflict, ask in the #appearance channel in Slack, or raise an issue in this github channel, but please be specific about what themes and snippets you are using, and what exactly doesn't look right.
-
-
+Some themes do a lot of customization for task lists. If there is a conflict, ask in the #appearance channel in Discord, or raise an issue in this github repository, but please be specific about what themes and snippets you are using, and what exactly doesn't look right.
 
 ## Acknowledgements
 
