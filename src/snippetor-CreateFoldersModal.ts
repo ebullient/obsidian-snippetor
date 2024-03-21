@@ -22,13 +22,13 @@ import { FolderSuggestionModal } from "./snippetor-FolderSuggestor";
 export function openCreateFolderModal(
     app: App,
     folderSnippetConfig: FolderSnippetConfig,
-    snippetor: Snippetor
+    snippetor: Snippetor,
 ): Promise<FolderSnippetConfig> {
     return new Promise((resolve) => {
         const modal = new CreateFolderModal(
             app,
             folderSnippetConfig,
-            snippetor
+            snippetor,
         );
 
         modal.onClose = () => {
@@ -62,7 +62,7 @@ class CreateFolderModal extends Modal {
     constructor(
         app: App,
         folderSnippetCfg: FolderSnippetConfig,
-        snippetor: Snippetor
+        snippetor: Snippetor,
     ) {
         super(app);
         this.snippetor = snippetor;
@@ -71,7 +71,7 @@ class CreateFolderModal extends Modal {
 
         // Ensure required config, migrate old data
         this.cfg = this.snippetor.initFolderSnippetConfig(
-            folderSnippetCfg || snippetor.createNewFolderSnippetCfg()
+            folderSnippetCfg || snippetor.createNewFolderSnippetCfg(),
         );
 
         // save snapshot of settings
@@ -87,7 +87,7 @@ class CreateFolderModal extends Modal {
         this.helper = new ModalHelper(
             this.snippetor,
             this.containerEl,
-            content
+            content,
         );
         this.style = this.helper.createHtmlStyleElement(this.cfg);
         this.helper.createFilenameSetting(content, this.cfg);
@@ -127,8 +127,8 @@ class CreateFolderModal extends Modal {
 
         this.defaultFontSize = Math.ceil(
             Number(
-                getComputedStyle(basicFolderTitle).fontSize.replace("px", "")
-            )
+                getComputedStyle(basicFolderTitle).fontSize.replace("px", ""),
+            ),
         );
 
         this.createHeader(headerEl, folderEl);
@@ -145,7 +145,7 @@ class CreateFolderModal extends Modal {
                             this.snippetor.createNewFolderCfg(null);
                         this.createFolderItem(folderEl, folderSettings);
                         this.cfg.folders.push(folderSettings);
-                    })
+                    }),
             );
 
         content.createEl("h3", {
@@ -208,7 +208,7 @@ class CreateFolderModal extends Modal {
         }
         this.cfg.folders.forEach((ts) => Reflect.deleteProperty(ts, "cache"));
         this.cfg.folders = this.cfg.folders.filter(
-            (f) => f.target && f.target.length
+            (f) => f.target && f.target.length,
         );
         // make sure a name is set
         this.snippetor.initCommonConfig(this.cfg);
@@ -231,7 +231,7 @@ class CreateFolderModal extends Modal {
         const roundGroup = actions.createSpan("snippetor-folder-roundness");
         const roundness = new SliderComponent(roundGroup)
             .setValue(
-                this.cfg.borderRadius === undefined ? 0 : this.cfg.borderRadius
+                this.cfg.borderRadius === undefined ? 0 : this.cfg.borderRadius,
             )
             .setLimits(0, 25, 1)
             .setDynamicTooltip()
@@ -246,7 +246,7 @@ class CreateFolderModal extends Modal {
         roundness.sliderEl.name = "snippetor-border-radius";
 
         this.helper.createThemeToggleComponent(actions, () =>
-            this.showFolders(folderEl)
+            this.showFolders(folderEl),
         );
 
         const reset = new ExtraButtonComponent(actions)
@@ -272,20 +272,20 @@ class CreateFolderModal extends Modal {
     createFolderItem(
         folderEl: HTMLElement,
         folderSettings: FolderConfig,
-        isDefault = false
+        isDefault = false,
     ): void {
         const containerEl = folderEl.createDiv("snippetor-folder-container");
 
         const preview = containerEl.createDiv(
             `nav-folder is-collapsed ${
                 this.cfg.folderIcon ? "folder-icon" : ""
-            } ${this.cfg.hoverDecoration ? "hover" : ""}`
+            } ${this.cfg.hoverDecoration ? "hover" : ""}`,
         );
         preview.addEventListener("click", () => {
             folderSettings.cache.expanded = !preview.hasClass("is-collapsed");
             preview.toggleClass(
                 "is-collapsed",
-                !preview.hasClass("is-collapsed")
+                !preview.hasClass("is-collapsed"),
             );
         });
         const title = preview.createDiv({
@@ -296,7 +296,6 @@ class CreateFolderModal extends Modal {
         setIcon(
             title.createDiv("nav-folder-collapse-indicator collapse-icon"),
             "right-triangle",
-            8
         );
         const content = title.createDiv({
             cls: "nav-folder-title-content",
@@ -328,7 +327,7 @@ class CreateFolderModal extends Modal {
             (expanded) => {
                 folderSettings.cache.expanded = expanded;
                 this.drawSettings(folderSettings, settings, content);
-            }
+            },
         );
         new ExtraButtonComponent(actions)
             .setIcon("trash")
@@ -346,7 +345,7 @@ class CreateFolderModal extends Modal {
         folderSettings: FolderConfig,
         parent: HTMLSpanElement,
         content: HTMLDivElement,
-        isDefault = false
+        isDefault = false,
     ): void {
         const i = this.id++;
         parent.empty();
@@ -358,11 +357,11 @@ class CreateFolderModal extends Modal {
                 .children?.filter(
                     (f) =>
                         f instanceof TFolder &&
-                        !this.cfg.folders.find((t) => t.target == f.path)
+                        !this.cfg.folders.find((t) => t.target == f.path),
                 ) as TFolder[];
 
             const folderNameGroup = settings.createSpan(
-                "snippetor-group aligned-1"
+                "snippetor-group aligned-1",
             );
             const text = new TextComponent(folderNameGroup)
                 .onChange((v) => {
@@ -374,7 +373,7 @@ class CreateFolderModal extends Modal {
             const suggestor = new FolderSuggestionModal(
                 this.app,
                 text,
-                folders
+                folders,
             );
 
             suggestor.onClose = () => {
@@ -392,7 +391,7 @@ class CreateFolderModal extends Modal {
             (v) => {
                 this.helper.setColor(folderSettings, v, COLOR.FOREGROUND);
                 this.setFolderColors(folderSettings);
-            }
+            },
         );
         this.backgroundColorPicker(
             colors,
@@ -402,7 +401,7 @@ class CreateFolderModal extends Modal {
             (v) => {
                 this.helper.setColor(folderSettings, v, COLOR.BACKGROUND);
                 this.setFolderColors(folderSettings);
-            }
+            },
         );
 
         const subfolder = this.helper.createToggleButton(
@@ -411,7 +410,7 @@ class CreateFolderModal extends Modal {
             (enabled) => {
                 folderSettings.includeChildren = enabled;
                 this.setFolderColors(folderSettings);
-            }
+            },
         );
         subfolder
             .setIcon("stacked-levels")
@@ -426,12 +425,12 @@ class CreateFolderModal extends Modal {
     drawFolderIconSettings(
         folderSettings: FolderConfig,
         parent: HTMLSpanElement,
-        i: number
+        i: number,
     ): void {
         const settings = parent.createSpan("snippetor-row");
         const initalValue = this.helper.valueOrDefault(
             folderSettings.content,
-            ""
+            "",
         );
 
         const iconGroup = settings.createSpan("snippetor-group aligned-1");
@@ -455,14 +454,14 @@ class CreateFolderModal extends Modal {
                 folderSettings.content = folderContent.value;
                 this.setFolderColors(folderSettings);
             },
-            false
+            false,
         );
     }
 
     drawFolderFontSettings(
         folderSettings: FolderConfig,
         parent: HTMLSpanElement,
-        i: number
+        i: number,
     ): void {
         const settings = parent.createSpan("snippetor-row");
 
@@ -473,7 +472,7 @@ class CreateFolderModal extends Modal {
         });
         const font = new TextComponent(fontGroup)
             .setValue(
-                folderSettings.font === undefined ? "" : folderSettings.font
+                folderSettings.font === undefined ? "" : folderSettings.font,
             )
             .onChange((v) => {
                 folderSettings.font = v;
@@ -491,7 +490,7 @@ class CreateFolderModal extends Modal {
             .setValue(
                 folderSettings.fontSize === undefined
                     ? this.defaultFontSize
-                    : folderSettings.fontSize
+                    : folderSettings.fontSize,
             )
             .setLimits(6, 30, 1)
             .setDynamicTooltip()
@@ -515,11 +514,11 @@ class CreateFolderModal extends Modal {
     setFolderColors(folderSettings: FolderConfig) {
         const textColor = this.helper.getColor(
             folderSettings,
-            COLOR.FOREGROUND
+            COLOR.FOREGROUND,
         );
         const backgroundColor = this.helper.getColor(
             folderSettings,
-            COLOR.BACKGROUND
+            COLOR.BACKGROUND,
         );
 
         const folderEl = folderSettings.cache.folderEl;
@@ -535,12 +534,12 @@ class CreateFolderModal extends Modal {
 
         folderEl.style.setProperty(
             "--snippetor-fg-color",
-            textColor === "inherit" ? "var(--text-normal)" : textColor
+            textColor === "inherit" ? "var(--text-normal)" : textColor,
         );
         folderEl.style.setProperty("--snippetor-bg-color", backgroundColor);
         folderEl.style.setProperty(
             "--snippetor-border-radius",
-            `${this.cfg.borderRadius}px`
+            `${this.cfg.borderRadius}px`,
         );
         folderEl.style.setProperty("--snippetor-font", font);
         folderEl.style.setProperty("--snippetor-font-size", fontSize);
@@ -555,10 +554,10 @@ class CreateFolderModal extends Modal {
         element: ColoredElement,
         name: string,
         label: string,
-        update: (value: string) => void
+        update: (value: string) => void,
     ) {
         const colorGroup = container.createSpan(
-            "snippetor-group decorated color"
+            "snippetor-group decorated color",
         );
         colorGroup.createEl("label", {
             text: label,
@@ -569,7 +568,7 @@ class CreateFolderModal extends Modal {
             element,
             name,
             update,
-            COLOR.FOREGROUND
+            COLOR.FOREGROUND,
         );
         // sync light/dark mode
         this.helper.createColorSyncComponent(
@@ -579,10 +578,10 @@ class CreateFolderModal extends Modal {
             (value) => {
                 colorPicker.value = this.helper.getPickerValue(
                     element,
-                    COLOR.FOREGROUND
+                    COLOR.FOREGROUND,
                 );
                 update(value);
-            }
+            },
         );
         // reset input element
         const resetFg = this.helper.createResetColorComponent(
@@ -591,11 +590,11 @@ class CreateFolderModal extends Modal {
                 this.helper.clearModeColor(element, COLOR.FOREGROUND);
                 colorPicker.value = this.helper.getPickerValue(
                     element,
-                    COLOR.FOREGROUND
+                    COLOR.FOREGROUND,
                 );
                 update(undefined);
             },
-            COLOR.FOREGROUND
+            COLOR.FOREGROUND,
         );
         resetFg.extraSettingsEl.addClass("no-padding");
     }
@@ -605,10 +604,10 @@ class CreateFolderModal extends Modal {
         element: ColoredElement,
         name: string,
         label: string,
-        update: (value: string) => void
+        update: (value: string) => void,
     ) {
         const colorGroup = container.createSpan(
-            "snippetor-group decorated color"
+            "snippetor-group decorated color",
         );
         colorGroup.createEl("label", {
             text: label,
@@ -619,7 +618,7 @@ class CreateFolderModal extends Modal {
             element,
             name,
             update,
-            COLOR.BACKGROUND
+            COLOR.BACKGROUND,
         );
         // sync light/dark mode
         this.helper.createColorSyncComponent(
@@ -629,10 +628,10 @@ class CreateFolderModal extends Modal {
             (value) => {
                 colorPicker.value = this.helper.getPickerValue(
                     element,
-                    COLOR.BACKGROUND
+                    COLOR.BACKGROUND,
                 );
                 update(value);
-            }
+            },
         );
         // reset input element
         const reset = this.helper.createResetColorComponent(
@@ -641,11 +640,11 @@ class CreateFolderModal extends Modal {
                 this.helper.clearModeColor(element, COLOR.BACKGROUND);
                 colorPicker.value = this.helper.getPickerValue(
                     element,
-                    COLOR.BACKGROUND
+                    COLOR.BACKGROUND,
                 );
                 update(undefined);
             },
-            COLOR.BACKGROUND
+            COLOR.BACKGROUND,
         );
         reset.extraSettingsEl.addClass("no-padding");
     }

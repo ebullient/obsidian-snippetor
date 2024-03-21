@@ -21,7 +21,7 @@ import { COLOR, LOCK, UNLOCK } from "./snippetor-Defaults";
 export function openCreateCheckboxModal(
     app: App,
     taskSnippetCfg: TaskSnippetConfig,
-    snippetor: Snippetor
+    snippetor: Snippetor,
 ): Promise<TaskSnippetConfig> {
     return new Promise((resolve) => {
         const modal = new CreateCheckboxesModal(app, taskSnippetCfg, snippetor);
@@ -57,7 +57,7 @@ class CreateCheckboxesModal extends Modal {
     constructor(
         app: App,
         taskSnippetCfg: TaskSnippetConfig,
-        snippetor: Snippetor
+        snippetor: Snippetor,
     ) {
         super(app);
         this.snippetor = snippetor;
@@ -66,12 +66,12 @@ class CreateCheckboxesModal extends Modal {
 
         // Ensure required config, migrate old task data
         this.cfg = this.snippetor.initTaskSnippetConfig(
-            taskSnippetCfg || snippetor.createNewTaskSnippetCfg()
+            taskSnippetCfg || snippetor.createNewTaskSnippetCfg(),
         );
 
         // save snapshot of task settings
         this.origTaskSettings = JSON.parse(
-            JSON.stringify(this.cfg.taskSettings)
+            JSON.stringify(this.cfg.taskSettings),
         );
 
         this.elements = {};
@@ -82,13 +82,13 @@ class CreateCheckboxesModal extends Modal {
         this.titleEl.createSpan({ text: "Snippetor: Tasks" });
 
         const content = this.contentEl.createDiv(
-            "snippetor-content markdown-preview-view"
+            "snippetor-content markdown-preview-view",
         );
 
         this.helper = new ModalHelper(
             this.snippetor,
             this.containerEl,
-            content
+            content,
         );
         this.style = this.helper.createHtmlStyleElement(this.cfg);
         this.helper.createFilenameSetting(content, this.cfg);
@@ -114,7 +114,7 @@ class CreateCheckboxesModal extends Modal {
                             this.snippetor.createNewTaskCfg("");
                         this.createTaskItem(taskSettings);
                         this.cfg.taskSettings.push(taskSettings);
-                    })
+                    }),
             );
 
         content.createEl("h3", {
@@ -146,7 +146,7 @@ class CreateCheckboxesModal extends Modal {
             Reflect.deleteProperty(this.cfg.uncheckedTask, "cache");
         }
         this.cfg.taskSettings.forEach((ts) =>
-            Reflect.deleteProperty(ts, "cache")
+            Reflect.deleteProperty(ts, "cache"),
         );
         // make sure a name is set
         this.snippetor.initCommonConfig(this.cfg);
@@ -207,7 +207,7 @@ class CreateCheckboxesModal extends Modal {
             example.style.color = "transparent";
         }
         this.elements.defaultFontSize = Math.ceil(
-            Number(getComputedStyle(checkbox).fontSize.replace("px", ""))
+            Number(getComputedStyle(checkbox).fontSize.replace("px", "")),
         );
         console.log("defaultFontSize", this.elements.defaultFontSize);
 
@@ -216,7 +216,7 @@ class CreateCheckboxesModal extends Modal {
         const roundGroup = actions.createSpan("snippetor-checkbox-roundness");
         const roundness = new SliderComponent(roundGroup)
             .setValue(
-                this.cfg.borderRadius === undefined ? 0 : this.cfg.borderRadius
+                this.cfg.borderRadius === undefined ? 0 : this.cfg.borderRadius,
             )
             .setLimits(0, 50, 2)
             .setDynamicTooltip()
@@ -254,7 +254,7 @@ class CreateCheckboxesModal extends Modal {
             .setTooltip("Reset to previously saved (or generated) values")
             .onClick(() => {
                 this.cfg.taskSettings = JSON.parse(
-                    JSON.stringify(this.origTaskSettings)
+                    JSON.stringify(this.origTaskSettings),
                 ); // reset
                 this.showTasks();
             });
@@ -301,7 +301,7 @@ class CreateCheckboxesModal extends Modal {
             (expanded) => {
                 taskSettings.cache.expanded = expanded;
                 this.drawSettings(taskSettings, settings);
-            }
+            },
         );
         const remove = new ExtraButtonComponent(actions)
             .setIcon("trash")
@@ -336,7 +336,7 @@ class CreateCheckboxesModal extends Modal {
         // Input box for the task character: UNLESS unchecked
         if (!ts.unchecked) {
             const sourceGroup = settings.createSpan(
-                "snippetor-group decorated"
+                "snippetor-group decorated",
             );
             const dataTaskLabel = sourceGroup.createEl("label", {
                 text: `- `,
@@ -361,7 +361,7 @@ class CreateCheckboxesModal extends Modal {
                     this.applySettingsToElements(ts);
                     this.verifyDataValue(dataTask);
                 },
-                false
+                false,
             );
             ts.cache.dataEl = dataTask;
             this.verifyDataValue(dataTask);
@@ -376,7 +376,7 @@ class CreateCheckboxesModal extends Modal {
             (value) => {
                 this.helper.setColor(ts.checkbox, value, COLOR.FOREGROUND);
                 this.applySettingsToElements(ts);
-            }
+            },
         );
 
         // the checkbox background
@@ -388,7 +388,7 @@ class CreateCheckboxesModal extends Modal {
             (value) => {
                 this.helper.setColor(ts.checkbox, value, COLOR.BACKGROUND);
                 this.applySettingsToElements(ts);
-            }
+            },
         );
 
         // Checkbox border
@@ -398,7 +398,7 @@ class CreateCheckboxesModal extends Modal {
             (enabled) => {
                 ts.checkbox.hideBorder = enabled;
                 this.applySettingsToElements(ts);
-            }
+            },
         );
         hideBorder.setIcon("fullscreen").setTooltip("Toggle: Hide border");
 
@@ -409,7 +409,7 @@ class CreateCheckboxesModal extends Modal {
                 ts.checkbox.preventClick = enabled;
                 lockMode.setIcon(ts.checkbox.preventClick ? LOCK : UNLOCK);
                 this.applySettingsToElements(ts);
-            }
+            },
         );
         lockMode
             .setIcon(ts.checkbox.preventClick ? LOCK : UNLOCK)
@@ -418,7 +418,7 @@ class CreateCheckboxesModal extends Modal {
 
     drawReadingModeCheckboxSettings(
         ts: TaskSettings,
-        parent: HTMLSpanElement
+        parent: HTMLSpanElement,
     ): void {
         const i = ts.cache.i;
 
@@ -431,7 +431,7 @@ class CreateCheckboxesModal extends Modal {
 
         const initalValue = this.helper.valueOrDefault(
             ts.checkbox.readModeData,
-            ts.data
+            ts.data,
         );
 
         const sourceGroup = settings.createSpan("snippetor-group decorated");
@@ -456,7 +456,7 @@ class CreateCheckboxesModal extends Modal {
                 ts.checkbox.format === undefined ||
                     ts.checkbox.format.fontSize === undefined
                     ? this.elements.defaultFontSize
-                    : ts.checkbox.format.fontSize
+                    : ts.checkbox.format.fontSize,
             )
             .setLimits(6, 30, 1)
             .setDynamicTooltip()
@@ -469,7 +469,7 @@ class CreateCheckboxesModal extends Modal {
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
             .setTooltip(
-                "Reset font size to default: " + this.elements.defaultFontSize
+                "Reset font size to default: " + this.elements.defaultFontSize,
             )
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
@@ -491,7 +491,7 @@ class CreateCheckboxesModal extends Modal {
                 }
                 this.applySettingsToElements(ts);
             },
-            false
+            false,
         );
 
         this.positionAdjust(
@@ -507,7 +507,7 @@ class CreateCheckboxesModal extends Modal {
                     Reflect.deleteProperty(ts.checkbox, "left");
                 }
                 this.applySettingsToElements(ts);
-            }
+            },
         );
 
         this.positionAdjust(
@@ -523,7 +523,7 @@ class CreateCheckboxesModal extends Modal {
                     Reflect.deleteProperty(ts.checkbox, "top");
                 }
                 this.applySettingsToElements(ts);
-            }
+            },
         );
     }
 
@@ -570,7 +570,7 @@ class CreateCheckboxesModal extends Modal {
                 ts.li.format === undefined ||
                     ts.li.format.fontSize === undefined
                     ? this.elements.defaultFontSize
-                    : ts.li.format.fontSize
+                    : ts.li.format.fontSize,
             )
             .setLimits(6, 30, 1)
             .setDynamicTooltip()
@@ -583,7 +583,7 @@ class CreateCheckboxesModal extends Modal {
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
             .setTooltip(
-                "Reset font size to default: " + this.elements.defaultFontSize
+                "Reset font size to default: " + this.elements.defaultFontSize,
             )
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
@@ -601,7 +601,7 @@ class CreateCheckboxesModal extends Modal {
             (enabled) => {
                 ts.li.syncTaskColor = enabled;
                 textColorMode.buttonEl.setText(
-                    ts.li.syncTaskColor ? useTaskColors : useTextColors
+                    ts.li.syncTaskColor ? useTaskColors : useTextColors,
                 );
                 this.applySettingsToElements(ts);
                 if (ts.li.syncTaskColor) {
@@ -609,12 +609,12 @@ class CreateCheckboxesModal extends Modal {
                 } else {
                     settings.removeClass("hide-text-colors");
                 }
-            }
+            },
         );
         textColorMode.buttonEl.addClass("toggle-sync-color");
         textColorMode.setTooltip("Toggle: Sync text color with task color");
         textColorMode.setButtonText(
-            ts.li.syncTaskColor ? useTaskColors : useTextColors
+            ts.li.syncTaskColor ? useTaskColors : useTextColors,
         );
         if (ts.li.syncTaskColor) {
             settings.addClass("hide-text-colors");
@@ -628,7 +628,7 @@ class CreateCheckboxesModal extends Modal {
             (value) => {
                 this.helper.setColor(ts.li, value, COLOR.FOREGROUND);
                 this.applySettingsToElements(ts);
-            }
+            },
         );
         // the checkbox background
         this.backgroundColorPicker(
@@ -639,7 +639,7 @@ class CreateCheckboxesModal extends Modal {
             (value) => {
                 this.helper.setColor(ts.li, value, COLOR.BACKGROUND);
                 this.applySettingsToElements(ts);
-            }
+            },
         );
     }
 
@@ -654,7 +654,7 @@ class CreateCheckboxesModal extends Modal {
 
         // List Item font
         const liGroup = settings.createSpan(
-            "snippetor-group decorated li-font"
+            "snippetor-group decorated li-font",
         );
         liGroup.createEl("label", {
             text: "Text:",
@@ -665,7 +665,7 @@ class CreateCheckboxesModal extends Modal {
             .setValue(
                 ts.li.format === undefined || ts.li.format.font === undefined
                     ? ""
-                    : ts.li.format.font
+                    : ts.li.format.font,
             )
             .onChange((v) => {
                 ts.li.format.font = v;
@@ -675,7 +675,7 @@ class CreateCheckboxesModal extends Modal {
 
         // List Item font
         const chkboxGroup = settings.createSpan(
-            "snippetor-group decorated checkbox-font"
+            "snippetor-group decorated checkbox-font",
         );
         chkboxGroup.createEl("label", {
             text: "Checkbox:",
@@ -687,7 +687,7 @@ class CreateCheckboxesModal extends Modal {
                 ts.checkbox.format === undefined ||
                     ts.checkbox.format.font === undefined
                     ? ""
-                    : ts.checkbox.format.font
+                    : ts.checkbox.format.font,
             )
             .onChange((v) => {
                 ts.checkbox.format.font = v;
@@ -701,10 +701,10 @@ class CreateCheckboxesModal extends Modal {
         element: ColoredElement,
         name: string,
         label: string,
-        update: (value: string) => void
+        update: (value: string) => void,
     ) {
         const colorGroup = container.createSpan(
-            "snippetor-group decorated color"
+            "snippetor-group decorated color",
         );
         colorGroup.createEl("label", {
             text: label,
@@ -716,7 +716,7 @@ class CreateCheckboxesModal extends Modal {
             name,
             update,
             COLOR.FOREGROUND,
-            this.cfg.hideColorPicker
+            this.cfg.hideColorPicker,
         );
         // sync light/dark mode
         this.helper.createColorSyncComponent(
@@ -727,10 +727,10 @@ class CreateCheckboxesModal extends Modal {
                 taskColor.value = this.helper.getPickerValue(
                     element,
                     COLOR.FOREGROUND,
-                    this.cfg.hideColorPicker
+                    this.cfg.hideColorPicker,
                 );
                 update(value);
-            }
+            },
         );
         // reset input element
         const resetFg = this.helper.createResetColorComponent(
@@ -740,11 +740,11 @@ class CreateCheckboxesModal extends Modal {
                 taskColor.value = this.helper.getPickerValue(
                     element,
                     COLOR.FOREGROUND,
-                    this.cfg.hideColorPicker
+                    this.cfg.hideColorPicker,
                 );
                 update(undefined);
             },
-            COLOR.FOREGROUND
+            COLOR.FOREGROUND,
         );
         resetFg.extraSettingsEl.addClass("no-padding");
     }
@@ -754,10 +754,10 @@ class CreateCheckboxesModal extends Modal {
         element: ColoredElement,
         name: string,
         label: string,
-        update: (value: string) => void
+        update: (value: string) => void,
     ) {
         const colorGroup = container.createSpan(
-            "snippetor-group decorated color"
+            "snippetor-group decorated color",
         );
         colorGroup.createEl("label", {
             text: label,
@@ -769,7 +769,7 @@ class CreateCheckboxesModal extends Modal {
             name,
             update,
             COLOR.BACKGROUND,
-            this.cfg.hideColorPicker
+            this.cfg.hideColorPicker,
         );
         // sync light/dark mode
         this.helper.createColorSyncComponent(
@@ -780,10 +780,10 @@ class CreateCheckboxesModal extends Modal {
                 taskColor.value = this.helper.getPickerValue(
                     element,
                     COLOR.BACKGROUND,
-                    this.cfg.hideColorPicker
+                    this.cfg.hideColorPicker,
                 );
                 update(value);
-            }
+            },
         );
         // reset input element
         const reset = this.helper.createResetColorComponent(
@@ -793,11 +793,11 @@ class CreateCheckboxesModal extends Modal {
                 taskColor.value = this.helper.getPickerValue(
                     element,
                     COLOR.BACKGROUND,
-                    this.cfg.hideColorPicker
+                    this.cfg.hideColorPicker,
                 );
                 update(undefined);
             },
-            COLOR.BACKGROUND
+            COLOR.BACKGROUND,
         );
         reset.extraSettingsEl.addClass("no-padding");
     }
@@ -808,10 +808,10 @@ class CreateCheckboxesModal extends Modal {
         label: string,
         base: number,
         initial: number,
-        update: (value: number) => void
+        update: (value: number) => void,
     ): void {
         const posGroup = container.createSpan(
-            "snippetor-group decorated position"
+            "snippetor-group decorated position",
         );
         posGroup.createEl("label", {
             text: label,
@@ -891,41 +891,41 @@ class CreateCheckboxesModal extends Modal {
 
         const boxFgColor = this.helper.getColor(
             taskSettings.checkbox,
-            COLOR.FOREGROUND
+            COLOR.FOREGROUND,
         );
         const boxBgColor = this.helper.getColor(
             taskSettings.checkbox,
-            COLOR.BACKGROUND
+            COLOR.BACKGROUND,
         );
 
         const textFgColor = this.helper.getColor(
             taskSettings.li.syncTaskColor
                 ? taskSettings.checkbox
                 : taskSettings.li,
-            COLOR.FOREGROUND
+            COLOR.FOREGROUND,
         );
         const textBgColor = this.helper.getColor(
             taskSettings.li.syncTaskColor
                 ? taskSettings.checkbox
                 : taskSettings.li,
-            COLOR.BACKGROUND
+            COLOR.BACKGROUND,
         );
 
         li.style.setProperty(
             "--checkbox-color",
-            boxFgColor === "inherit" ? "var(--text-normal)" : boxFgColor
+            boxFgColor === "inherit" ? "var(--text-normal)" : boxFgColor,
         );
 
         li.style.setProperty("--checkbox-bg", boxBgColor);
         li.style.setProperty(
             "--checkbox-border-color",
-            taskSettings.checkbox.hideBorder ? "transparent" : boxFgColor
+            taskSettings.checkbox.hideBorder ? "transparent" : boxFgColor,
         );
 
         if (this.cfg.borderRadius) {
             li.style.setProperty(
                 "--checkbox-radius",
-                this.cfg.borderRadius + "%"
+                this.cfg.borderRadius + "%",
             );
         } else {
             li.style.removeProperty("--checkbox-radius");
@@ -961,7 +961,7 @@ class CreateCheckboxesModal extends Modal {
         checkbox.style.setProperty("--snippetor-box-font", font);
         checkbox.style.setProperty(
             "--snippetor-box-font-size",
-            fontSize + "px"
+            fontSize + "px",
         );
 
         checkbox.style.setProperty("--snippetor-box-top", top + "px");
@@ -969,14 +969,14 @@ class CreateCheckboxesModal extends Modal {
         if (taskSettings.checkbox.left) {
             checkbox.style.setProperty(
                 "--snippetor-box-left",
-                taskSettings.checkbox.left + "px"
+                taskSettings.checkbox.left + "px",
             );
             checkbox.style.setProperty("--snippetor-box-margin-left", "0");
         } else {
             checkbox.style.setProperty("--snippetor-box-left", "50%");
             checkbox.style.setProperty(
                 "--snippetor-box-margin-left",
-                "-" + fontSize / 2 + "px"
+                "-" + fontSize / 2 + "px",
             );
         }
     }
@@ -986,7 +986,7 @@ class CreateCheckboxesModal extends Modal {
         input.removeAttribute("aria-label");
 
         const count = this.cfg.taskSettings.filter(
-            (t) => input.value === t.data
+            (t) => input.value === t.data,
         ).length;
         if (count > 1) {
             console.log("verifyDataValue: conflict over %s", input.value);
@@ -994,7 +994,7 @@ class CreateCheckboxesModal extends Modal {
             input.addClass("data-value-error");
             input.setAttribute(
                 "aria-label",
-                "Another task uses the same value"
+                "Another task uses the same value",
             );
             this.cfg.taskSettings.forEach((ts) => {
                 const e = ts.cache?.dataEl;
@@ -1013,14 +1013,14 @@ class CreateCheckboxesModal extends Modal {
                 input.addClass("data-value-error");
                 input.setAttribute(
                     "aria-label",
-                    "Unchecked tasks are a special case. See additional settings."
+                    "Unchecked tasks are a special case. See additional settings.",
                 );
             } else if (input.value === "") {
                 console.log("verifyDataValue: empty value");
                 input.addClass("data-value-required");
                 input.setAttribute(
                     "aria-label",
-                    "Specify a task value, e.g. X"
+                    "Specify a task value, e.g. X",
                 );
             } else if (conflict) {
                 console.log("verifyDataValue: conflict resolved");

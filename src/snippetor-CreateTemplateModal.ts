@@ -7,7 +7,7 @@ import { Snippetor } from "./snippetor-Snippetor";
 export function openCreateTemplateModal(
     app: App,
     snippetConfig: SnippetConfig, // replace with specific type
-    snippetor: Snippetor
+    snippetor: Snippetor,
 ): Promise<SnippetConfig> {
     // replace with specific type
     return new Promise((resolve) => {

@@ -49,7 +49,7 @@ export class SnippetorPlugin extends Plugin {
 
         return this.saveSettings().then(() =>
             // delete file, too
-            this.snippetor.deleteSnippet(snippetCfg)
+            this.snippetor.deleteSnippet(snippetCfg),
         );
     }
 
@@ -61,7 +61,7 @@ export class SnippetorPlugin extends Plugin {
 
     get allSnippets(): SnippetConfig[] {
         return Object.values(this.settings.snippets).sort((a, b) =>
-            a.name.localeCompare(b.name)
+            a.name.localeCompare(b.name),
         );
     }
 }

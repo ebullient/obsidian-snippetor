@@ -27,7 +27,7 @@ export class ModalHelper {
     constructor(
         snippetor: Snippetor,
         containerEl: HTMLElement,
-        content: HTMLElement
+        content: HTMLElement,
     ) {
         this.snippetor = snippetor;
         this.containerEl = containerEl;
@@ -97,7 +97,7 @@ export class ModalHelper {
     getPickerValue(
         element: ColoredElement,
         color?: COLOR,
-        hidePicker?: boolean
+        hidePicker?: boolean,
     ): string {
         const value = this.getColor(element, color);
         if (hidePicker) {
@@ -134,7 +134,7 @@ export class ModalHelper {
             return color === COLOR.BACKGROUND
                 ? this.valueOrDefault(
                       element.darkMode.background,
-                      "transparent"
+                      "transparent",
                   )
                 : this.valueOrDefault(element.darkMode.foreground, "inherit");
         }
@@ -167,12 +167,12 @@ export class ModalHelper {
 
     createThemeToggleComponent(
         container: HTMLElement,
-        callback: () => void
+        callback: () => void,
     ): void {
         const toggle = new ToggleComponent(container)
             .setValue(this.isLightMode)
             .setTooltip(
-                `Switch to ${this.isLightMode ? "dark" : "light"} mode`
+                `Switch to ${this.isLightMode ? "dark" : "light"} mode`,
             );
         toggle.onChange(async (value) => {
             if (value) {
@@ -184,7 +184,7 @@ export class ModalHelper {
             }
             this.getDefaultColors();
             toggle.setTooltip(
-                `Switch to ${this.isLightMode ? "dark" : "light"} mode`
+                `Switch to ${this.isLightMode ? "dark" : "light"} mode`,
             );
             return callback();
         });
@@ -197,7 +197,7 @@ export class ModalHelper {
         name: string,
         update: (value: string) => void,
         color?: COLOR,
-        hidePicker?: boolean
+        hidePicker?: boolean,
     ): HTMLInputElement {
         const initial = this.getPickerValue(element, color, hidePicker);
         const which = color === COLOR.BACKGROUND ? "Background" : "Foreground";
@@ -221,7 +221,7 @@ export class ModalHelper {
                 colorInput.title = `${which} color ${colorInput.value}`;
                 return update(colorInput.value);
             },
-            false
+            false,
         );
         return colorInput;
     }
@@ -230,7 +230,7 @@ export class ModalHelper {
         container: HTMLElement,
         element: ColoredElement,
         color: COLOR,
-        callback: (value: string) => void
+        callback: (value: string) => void,
     ): HTMLSpanElement {
         const result = container.createSpan({
             text: "🌗",
@@ -248,7 +248,7 @@ export class ModalHelper {
                 const value = this.syncModeColor(element, color);
                 callback(value);
             },
-            false
+            false,
         );
         return result;
     }
@@ -256,7 +256,7 @@ export class ModalHelper {
     createResetColorComponent(
         container: HTMLElement,
         callback: () => void,
-        color?: COLOR
+        color?: COLOR,
     ): ExtraButtonComponent {
         const which = color === COLOR.BACKGROUND ? "background" : "foreground";
         return new ExtraButtonComponent(container)
@@ -268,7 +268,7 @@ export class ModalHelper {
     createExpandCollapseComponents(
         container: HTMLElement,
         expanded: boolean,
-        callback: (expanded: boolean) => void
+        callback: (expanded: boolean) => void,
     ): void {
         const showExtra = new ExtraButtonComponent(container)
             .setIcon("enlarge-glyph")
@@ -302,7 +302,7 @@ export class ModalHelper {
     createBoldButton(
         container: HTMLElement,
         element: FormattedElement,
-        update: (enabled: boolean) => void
+        update: (enabled: boolean) => void,
     ): ButtonComponent {
         const result = new ButtonComponent(container)
             .setIcon("bold-glyph")
@@ -322,7 +322,7 @@ export class ModalHelper {
     createItalicButton(
         container: HTMLElement,
         element: FormattedElement,
-        update: (enabled: boolean) => void
+        update: (enabled: boolean) => void,
     ): ButtonComponent {
         const result = new ButtonComponent(container)
             .setIcon("italic-glyph")
@@ -343,7 +343,7 @@ export class ModalHelper {
     createStrikethroughButton(
         container: HTMLElement,
         element: FormattedElement,
-        update: (enabled: boolean) => void
+        update: (enabled: boolean) => void,
     ): ButtonComponent {
         const result = new ButtonComponent(container)
             .setIcon("strikethrough-glyph")
@@ -364,7 +364,7 @@ export class ModalHelper {
     createToggleButton(
         container: HTMLElement,
         enabled: boolean,
-        update: (enabled: boolean) => void
+        update: (enabled: boolean) => void,
     ): ButtonComponent {
         const result = new ButtonComponent(container).onClick(() => {
             const enabled = this.toggleSetIsActive(result.buttonEl);
@@ -410,7 +410,7 @@ export class ModalHelper {
                         await this.snippetor.generateCss(cfg);
                         button.buttonEl.removeClass("is-active");
                         button.disabled = false;
-                    })
+                    }),
             );
     }
 
@@ -426,12 +426,12 @@ export class ModalHelper {
     createImportFontSetting(
         content: HTMLDivElement,
         cfg: SnippetConfig,
-        style: HTMLStyleElement
+        style: HTMLStyleElement,
     ): void {
         const result = new Setting(content)
             .setName("Import (CSS) additional fonts")
             .setDesc(
-                "Cut/paste a CSS @import statement to add an additional font to this snippet."
+                "Cut/paste a CSS @import statement to add an additional font to this snippet.",
             )
             .addTextArea((t) =>
                 t.setValue(cfg.cssFontImport).onChange((v) => {
@@ -439,10 +439,10 @@ export class ModalHelper {
                     cfg.cssFontImport = v;
                     if (redraw) {
                         style.replaceChildren(
-                            document.createTextNode(cfg.cssFontImport)
+                            document.createTextNode(cfg.cssFontImport),
                         );
                     }
-                })
+                }),
             );
         result.controlEl.addClass("font-import");
         result.infoEl.addClass("font-import");
