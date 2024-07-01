@@ -43,7 +43,7 @@
     "prettier": "^3.3.2",
     "ts-jest": "^29.1.5",
     "tslib": "^2.6.3",
-    "typescript": "5.4.5"
+    "typescript": "5.5.3"
   },
   "dependencies": {
     "compare-versions": "^6.1.0",
