@@ -46,7 +46,7 @@
     "typescript": "5.5.3"
   },
   "dependencies": {
-    "compare-versions": "^6.1.0",
+    "compare-versions": "^6.1.1",
     "eta": "^2.0.0",
     "random-word-slugs": "^0.1.6",
     "randomcolor": "^0.6.2"
