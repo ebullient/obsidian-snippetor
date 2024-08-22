@@ -68,16 +68,20 @@
       border: 0;
 
       &.hover:hover {
+        background-color: var(--background-primary);
+        transition-duration: 0.25s;
+        transition-timing-function: ease;
+        transition-property: background-color, color;
         .nav-folder-title:hover {
           background-color: transparent;
           color: inherit;
         }
         .nav-folder-title {
           .nav-folder-title-content.nav-folder-title-content {
+            color: inherit;
             &::before {
               background-color: transparent;
             }
-            color: inherit;
           }
         }
         .nav-folder-collapse-indicator.collapse-icon > svg.right-triangle {
@@ -86,10 +90,6 @@
         .nav-folder-title-content::before {
           background-color: var(--text-normal);
         }
-        background-color: var(--background-primary);
-        transition-duration: 0.25s;
-        transition-timing-function: ease;
-        transition-property: background-color, color;
       }
 
       &.folder-icon {

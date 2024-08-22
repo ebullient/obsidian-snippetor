@@ -62,6 +62,9 @@
     flex-flow: column wrap;
     align-items: stretch;
     justify-content: flex-start;
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
+    padding: 0 2px;
 
     /* Flex container of labels, groups */
     .snippetor-row {
@@ -160,10 +163,6 @@
       border-color: var(--text-error);
       text-decoration: underline;
     }
-
-    border-right: 1px solid transparent;
-    border-left: 1px solid transparent;
-    padding: 0 2px;
 
     &:hover {
       border-right: 1px solid var(--interactive-accent);
