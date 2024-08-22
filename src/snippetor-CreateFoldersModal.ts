@@ -301,7 +301,7 @@ class CreateFolderModal extends Modal {
             cls: "nav-folder-title-content",
             text: isDefault
                 ? "Default Folder"
-                : folderSettings.target ?? "Folder Name",
+                : (folderSettings.target ?? "Folder Name"),
         });
         if (!folderSettings.cache) {
             folderSettings.cache = {

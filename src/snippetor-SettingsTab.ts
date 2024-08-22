@@ -62,13 +62,13 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             .addDropdown((d) => {
                 d.addOption(
                     DEFAULT_TASK_SNIPPET_SETTINGS.type,
-                    "Custom checkboxes"
+                    "Custom checkboxes",
                 );
                 d.setValue(DEFAULT_TASK_SNIPPET_SETTINGS.type);
 
                 d.addOption(
                     DEFAULT_FOLDER_SNIPPET_SETTINGS.type,
-                    "Colored folders"
+                    "Colored folders",
                 );
 
                 d.onChange((v) => {
@@ -81,7 +81,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                     .setIcon("plus-with-circle")
                     .onClick(async () => {
                         await this.openModal(selector.type, null);
-                    })
+                    }),
             );
     }
 
@@ -99,7 +99,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                         .onClick(async () => {
                             await this.openModal(snippet.type, snippet);
                             this.listExistingSnippets();
-                        })
+                        }),
                 )
                 .addExtraButton((b: ExtraButtonComponent) =>
                     b
@@ -112,7 +112,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                             new Notice(`Copied snippet '${snippet.name}'`);
                             await this.openModal(snippet.type, copy);
                             this.listExistingSnippets();
-                        })
+                        }),
                 )
                 .addExtraButton((b: ExtraButtonComponent) =>
                     b
@@ -121,7 +121,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                         .onClick(async () => {
                             await this.plugin.removeSnippet(snippet);
                             this.listExistingSnippets();
-                        })
+                        }),
                 );
         }
     }
@@ -148,7 +148,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             const taskCfg = await openCreateCheckboxModal(
                 this.app,
                 snippet as TaskSnippetConfig,
-                this.plugin.snippetor
+                this.plugin.snippetor,
             );
             if (taskCfg) {
                 console.debug("Snippetor: modal closed with %o", taskCfg);
@@ -159,7 +159,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             const taskCfg = await openCreateFolderModal(
                 this.app,
                 snippet as FolderSnippetConfig,
-                this.plugin.snippetor
+                this.plugin.snippetor,
             );
             if (taskCfg) {
                 console.debug("Snippetor: modal closed with %o", taskCfg);

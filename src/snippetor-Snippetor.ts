@@ -125,7 +125,7 @@ export class Snippetor {
     }
 
     initFolderSnippetConfig(
-        cfg: Partial<FolderSnippetConfig>
+        cfg: Partial<FolderSnippetConfig>,
     ): FolderSnippetConfig {
         this.initCommonConfig(cfg); // last, it bumps the version
         return cfg as FolderSnippetConfig;
@@ -243,7 +243,7 @@ export class Snippetor {
         }
         if (!snippet) {
             new Notice(
-                "Unable to create snippet: Content is empty. Check console for details."
+                "Unable to create snippet: Content is empty. Check console for details.",
             );
             return Promise.reject();
         }
@@ -261,10 +261,10 @@ export class Snippetor {
                 },
                 (reason) => {
                     new Notice(
-                        "Snippet modification failed. Check console for details."
+                        "Snippet modification failed. Check console for details.",
                     );
                     console.error("Snippet modification failed: %o", reason);
-                }
+                },
             );
         } else {
             update = this.app.vault.create(path, snippet as string).then(
@@ -273,10 +273,10 @@ export class Snippetor {
                 },
                 (reason) => {
                     new Notice(
-                        "Snippet creation failed. Check console for details."
+                        "Snippet creation failed. Check console for details.",
                     );
                     console.error("Snippet creation failed: %o", reason);
-                }
+                },
             );
         }
         return update.then(() => this.app.customCss.readSnippets()); // refresh snippets
@@ -298,10 +298,10 @@ export class Snippetor {
                 },
                 (reason) => {
                     new Notice(
-                        "Snippet deletion failed. Check console for details."
+                        "Snippet deletion failed. Check console for details.",
                     );
                     console.error("Snippet creation failed: %o", reason);
-                }
+                },
             );
         }
 

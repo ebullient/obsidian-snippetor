@@ -28,19 +28,19 @@ class Suggester<T> {
     constructor(
         owner: SuggestModal<T>,
         containerEl: HTMLElement,
-        scope: Scope
+        scope: Scope,
     ) {
         this.containerEl = containerEl;
         this.owner = owner;
         containerEl.on(
             "click",
             ".suggestion-item",
-            this.onSuggestionClick.bind(this)
+            this.onSuggestionClick.bind(this),
         );
         containerEl.on(
             "mousemove",
             ".suggestion-item",
-            this.onSuggestionMouseover.bind(this)
+            this.onSuggestionMouseover.bind(this),
         );
 
         scope.register([], "ArrowUp", () => {
@@ -158,7 +158,7 @@ export abstract class SuggestionModal<T> extends FuzzySuggestModal<T> {
             ".suggestion-container",
             (event: MouseEvent) => {
                 event.preventDefault();
-            }
+            },
         );
     }
     onInputChanged(): void {
@@ -183,7 +183,7 @@ export abstract class SuggestionModal<T> extends FuzzySuggestModal<T> {
         this.suggester.empty();
         this.renderSuggestion(
             null,
-            this.contentEl.createDiv("suggestion-item")
+            this.contentEl.createDiv("suggestion-item"),
         );
     }
     open(): void {
