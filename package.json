@@ -24,7 +24,7 @@
   "repository": "github.com:ebullient/obsidian-snippetor",
   "license": "AGPL-3.0-only",
   "devDependencies": {
-    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.14.0",
     "@popperjs/core": "^2.11.2",
     "@types/chroma-js": "^2.4.4",
