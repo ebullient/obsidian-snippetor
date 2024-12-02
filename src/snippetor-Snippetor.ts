@@ -11,18 +11,19 @@ import {
     DEFAULT_FOLDER_SNIPPET_SETTINGS,
     DEFAULT_TASK_SNIPPET_SETTINGS,
 } from "./snippetor-Defaults";
-import * as Eta from "eta";
+import { Eta } from "eta";
 import { COLORED_FOLDERS, SIMPLE_TASK } from "./snippetor-Snippetor-Templates";
 import { generateSlug } from "random-word-slugs";
 import randomColor from "randomcolor";
 import { compare } from "compare-versions";
 
 export class Snippetor {
+    eta: Eta;
+
     constructor(private app: App) {
-        Eta.configure({
-            cache: true, // Make Eta cache templates
-            async: false,
-        });
+        this.eta = new Eta({
+            cache: true, // yes, cache templates
+         });
     }
 
     get taskValues(): Set<string> {
@@ -227,14 +228,14 @@ export class Snippetor {
         let snippet;
         switch (cfg.type) {
             case DEFAULT_TASK_SNIPPET_SETTINGS.type: {
-                snippet = Eta.render(SIMPLE_TASK, {
+                snippet = this.eta.render(SIMPLE_TASK, {
                     date: new Date(),
                     cfg,
                 });
                 break;
             }
             case DEFAULT_FOLDER_SNIPPET_SETTINGS.type: {
-                snippet = Eta.render(COLORED_FOLDERS, {
+                snippet = this.eta.render(COLORED_FOLDERS, {
                     date: new Date(),
                     cfg,
                 });
