@@ -1,6 +1,6 @@
 import {
-    App,
-    ButtonComponent,
+    type App,
+    type ButtonComponent,
     ExtraButtonComponent,
     Modal,
     Setting,
@@ -9,14 +9,14 @@ import {
     ToggleComponent,
 } from "obsidian";
 import type {
-    TaskSnippetConfig,
-    TaskSettings,
-    ConstructedElements,
     ColoredElement,
+    ConstructedElements,
+    TaskSettings,
+    TaskSnippetConfig,
 } from "./@types";
-import { Snippetor } from "./snippetor-Snippetor";
-import { ModalHelper } from "./snippetor-ModalHelper";
 import { COLOR, LOCK, UNLOCK } from "./snippetor-Defaults";
+import { ModalHelper } from "./snippetor-ModalHelper";
+import type { Snippetor } from "./snippetor-Snippetor";
 
 export function openCreateCheckboxModal(
     app: App,
@@ -126,7 +126,7 @@ class CreateCheckboxesModal extends Modal {
             .setDesc("Add a special row to style incomplete (unchecked) items.")
             .addToggle((t) => {
                 t.setValue(this.cfg.styleUncheckedTask).onChange((v) => {
-                    const redraw = v != this.cfg.styleUncheckedTask;
+                    const redraw = v !== this.cfg.styleUncheckedTask;
                     this.cfg.styleUncheckedTask = v;
                     if (redraw) {
                         this.showTasks();
@@ -145,18 +145,18 @@ class CreateCheckboxesModal extends Modal {
         if (this.cfg.uncheckedTask) {
             Reflect.deleteProperty(this.cfg.uncheckedTask, "cache");
         }
-        this.cfg.taskSettings.forEach((ts) =>
-            Reflect.deleteProperty(ts, "cache"),
-        );
+        for (const ts of this.cfg.taskSettings) {
+            Reflect.deleteProperty(ts, "cache");
+        }
         // make sure a name is set
         this.snippetor.initCommonConfig(this.cfg);
     }
 
     showTasks(): void {
         this.elements.list.empty();
-        this.cfg.taskSettings.forEach((ts) => {
+        for (const ts of this.cfg.taskSettings) {
             this.resetTaskElements(ts);
-        });
+        }
         if (this.cfg.uncheckedTask) {
             this.resetTaskElements(this.cfg.uncheckedTask);
         }
@@ -173,9 +173,9 @@ class CreateCheckboxesModal extends Modal {
             this.createTaskItem(this.cfg.uncheckedTask, true);
         }
 
-        this.cfg.taskSettings.forEach((ts) => {
+        for (const ts of this.cfg.taskSettings) {
             this.createTaskItem(ts);
-        });
+        }
     }
 
     createHeader(): void {
@@ -221,15 +221,15 @@ class CreateCheckboxesModal extends Modal {
             .setLimits(0, 50, 2)
             .setDynamicTooltip()
             .onChange((v) => {
-                const redraw = v != this.cfg.borderRadius;
+                const redraw = v !== this.cfg.borderRadius;
                 this.cfg.borderRadius = v;
                 if (redraw) {
                     if (this.cfg.styleUncheckedTask) {
                         this.applySettingsToElements(this.cfg.uncheckedTask);
                     }
-                    this.cfg.taskSettings.forEach((ts) => {
+                    for (const ts of this.cfg.taskSettings) {
                         this.applySettingsToElements(ts);
-                    });
+                    }
                 }
             });
         roundness.sliderEl.title = "Checkbox roundness";
@@ -239,7 +239,7 @@ class CreateCheckboxesModal extends Modal {
             .setValue(this.cfg.hideColorPicker)
             .setTooltip("Toggle color picker")
             .onChange((v) => {
-                const redraw = v != this.cfg.hideColorPicker;
+                const redraw = v !== this.cfg.hideColorPicker;
                 this.cfg.hideColorPicker = v;
                 if (redraw) {
                     this.showTasks();
@@ -339,7 +339,7 @@ class CreateCheckboxesModal extends Modal {
                 "snippetor-group decorated",
             );
             const dataTaskLabel = sourceGroup.createEl("label", {
-                text: `- `,
+                text: "- ",
                 cls: "source-mode-label",
                 attr: { for: `task-${i}` },
             });
@@ -448,8 +448,8 @@ class CreateCheckboxesModal extends Modal {
 
         const sizeGroup = settings.createSpan("snippetor-group decorated");
         const sizeLabel = sizeGroup.createEl("label", {
-            text: `size: `,
-            attr: { for: "size-" + i },
+            text: "size: ",
+            attr: { for: `size-${i}` },
         });
         const fontSize = new SliderComponent(sizeGroup)
             .setValue(
@@ -465,11 +465,11 @@ class CreateCheckboxesModal extends Modal {
                 ts.checkbox.format.fontSize = v;
                 this.applySettingsToElements(ts);
             });
-        fontSize.sliderEl.name = "size-" + i;
+        fontSize.sliderEl.name = `size-${i}`;
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
             .setTooltip(
-                "Reset font size to default: " + this.elements.defaultFontSize,
+                `Reset font size to default: ${this.elements.defaultFontSize}`,
             )
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
@@ -562,8 +562,8 @@ class CreateCheckboxesModal extends Modal {
 
         const sizeGroup = settings.createSpan("snippetor-group decorated");
         sizeGroup.createEl("label", {
-            text: `Text size: `,
-            attr: { for: "size-" + i },
+            text: "Text size: ",
+            attr: { for: `size-${i}` },
         });
         const fontSize = new SliderComponent(sizeGroup)
             .setValue(
@@ -579,11 +579,11 @@ class CreateCheckboxesModal extends Modal {
                 ts.li.format.fontSize = v;
                 this.applySettingsToElements(ts);
             });
-        fontSize.sliderEl.name = "size-" + i;
+        fontSize.sliderEl.name = `size-${i}`;
         new ExtraButtonComponent(sizeGroup)
             .setIcon("reset")
             .setTooltip(
-                "Reset font size to default: " + this.elements.defaultFontSize,
+                `Reset font size to default: ${this.elements.defaultFontSize}`,
             )
             .onClick(async () => {
                 fontSize.setValue(this.elements.defaultFontSize);
@@ -838,13 +838,12 @@ class CreateCheckboxesModal extends Modal {
         const checkboxEl = taskSettings.cache.checkboxEl;
 
         // data-line attribute
-        itemEl.setAttribute("data-line", taskSettings.cache.i + "");
-        checkboxEl.setAttribute("data-line", taskSettings.cache.i + "");
+        itemEl.setAttribute("data-line", `${taskSettings.cache.i}`);
+        checkboxEl.setAttribute("data-line", `${taskSettings.cache.i}`);
 
         // data-task attribute
         itemEl.setAttr("data-task", taskSettings.data);
-        itemEl.className =
-            "task-list-item" + (taskSettings.data == " " ? "" : " is-checked");
+        itemEl.className = `task-list-item${taskSettings.data === " " ? "" : " is-checked"}`;
 
         this.setColors(taskSettings);
         this.setCheckboxStyles(taskSettings);
@@ -856,7 +855,7 @@ class CreateCheckboxesModal extends Modal {
 
         let decoration = "none";
         let font = "var(--font-text)";
-        let fontSize = this.elements.defaultFontSize + "px";
+        let fontSize = `${this.elements.defaultFontSize}px`;
         let style = "normal";
         let weight = "500";
 
@@ -872,10 +871,10 @@ class CreateCheckboxesModal extends Modal {
             }
         }
 
-        if (taskSettings.li.format && taskSettings.li.format.fontSize) {
-            fontSize = taskSettings.li.format.fontSize + "px";
+        if (taskSettings.li.format?.fontSize) {
+            fontSize = `${taskSettings.li.format.fontSize}px`;
         }
-        if (taskSettings.li.format && taskSettings.li.format.font) {
+        if (taskSettings.li.format?.font) {
             font = taskSettings.li.format.font;
         }
 
@@ -925,7 +924,7 @@ class CreateCheckboxesModal extends Modal {
         if (this.cfg.borderRadius) {
             li.style.setProperty(
                 "--checkbox-radius",
-                this.cfg.borderRadius + "%",
+                `${this.cfg.borderRadius}%`,
             );
         } else {
             li.style.removeProperty("--checkbox-radius");
@@ -948,35 +947,32 @@ class CreateCheckboxesModal extends Modal {
         let fontSize = this.elements.defaultFontSize;
         const top = taskSettings.checkbox.top ? taskSettings.checkbox.top : 0;
 
-        if (taskSettings.checkbox.format && taskSettings.checkbox.format.font) {
+        if (taskSettings.checkbox.format?.font) {
             font = taskSettings.checkbox.format.font;
         }
-        if (
-            taskSettings.checkbox.format &&
-            taskSettings.checkbox.format.fontSize
-        ) {
+        if (taskSettings.checkbox.format?.fontSize) {
             fontSize = taskSettings.checkbox.format.fontSize;
         }
 
         checkbox.style.setProperty("--snippetor-box-font", font);
         checkbox.style.setProperty(
             "--snippetor-box-font-size",
-            fontSize + "px",
+            `${fontSize}px`,
         );
 
-        checkbox.style.setProperty("--snippetor-box-top", top + "px");
+        checkbox.style.setProperty("--snippetor-box-top", `${top}px`);
 
         if (taskSettings.checkbox.left) {
             checkbox.style.setProperty(
                 "--snippetor-box-left",
-                taskSettings.checkbox.left + "px",
+                `${taskSettings.checkbox.left}px`,
             );
             checkbox.style.setProperty("--snippetor-box-margin-left", "0");
         } else {
             checkbox.style.setProperty("--snippetor-box-left", "50%");
             checkbox.style.setProperty(
                 "--snippetor-box-margin-left",
-                "-" + fontSize / 2 + "px",
+                `-${fontSize / 2}px`,
             );
         }
     }
@@ -996,7 +992,7 @@ class CreateCheckboxesModal extends Modal {
                 "aria-label",
                 "Another task uses the same value",
             );
-            this.cfg.taskSettings.forEach((ts) => {
+            for (const ts of this.cfg.taskSettings) {
                 const e = ts.cache?.dataEl;
                 if (
                     e &&
@@ -1005,7 +1001,7 @@ class CreateCheckboxesModal extends Modal {
                 ) {
                     this.verifyDataValue(e);
                 }
-            });
+            }
         } else {
             const conflict = input.getAttribute("conflict");
             if (input.value === " ") {
@@ -1025,12 +1021,12 @@ class CreateCheckboxesModal extends Modal {
             } else if (conflict) {
                 console.log("verifyDataValue: conflict resolved");
                 input.removeAttribute("conflict");
-                this.cfg.taskSettings.forEach((ts) => {
+                for (const ts of this.cfg.taskSettings) {
                     const e = ts.cache.dataEl;
                     if (e.value === conflict) {
                         this.verifyDataValue(e);
                     }
-                });
+                }
             }
         }
     }

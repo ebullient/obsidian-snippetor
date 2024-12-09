@@ -1,7 +1,12 @@
-import { Workspace, Vault, MetadataCache, FileManager, UserEvent } from "obsidian";
+import {
+    Workspace,
+    Vault,
+    MetadataCache,
+    FileManager,
+    UserEvent,
+} from "obsidian";
 
 export class App {
-
     /** @public */
     workspace: Workspace;
 
@@ -18,5 +23,4 @@ export class App {
      * @public
      */
     lastEvent: UserEvent | null;
-
 }

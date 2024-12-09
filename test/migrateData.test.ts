@@ -9,14 +9,14 @@ import { Snippetor } from "../src/snippetor-Snippetor";
 
 const MANIFEST: PluginManifest = {
     id: "obsidian-snippetor",
-	name: "Snippetor",
+    name: "Snippetor",
     author: "",
     version: "1.0.0",
     minAppVersion: "",
-    description: ""
-}
+    description: "",
+};
 
-jest.mock('obsidian', () => ({
+jest.mock("obsidian", () => ({
     App: jest.fn().mockImplementation(),
     Plugin: jest.fn().mockImplementation(() => {
         return {
@@ -26,9 +26,9 @@ jest.mock('obsidian', () => ({
             //     console.debug(message, ...optionalParams); // tests
             // }
         };
-      }),
+    }),
     PluginSettingTab: jest.fn().mockImplementation(),
-    Modal: jest.fn().mockImplementation()
+    Modal: jest.fn().mockImplementation(),
 }));
 
 jest.mock("../src/templates/COLORED_FOLDER.eta", () => "");

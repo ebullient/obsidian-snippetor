@@ -1,5 +1,9 @@
-import { App, Notice } from "obsidian";
-import {
+import { compare } from "compare-versions";
+import { Eta } from "eta";
+import { type App, Notice } from "obsidian";
+import { generateSlug } from "random-word-slugs";
+import randomColor from "randomcolor";
+import type {
     FolderConfig,
     FolderSnippetConfig,
     OldTaskSettings,
@@ -11,17 +15,16 @@ import {
     DEFAULT_FOLDER_SNIPPET_SETTINGS,
     DEFAULT_TASK_SNIPPET_SETTINGS,
 } from "./snippetor-Defaults";
-import * as Eta from "eta";
 import { COLORED_FOLDERS, SIMPLE_TASK } from "./snippetor-Snippetor-Templates";
-import { generateSlug } from "random-word-slugs";
-import randomColor from "randomcolor";
-import { compare } from "compare-versions";
 
 export class Snippetor {
+    eta: Eta;
+
     constructor(private app: App) {
-        Eta.configure({
-            cache: true, // Make Eta cache templates
-            async: false,
+        this.eta = new Eta({
+            //views: path.join(scriptDir, "templates"),
+            autoTrim: false,
+            cache: true,
         });
     }
 
@@ -53,9 +56,9 @@ export class Snippetor {
             name: generateSlug(2),
             taskSettings: [],
         });
-        this.taskValues.forEach((v) => {
+        for (const v of this.taskValues) {
             result.taskSettings.push(this.createNewTaskCfg(v));
-        });
+        }
         return result;
     }
     createNewFolderSnippetCfg(): Partial<FolderSnippetConfig> {
@@ -111,7 +114,7 @@ export class Snippetor {
     }
 
     generateId(): string {
-        return generateSlug(3) + "-" + randomColor();
+        return `${generateSlug(3)}-${randomColor()}`;
     }
 
     initCommonConfig(cfg: Partial<SnippetConfig>): void {
@@ -132,9 +135,9 @@ export class Snippetor {
     }
 
     initTaskSnippetConfig(cfg: Partial<TaskSnippetConfig>): TaskSnippetConfig {
-        cfg.taskSettings.forEach((ts) => {
+        for (const ts of cfg.taskSettings) {
             this.initTaskSettings(cfg.version, ts);
-        });
+        }
         if (cfg.uncheckedTask) {
             this.initTaskSettings(cfg.version, cfg.uncheckedTask);
         }
@@ -163,33 +166,33 @@ export class Snippetor {
     private convertTaskSettings(ts: Partial<OldTaskSettings>): TaskSettings {
         if (ts.reader) {
             ts.checkbox.readModeData = ts.reader;
-            delete ts.reader;
+            ts.reader = undefined;
         }
 
         if (ts.hideBorder) {
             ts.checkbox.hideBorder = ts.hideBorder;
-            delete ts.hideBorder;
+            ts.hideBorder = undefined;
         }
 
         if (ts.fontSize) {
             this.initialize(ts, "checkbox", "format");
             ts.checkbox.format.fontSize = ts.fontSize;
-            delete ts.fontSize;
+            ts.fontSize = undefined;
         }
 
         if (ts.taskColorLight) {
             ts.checkbox.lightMode.foreground = ts.taskColorLight;
-            delete ts.taskColorLight;
+            ts.taskColorLight = undefined;
         }
         if (ts.taskColorDark) {
             ts.checkbox.darkMode.foreground = ts.taskColorDark;
-            delete ts.taskColorDark;
+            ts.taskColorDark = undefined;
         }
         if (ts.applyTextColor || ts.applyTextBgColor) {
             this.initialize(ts, "li");
             ts.li.syncTaskColor = true;
-            delete ts.applyTextColor;
-            delete ts.applyTextBgColor;
+            ts.applyTextColor = undefined;
+            ts.applyTextBgColor = undefined;
         }
 
         if (ts.bgColorLight) {
@@ -197,14 +200,14 @@ export class Snippetor {
             if (ts.applyTextBgColor) {
                 ts.li.lightMode.background = ts.bgColorLight;
             }
-            delete ts.bgColorLight;
+            ts.bgColorLight = undefined;
         }
         if (ts.bgColorDark) {
             ts.checkbox.darkMode.background = ts.bgColorDark;
             if (ts.applyTextBgColor) {
                 ts.li.darkMode.background = ts.bgColorDark;
             }
-            delete ts.bgColorDark;
+            ts.bgColorDark = undefined;
         }
 
         if (ts.strikethrough) {
@@ -212,7 +215,7 @@ export class Snippetor {
 
             if (ts.strikethrough) {
                 ts.li.format.strikethrough = ts.strikethrough;
-                delete ts.strikethrough;
+                ts.strikethrough = undefined;
             }
         }
 
@@ -224,17 +227,17 @@ export class Snippetor {
             new Notice("Unable to create snippet: Missing file name.");
             return Promise.reject();
         }
-        let snippet;
+        let snippet: string;
         switch (cfg.type) {
             case DEFAULT_TASK_SNIPPET_SETTINGS.type: {
-                snippet = Eta.render(SIMPLE_TASK, {
+                snippet = this.eta.renderString(SIMPLE_TASK, {
                     date: new Date(),
                     cfg,
                 });
                 break;
             }
             case DEFAULT_FOLDER_SNIPPET_SETTINGS.type: {
-                snippet = Eta.render(COLORED_FOLDERS, {
+                snippet = this.eta.renderString(COLORED_FOLDERS, {
                     date: new Date(),
                     cfg,
                 });
@@ -248,12 +251,12 @@ export class Snippetor {
             return Promise.reject();
         }
 
-        const fileName = cfg.type + "-" + cfg.name;
+        const fileName = `${cfg.type}-${cfg.name}`;
         const path = this.app.customCss.getSnippetPath(fileName);
         const exists = await this.app.vault.adapter.exists(path);
         console.log("Create CSS file %s for snippet %o", fileName, cfg);
 
-        let update;
+        let update: Promise<void>;
         if (exists) {
             update = this.app.vault.adapter.write(path, snippet as string).then(
                 () => {
@@ -287,7 +290,7 @@ export class Snippetor {
     }
 
     async deleteSnippet(cfg: SnippetConfig): Promise<void> {
-        const fileName = cfg.type + "-" + cfg.name;
+        const fileName = `${cfg.type}-${cfg.name}`;
         const path = this.app.customCss.getSnippetPath(fileName);
         const exists = await this.app.vault.adapter.exists(path);
 
@@ -308,15 +311,14 @@ export class Snippetor {
         return Promise.resolve();
     }
 
-    /* eslint-disable */
+    // biome-ignore lint/suspicious/noExplicitAny: nested object initialization
     initialize(root: any, ...args: string[]): void {
         let o = root;
-        args.forEach((arg) => {
+        for (const arg of args) {
             if (o[arg] === undefined) {
                 o[arg] = {};
             }
             o = o[arg];
-        });
+        }
     }
-    /* eslint-enable */
 }

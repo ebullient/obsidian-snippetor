@@ -52,17 +52,17 @@ function defineColors(i, ts) {
 %>
 /* '<%~ ts.data %>' for task ('- [<%~ ts.data %>]') */
 .theme-dark {
-    --<%~ root %>-checkbox-<%= i %>: <% tR += getForeground(ts.checkbox, false) %>;
-    --<%~ root %>-checkbox-bg-<%= i %>: <% tR += getBackground(ts.checkbox, false) %>;
-    --<%~ root %>-li-<%= i %>: <% tR += getForeground(li, false) %>;
-    --<%~ root %>-li-bg-<%= i %>: <% tR += getBackground(li, false) %>;
+    --<%~ root %>-checkbox-<%= i %>: <% getForeground(ts.checkbox, false) %>;
+    --<%~ root %>-checkbox-bg-<%= i %>: <% getBackground(ts.checkbox, false) %>;
+    --<%~ root %>-li-<%= i %>: <% getForeground(li, false) %>;
+    --<%~ root %>-li-bg-<%= i %>: <% getBackground(li, false) %>;
 }
 .theme-dark .print:not(.published-container),
 .theme-light {
-    --<%~ root %>-checkbox-<%= i %>: <% tR += getForeground(ts.checkbox, true) %>;
-    --<%~ root %>-checkbox-bg-<%= i %>: <% tR += getBackground(ts.checkbox, true) %>;
-    --<%~ root %>-li-<%= i %>: <% tR += getForeground(li, true) %>;
-    --<%~ root %>-li-bg-<%= i %>: <% tR += getBackground(li, true) %>;
+    --<%~ root %>-checkbox-<%= i %>: <% getForeground(ts.checkbox, true) %>;
+    --<%~ root %>-checkbox-bg-<%= i %>: <% getBackground(ts.checkbox, true) %>;
+    --<%~ root %>-li-<%= i %>: <% getForeground(li, true) %>;
+    --<%~ root %>-li-bg-<%= i %>: <% getBackground(li, true) %>;
 }
 <%
 } // end defineColors
@@ -85,7 +85,7 @@ li[data-task="<%~ ts.data %>"] > p,
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"] {
   --checkbox-color: var(--<%~ root %>-checkbox-<%= i %>);
   --checkbox-marker-color: transparent;
-  --checklist-done-decoration: <% tR += getTextDecoration(ts.checkbox.format) %>;
+  --checklist-done-decoration: <% getTextDecoration(ts.checkbox.format) %>;
   <% if (ts.borderRadius) { %>
   --checkbox-radius: <%~ ts.borderRadius %>%;
   <% } %>
@@ -131,7 +131,7 @@ li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked::after {
     margin-left: -<%~ getFontSize(ts.checkbox.format) / 2 %>px;
 <% } %>
     color: var(--checkbox-color);
-    content: '<% tR += ts.checkbox.readModeData ? ts.checkbox.readModeData : ts.data %>';
+    content: '<% ts.checkbox.readModeData ? ts.checkbox.readModeData : ts.data %>';
 }
 <%
 }

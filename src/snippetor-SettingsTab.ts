@@ -1,17 +1,17 @@
 import {
-    App,
-    ButtonComponent,
-    ExtraButtonComponent,
+    type App,
+    type ButtonComponent,
+    type ExtraButtonComponent,
     Notice,
     PluginSettingTab,
     Setting,
 } from "obsidian";
-import {
+import type {
     FolderSnippetConfig,
     SnippetConfig,
     TaskSnippetConfig,
 } from "./@types";
-import SnippetorPlugin from "./main";
+import type SnippetorPlugin from "./main";
 import { openCreateCheckboxModal } from "./snippetor-CreateCheckboxesModal";
 import { openCreateFolderModal } from "./snippetor-CreateFoldersModal";
 import {
@@ -107,8 +107,8 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                         .setTooltip("Copy this Snippet")
                         .onClick(async () => {
                             const copy = JSON.parse(JSON.stringify(snippet));
-                            delete copy.id;
-                            delete copy.name;
+                            copy.id = undefined;
+                            copy.name = undefined;
                             new Notice(`Copied snippet '${snippet.name}'`);
                             await this.openModal(snippet.type, copy);
                             this.listExistingSnippets();

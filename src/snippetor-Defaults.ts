@@ -50,6 +50,6 @@ export const DEFAULT_FOLDER_SNIPPET_SETTINGS: Partial<FolderSnippetConfig> = {
 };
 
 export enum COLOR {
-    FOREGROUND,
-    BACKGROUND,
+    FOREGROUND = "FG",
+    BACKGROUND = "BG",
 }

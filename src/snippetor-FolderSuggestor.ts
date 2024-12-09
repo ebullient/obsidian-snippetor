@@ -1,14 +1,14 @@
+import { type Instance as PopperInstance, createPopper } from "@popperjs/core";
 import {
-    App,
-    FuzzyMatch,
+    type App,
+    type CachedMetadata,
+    type FuzzyMatch,
     FuzzySuggestModal,
     Scope,
-    SuggestModal,
+    type SuggestModal,
     TFolder,
-    TextComponent,
-    CachedMetadata,
+    type TextComponent,
 } from "obsidian";
-import { createPopper, Instance as PopperInstance } from "@popperjs/core";
 
 declare module "obsidian" {
     interface App {
@@ -91,11 +91,12 @@ class Suggester<T> {
         this.containerEl.empty();
         const els: HTMLDivElement[] = [];
 
-        items.forEach((item) => {
+        for (const item of items) {
             const suggestionEl = this.containerEl.createDiv("suggestion-item");
             this.owner.renderSuggestion(item, suggestionEl);
             els.push(suggestionEl);
-        });
+        }
+
         this.items = items;
         this.suggestions = els;
         this.setSelectedItem(0, false);
@@ -243,9 +244,10 @@ export class FolderSuggestionModal extends SuggestionModal<TFolder> {
         this.inputEl.addEventListener("input", () => this.getFolder());
     }
     getFolder(): void {
-        const v = this.inputEl.value,
-            folder = this.app.vault.getAbstractFileByPath(v);
-        if (folder == this.folder) return;
+        const v = this.inputEl.value;
+        const folder = this.app.vault.getAbstractFileByPath(v);
+
+        if (folder === this.folder) return;
         if (!(folder instanceof TFolder)) return;
         this.folder = folder;
 
