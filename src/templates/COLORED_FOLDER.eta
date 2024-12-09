@@ -29,17 +29,17 @@ function defineColors(i, folder) {
 %>
 /* for folder <%~ folder.target %> */
 .theme-light {
-    --<%~ root %>-folder-text-<%= i %>: <% tR += getForeground(folder, true) %>;
-    --<%~ root %>-folder-<%= i %>: <% tR += getBackground(folder, true) %>;
-    --<%~ root %>-folder-alpha2-<%= i %>: <% tR += getBackground(folder, true) %>04;
-    --<%~ root %>-folder-alpha4-<%= i %>: <% tR += getBackground(folder, true) %>06;
+    --<%~ root %>-folder-text-<%= i %>: <% getForeground(folder, true) %>;
+    --<%~ root %>-folder-<%= i %>: <% getBackground(folder, true) %>;
+    --<%~ root %>-folder-alpha2-<%= i %>: <% getBackground(folder, true) %>04;
+    --<%~ root %>-folder-alpha4-<%= i %>: <% getBackground(folder, true) %>06;
     --<%~ root %>-folder-radius: 5px;
 }
 .theme-dark {
-    --<%~ root %>-folder-text-<%= i %>: <% tR += getForeground(folder, false) %>;
-    --<%~ root %>-folder-<%= i %>: <% tR += getBackground(folder, false) %>;
-    --<%~ root %>-folder-alpha2-<%= i %>: <% tR += getBackground(folder, false) %>CC;
-    --<%~ root %>-folder-alpha4-<%= i %>: <% tR += getBackground(folder, false) %>EE;
+    --<%~ root %>-folder-text-<%= i %>: <% getForeground(folder, false) %>;
+    --<%~ root %>-folder-<%= i %>: <% getBackground(folder, false) %>;
+    --<%~ root %>-folder-alpha2-<%= i %>: <% getBackground(folder, false) %>CC;
+    --<%~ root %>-folder-alpha4-<%= i %>: <% getBackground(folder, false) %>EE;
     --<%~ root %>-folder-radius: 5px;
 }
 <%

@@ -1,5 +1,5 @@
-import { addIcon, Plugin } from "obsidian";
-import { SnippetConfig, SnippetorSettings } from "./@types";
+import { Plugin, addIcon } from "obsidian";
+import type { SnippetConfig, SnippetorSettings } from "./@types";
 import {
     DEFAULT_SETTINGS,
     LOCK,
@@ -8,7 +8,7 @@ import {
     UNLOCK_ICON,
 } from "./snippetor-Defaults";
 import { SnippetorSettingsTab } from "./snippetor-SettingsTab";
-import { Snippetor as Snippetor } from "./snippetor-Snippetor";
+import { Snippetor } from "./snippetor-Snippetor";
 
 export class SnippetorPlugin extends Plugin {
     settings: SnippetorSettings;
@@ -42,10 +42,11 @@ export class SnippetorPlugin extends Plugin {
     async removeSnippet(snippetCfg: SnippetConfig): Promise<void> {
         console.debug("Removing %o [%o]", snippetCfg.name, snippetCfg.id);
 
-        Object.entries(this.settings.snippets)
-            .filter(([k, v]) => v.id === snippetCfg.id)
-            .map(([k, v]) => k)
-            .forEach((k) => Reflect.deleteProperty(this.settings.snippets, k));
+        for (const [k, v] of Object.entries(this.settings.snippets)) {
+            if (v.id === snippetCfg.id) {
+                Reflect.deleteProperty(this.settings.snippets, k);
+            }
+        }
 
         return this.saveSettings().then(() =>
             // delete file, too

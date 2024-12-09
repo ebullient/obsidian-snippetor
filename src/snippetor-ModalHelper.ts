@@ -4,9 +4,9 @@ import {
     Setting,
     ToggleComponent,
 } from "obsidian";
-import { ColoredElement, FormattedElement, SnippetConfig } from "./@types";
+import type { ColoredElement, FormattedElement, SnippetConfig } from "./@types";
 import { COLOR } from "./snippetor-Defaults";
-import { Snippetor } from "./snippetor-Snippetor";
+import type { Snippetor } from "./snippetor-Snippetor";
 
 /**
  * Helper for colors and creating modal dialog elements.
@@ -152,16 +152,16 @@ export class ModalHelper {
     clearModeColor(element: ColoredElement, color?: COLOR): void {
         if (this.isLightMode) {
             if (color === COLOR.BACKGROUND) {
-                delete element.lightMode.background;
+                element.lightMode.background = undefined;
             } else {
-                delete element.lightMode.foreground;
+                element.lightMode.foreground = undefined;
             }
         }
 
         if (color === COLOR.BACKGROUND) {
-            delete element.darkMode.background;
+            element.darkMode.background = undefined;
         } else {
-            delete element.darkMode.foreground;
+            element.darkMode.foreground = undefined;
         }
     }
 
@@ -311,7 +311,7 @@ export class ModalHelper {
                 const enabled = this.toggleSetIsActive(result.buttonEl);
                 update(enabled);
             });
-        if (element.format && element.format.bold) {
+        if (element.format?.bold) {
             result.buttonEl.addClass("is-active");
         } else {
             result.buttonEl.removeClass("is-active");
@@ -331,7 +331,7 @@ export class ModalHelper {
                 const enabled = this.toggleSetIsActive(result.buttonEl);
                 update(enabled);
             });
-        if (element.format && element.format.italics) {
+        if (element.format?.italics) {
             result.buttonEl.addClass("is-active");
         } else {
             result.buttonEl.removeClass("is-active");
@@ -352,7 +352,7 @@ export class ModalHelper {
                 const enabled = this.toggleSetIsActive(result.buttonEl);
                 update(enabled);
             });
-        if (element.format && element.format.strikethrough) {
+        if (element.format?.strikethrough) {
             result.buttonEl.addClass("is-active");
         } else {
             result.buttonEl.removeClass("is-active");
@@ -435,7 +435,7 @@ export class ModalHelper {
             )
             .addTextArea((t) =>
                 t.setValue(cfg.cssFontImport).onChange((v) => {
-                    const redraw = v != cfg.cssFontImport;
+                    const redraw = v !== cfg.cssFontImport;
                     cfg.cssFontImport = v;
                     if (redraw) {
                         style.replaceChildren(

@@ -1,7 +1,7 @@
-import { App, Modal } from "obsidian";
-import { SnippetConfig } from "./@types";
-import { ModalHelper } from "./snippetor-ModalHelper";
-import { Snippetor } from "./snippetor-Snippetor";
+import { type App, Modal } from "obsidian";
+import type { SnippetConfig } from "./@types";
+import type { ModalHelper } from "./snippetor-ModalHelper";
+import type { Snippetor } from "./snippetor-Snippetor";
 
 // return a promise with revised config
 export function openCreateTemplateModal(

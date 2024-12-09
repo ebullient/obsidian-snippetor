@@ -1,23 +1,23 @@
 import {
-    App,
-    ButtonComponent,
+    type App,
+    type ButtonComponent,
     ExtraButtonComponent,
     Modal,
-    setIcon,
     Setting,
     SliderComponent,
-    TextComponent,
     TFolder,
+    TextComponent,
+    setIcon,
 } from "obsidian";
 import type {
     ColoredElement,
-    FolderSnippetConfig,
     FolderConfig,
+    FolderSnippetConfig,
 } from "./@types";
-import { Snippetor } from "./snippetor-Snippetor";
-import { ModalHelper } from "./snippetor-ModalHelper";
 import { COLOR } from "./snippetor-Defaults";
 import { FolderSuggestionModal } from "./snippetor-FolderSuggestor";
+import { ModalHelper } from "./snippetor-ModalHelper";
+import type { Snippetor } from "./snippetor-Snippetor";
 
 export function openCreateFolderModal(
     app: App,
@@ -206,10 +206,10 @@ class CreateFolderModal extends Modal {
         if (this.cfg.default) {
             Reflect.deleteProperty(this.cfg.default, "cache");
         }
-        this.cfg.folders.forEach((ts) => Reflect.deleteProperty(ts, "cache"));
-        this.cfg.folders = this.cfg.folders.filter(
-            (f) => f.target && f.target.length,
-        );
+        for (const ts of this.cfg.folders) {
+            Reflect.deleteProperty(ts, "cache");
+        }
+        this.cfg.folders = this.cfg.folders.filter((f) => f.target?.length);
         // make sure a name is set
         this.snippetor.initCommonConfig(this.cfg);
     }
@@ -236,7 +236,7 @@ class CreateFolderModal extends Modal {
             .setLimits(0, 25, 1)
             .setDynamicTooltip()
             .onChange((v) => {
-                const redraw = v != this.cfg.borderRadius;
+                const redraw = v !== this.cfg.borderRadius;
                 this.cfg.borderRadius = v;
                 if (redraw) {
                     this.showFolders(folderEl);
@@ -357,7 +357,7 @@ class CreateFolderModal extends Modal {
                 .children?.filter(
                     (f) =>
                         f instanceof TFolder &&
-                        !this.cfg.folders.find((t) => t.target == f.path),
+                        !this.cfg.folders.find((t) => t.target === f.path),
                 ) as TFolder[];
 
             const folderNameGroup = settings.createSpan(
@@ -524,12 +524,12 @@ class CreateFolderModal extends Modal {
         const folderEl = folderSettings.cache.folderEl;
 
         let font = "var(--font-text)";
-        let fontSize = this.defaultFontSize + "px";
+        let fontSize = `${this.defaultFontSize}px`;
         if (folderSettings.font) {
             font = folderSettings.font;
         }
         if (folderSettings.fontSize) {
-            fontSize = folderSettings.fontSize + "px";
+            fontSize = `${folderSettings.fontSize}px`;
         }
 
         folderEl.style.setProperty(
@@ -545,7 +545,7 @@ class CreateFolderModal extends Modal {
         folderEl.style.setProperty("--snippetor-font-size", fontSize);
 
         folderSettings.cache.titleEl.removeAttribute("data");
-        const data = folderSettings.content ? folderSettings.content + " " : "";
+        const data = folderSettings.content ? `${folderSettings.content} ` : "";
         folderSettings.cache.titleEl.setAttribute("data", data);
     }
 
