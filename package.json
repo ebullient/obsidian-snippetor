@@ -30,7 +30,7 @@
     "@popperjs/core": "^2.11.2",
     "@types/chroma-js": "^3.1.1",
     "@types/jest": "^29.5.12",
-    "@types/node": "^22.14.0",
+    "@types/node": "^22.14.1",
     "@types/randomcolor": "^0.5.9",
     "auto-changelog": "^2.5.0",
     "builtin-modules": "^5.0.0",
