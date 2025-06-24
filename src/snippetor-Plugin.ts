@@ -1,4 +1,4 @@
-import { Plugin, addIcon } from "obsidian";
+import { addIcon, Plugin } from "obsidian";
 import type { SnippetConfig, SnippetorSettings } from "./@types";
 import {
     DEFAULT_SETTINGS,

@@ -5,9 +5,9 @@ import {
     Modal,
     Setting,
     SliderComponent,
-    TFolder,
-    TextComponent,
     setIcon,
+    TextComponent,
+    TFolder,
 } from "obsidian";
 import type {
     ColoredElement,

@@ -1,4 +1,4 @@
-import { type Instance as PopperInstance, createPopper } from "@popperjs/core";
+import { createPopper, type Instance as PopperInstance } from "@popperjs/core";
 import {
     type App,
     type CachedMetadata,
@@ -6,8 +6,8 @@ import {
     FuzzySuggestModal,
     Scope,
     type SuggestModal,
-    TFolder,
     type TextComponent,
+    TFolder,
 } from "obsidian";
 
 declare module "obsidian" {
@@ -79,7 +79,7 @@ class Suggester<T> {
         this.useSelectedItem(event);
     }
 
-    onSuggestionMouseover(event: MouseEvent, el: HTMLDivElement): void {
+    onSuggestionMouseover(_event: MouseEvent, el: HTMLDivElement): void {
         if (!this.suggestions || !this.suggestions.length) return;
         const item = this.suggestions.indexOf(el);
         this.setSelectedItem(item, false);
@@ -282,7 +282,7 @@ export class FolderSuggestionModal extends SuggestionModal<TFolder> {
         }
 
         const pathLength = item.path.length - item.name.length;
-        const matchElements = matches.matches.map((m) => {
+        const matchElements = matches.matches.map((_m) => {
             return createSpan("suggestion-highlight");
         });
         for (let i = pathLength; i < item.path.length; i++) {

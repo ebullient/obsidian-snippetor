@@ -262,7 +262,7 @@ class CreateCheckboxesModal extends Modal {
         reset.extraSettingsEl.addClass("settings-reset");
     }
 
-    createTaskItem(taskSettings: TaskSettings, unchecked?: boolean): void {
+    createTaskItem(taskSettings: TaskSettings, _unchecked?: boolean): void {
         const itemEl = this.elements.list.createEl("li");
         const textEl = itemEl.createSpan("snippetor-preview");
         const checkboxEl = textEl.createEl("input", {
