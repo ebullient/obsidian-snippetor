@@ -37,7 +37,7 @@
     "dotenv": "^17.2.0",
     "esbuild": "0.25.5",
     "esbuild-sass-plugin": "^3.3.1",
-    "jest": "^30.0.2",
+    "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.2",
     "obsidian": "^1.8.7",
     "ts-jest": "^29.4.0",
