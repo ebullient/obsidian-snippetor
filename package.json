@@ -42,7 +42,7 @@
     "obsidian": "^1.10.2",
     "ts-jest": "^29.4.1",
     "tslib": "^2.8.1",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   },
   "dependencies": {
     "compare-versions": "^6.1.1",
