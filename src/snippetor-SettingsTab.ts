@@ -26,6 +26,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
     constructor(app: App, plugin: SnippetorPlugin) {
         super(app, plugin);
         this.plugin = plugin;
+        this.icon = "stamp";
     }
 
     async display(): Promise<void> {
