@@ -1,6 +1,6 @@
 {
   "name": "obsidian-snippetor",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Generate and tweak common snippets",
   "main": "main.js",
   "scripts": {
@@ -59,8 +59,8 @@
     "commitLimit": false,
     "ignoreCommitPattern": "(🔖|🔨|🧹|changelog|release|Update README).*",
     "replaceText": {
-        "([;.,] [rR]esolves) #\\d+\\.?\\s*$": "$1",
-        "([;.,] [Ff]ixes) #\\d+\\.?\\s*$": "$1"
+      "([;.,] [rR]esolves) #\\d+\\.?\\s*$": "$1",
+      "([;.,] [Ff]ixes) #\\d+\\.?\\s*$": "$1"
     }
   }
 }
