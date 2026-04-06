@@ -52,7 +52,7 @@
   },
   "overrides": {
     "glob": "13.0.6",
-    "minimatch": "10.2.2"
+    "minimatch": "10.2.3"
   },
   "auto-changelog": {
     "backfillLimit": false,
