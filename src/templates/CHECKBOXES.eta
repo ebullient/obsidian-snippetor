@@ -10,11 +10,11 @@ if (it.cfg.cssFontImport) { %>
 <% }
 function getForeground(e, light) {
     value = light ? e.lightMode.foreground : e.darkMode.foreground;
-    return value ? value : '"inherit"'
+    return value ? value : 'inherit'
 }
 function getBackground(e, light) {
     value = light ? e.lightMode.background : e.darkMode.background;
-    return value ? value : '"transparent"'
+    return value ? value : 'transparent'
 }
 function getTextDecoration(format) {
     if ( format && format.strikethrough ) {
@@ -52,21 +52,22 @@ function defineColors(i, ts) {
 %>
 /* '<%~ ts.data %>' for task ('- [<%~ ts.data %>]') */
 .theme-dark {
-    --<%~ root %>-checkbox-<%= i %>: <% getForeground(ts.checkbox, false) %>;
-    --<%~ root %>-checkbox-bg-<%= i %>: <% getBackground(ts.checkbox, false) %>;
-    --<%~ root %>-li-<%= i %>: <% getForeground(li, false) %>;
-    --<%~ root %>-li-bg-<%= i %>: <% getBackground(li, false) %>;
+    --<%~ root %>-checkbox-<%= i %>: <%= getForeground(ts.checkbox, false) %>;
+    --<%~ root %>-checkbox-bg-<%= i %>: <%= getBackground(ts.checkbox, false) %>;
+    --<%~ root %>-li-<%= i %>: <%= getForeground(li, false) %>;
+    --<%~ root %>-li-bg-<%= i %>: <%= getBackground(li, false) %>;
 }
 .theme-dark .print:not(.published-container),
 .theme-light {
-    --<%~ root %>-checkbox-<%= i %>: <% getForeground(ts.checkbox, true) %>;
-    --<%~ root %>-checkbox-bg-<%= i %>: <% getBackground(ts.checkbox, true) %>;
-    --<%~ root %>-li-<%= i %>: <% getForeground(li, true) %>;
-    --<%~ root %>-li-bg-<%= i %>: <% getBackground(li, true) %>;
+    --<%~ root %>-checkbox-<%= i %>: <%= getForeground(ts.checkbox, true) %>;
+    --<%~ root %>-checkbox-bg-<%= i %>: <%= getBackground(ts.checkbox, true) %>;
+    --<%~ root %>-li-<%= i %>: <%= getForeground(li, true) %>;
+    --<%~ root %>-li-bg-<%= i %>: <%= getBackground(li, true) %>;
 }
 <%
 } // end defineColors
-function customTask(i, ts) {
+
+function taskListItem(i, ts) {
 %>
 div[data-task="<%~ ts.data %>"],
 li[data-task="<%~ ts.data %>"],
@@ -79,13 +80,18 @@ li[data-task="<%~ ts.data %>"] > p {
   font-size: <%~ getFontSize(ts.li.format) %>px;
   font-family: <%~ getFont(ts.li.format, "inherit") %>;
 }
+<%
+} // end taskListItem
+
+function checkboxVars(i, ts) {
+%>
 div[data-task="<%~ ts.data %>"] > label.task-list-label,
 li[data-task="<%~ ts.data %>"],
 li[data-task="<%~ ts.data %>"] > p,
 .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="<%~ ts.data %>"] {
   --checkbox-color: var(--<%~ root %>-checkbox-<%= i %>);
   --checkbox-marker-color: transparent;
-  --checklist-done-decoration: <% getTextDecoration(ts.checkbox.format) %>;
+  --checklist-done-decoration: <%= getTextDecoration(ts.checkbox.format) %>;
   <% if (ts.borderRadius) { %>
   --checkbox-radius: <%~ ts.borderRadius %>%;
   <% } %>
@@ -93,6 +99,11 @@ li[data-task="<%~ ts.data %>"] > p,
   --checkbox-border-color: var(--<%~ root %>-checkbox-<%= i %>);
   <% } %>
 }
+<%
+} // end checkboxVars
+
+function checkboxChecked(i, ts) {
+%>
 input[type=checkbox][data-task="<%~ ts.data %>"]:checked,
 li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked,
 li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked {
@@ -105,17 +116,19 @@ li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked {
   border: 0px;
   <% } %>
 }
+<%
+} // end checkboxChecked
+
+function checkboxChar(i, ts) {
+%>
 input[type=checkbox][data-task="<%~ ts.data %>"]:checked::after,
 li[data-task="<%~ ts.data %>"] > input[type=checkbox]:checked::after,
 li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked::after {
-    display: block;
     transform: none;
     -webkit-mask-image: none;
     -webkit-mask-size: unset;
     -webkit-mask-position: unset;
     background: unset;
-    width: auto;
-    height: auto;
     position: absolute;
     text-align: center;
     font-weight: 500;
@@ -135,10 +148,18 @@ li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked::after {
     margin-left: -<%~ getFontSize(ts.checkbox.format) / 2 %>px;
 <% } %>
     color: var(--checkbox-color);
-    content: '<% ts.checkbox.readModeData ? ts.checkbox.readModeData : ts.data %>';
+    content: '<%~ ts.checkbox.readModeData ? ts.checkbox.readModeData : ts.data %>';
 }
 <%
-}
+} // end checkboxChar
+
+function customTask(i, ts) {
+    taskListItem(i, ts);
+    checkboxVars(i, ts);
+    checkboxChecked(i, ts);
+    checkboxChar(i, ts);
+} // end customTask
+
 // UNCHECKED TASKS ---------
 if (it.cfg.styleUncheckedTask && it.cfg.uncheckedTask) {
     const ts = it.cfg.uncheckedTask;
@@ -152,5 +173,5 @@ for (let i = 0; i < list.length; i++) {
     let ts = list[i];
     defineColors(i, ts);
     customTask(i, ts);
-} // end if unchecked
+}
 %>
