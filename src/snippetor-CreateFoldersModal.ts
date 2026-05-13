@@ -50,7 +50,7 @@ export function openCreateFolderModal(
 
 class CreateFolderModal extends Modal {
     cfg: FolderSnippetConfig;
-    original: FolderSnippetConfig[];
+    original: FolderSnippetConfig;
     id: number;
     helper: ModalHelper;
     snippetor: Snippetor;
@@ -73,7 +73,9 @@ class CreateFolderModal extends Modal {
         );
 
         // save snapshot of settings
-        this.original = JSON.parse(JSON.stringify(this.cfg));
+        this.original = JSON.parse(
+            JSON.stringify(this.cfg),
+        ) as FolderSnippetConfig;
         this.id = 0;
     }
 
@@ -251,7 +253,9 @@ class CreateFolderModal extends Modal {
             .setIcon("reset")
             .setTooltip("Reset to previously saved (or generated) values")
             .onClick(() => {
-                this.cfg = JSON.parse(JSON.stringify(this.original)); // reset
+                this.cfg = JSON.parse(
+                    JSON.stringify(this.original),
+                ) as FolderSnippetConfig; // reset
                 this.showFolders(folderEl);
             });
         reset.extraSettingsEl.addClass("no-padding");

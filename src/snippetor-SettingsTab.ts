@@ -119,9 +119,11 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                         .setIcon("duplicate-glyph")
                         .setTooltip("Copy this snippet")
                         .onClick(async () => {
-                            const copy = JSON.parse(JSON.stringify(snippet));
-                            copy.id = undefined;
-                            copy.name = undefined;
+                            const copy = JSON.parse(
+                                JSON.stringify(snippet),
+                            ) as SnippetConfig;
+                            Reflect.deleteProperty(copy, "id");
+                            Reflect.deleteProperty(copy, "name");
                             new Notice(`Copied snippet '${snippet.name}'`);
                             await this.openModal(snippet.type, copy);
                             this.listExistingSnippets();

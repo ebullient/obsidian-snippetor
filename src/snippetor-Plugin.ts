@@ -29,7 +29,8 @@ export class SnippetorPlugin extends Plugin {
     async loadSettings(): Promise<void> {
         if (!this.settings) {
             console.debug("Snippetor: loading settings");
-            const options = await this.loadData();
+            const options =
+                (await this.loadData()) as Partial<SnippetorSettings>;
             this.settings = Object.assign({}, DEFAULT_SETTINGS, options);
             this.snippetor.setDebug(() => this.settings.debug);
         }

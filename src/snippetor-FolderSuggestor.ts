@@ -35,12 +35,14 @@ class Suggester<T> {
         containerEl.on(
             "click",
             ".suggestion-item",
-            this.onSuggestionClick.bind(this),
+            (ev: MouseEvent, target: HTMLElement) =>
+                this.onSuggestionClick(ev, target as HTMLDivElement),
         );
         containerEl.on(
             "mousemove",
             ".suggestion-item",
-            this.onSuggestionMouseover.bind(this),
+            (ev: MouseEvent, target: HTMLElement) =>
+                this.onSuggestionMouseover(ev, target as HTMLDivElement),
         );
 
         scope.register([], "ArrowUp", () => {
@@ -149,11 +151,14 @@ export abstract class SuggestionModal<T> extends FuzzySuggestModal<T> {
 
         this.suggester = new Suggester(this, this.contentEl, this.scope);
 
-        this.scope.register([], "Escape", this.onEscape.bind(this));
+        this.scope.register([], "Escape", () => {
+            this.onEscape();
+            return false;
+        });
 
-        this.inputEl.addEventListener("input", this.onInputChanged.bind(this));
-        this.inputEl.addEventListener("focus", this.onFocus.bind(this));
-        this.inputEl.addEventListener("blur", this.close.bind(this));
+        this.inputEl.addEventListener("input", () => this.onInputChanged());
+        this.inputEl.addEventListener("focus", () => this.onFocus());
+        this.inputEl.addEventListener("blur", () => this.close());
         this.suggestEl.on(
             "mousedown",
             ".suggestion-container",

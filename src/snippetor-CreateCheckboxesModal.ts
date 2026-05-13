@@ -45,7 +45,7 @@ export function openCreateCheckboxModal(
 
 class CreateCheckboxesModal extends Modal {
     cfg: TaskSnippetConfig;
-    origTaskSettings: TaskSettings;
+    origTaskSettings: TaskSettings[];
     id: number;
     elements: ConstructedElements;
     helper: ModalHelper;
@@ -70,7 +70,7 @@ class CreateCheckboxesModal extends Modal {
         // save snapshot of task settings
         this.origTaskSettings = JSON.parse(
             JSON.stringify(this.cfg.taskSettings),
-        );
+        ) as TaskSettings[];
 
         this.elements = {};
         this.id = 0;
@@ -256,7 +256,7 @@ class CreateCheckboxesModal extends Modal {
             .onClick(() => {
                 this.cfg.taskSettings = JSON.parse(
                     JSON.stringify(this.origTaskSettings),
-                ); // reset
+                ) as TaskSettings[]; // reset
                 this.showTasks();
             });
         reset.extraSettingsEl.addClass("no-padding");

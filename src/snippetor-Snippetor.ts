@@ -269,7 +269,7 @@ export class Snippetor {
 
         let update: Promise<void>;
         if (exists) {
-            update = this.app.vault.adapter.write(path, snippet as string).then(
+            update = this.app.vault.adapter.write(path, snippet).then(
                 () => {
                     new Notice(`Updated ${fileName}`);
                 },
@@ -281,7 +281,7 @@ export class Snippetor {
                 },
             );
         } else {
-            update = this.app.vault.create(path, snippet as string).then(
+            update = this.app.vault.create(path, snippet).then(
                 () => {
                     new Notice(`Created ${fileName}`);
                 },
@@ -322,14 +322,13 @@ export class Snippetor {
         return Promise.resolve();
     }
 
-    // biome-ignore lint/suspicious/noExplicitAny: nested object initialization
-    initialize(root: any, ...args: string[]): void {
+    initialize(root: Record<string, unknown>, ...args: string[]): void {
         let o = root;
         for (const arg of args) {
             if (o[arg] === undefined) {
                 o[arg] = {};
             }
-            o = o[arg];
+            o = o[arg] as Record<string, unknown>;
         }
     }
 }
