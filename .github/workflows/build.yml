@@ -1,5 +1,7 @@
-name: Build and Test Obsidian Plugin
+name: CI Test
+
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
     paths:
@@ -8,7 +10,6 @@ on:
       - '**.scss'
       - '**.css'
   pull_request:
-    branches: [ main ]
     paths:
       - '**.ts'
       - '**.json'
@@ -19,6 +20,7 @@ permissions: read-all
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
@@ -27,12 +29,12 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
       with:
-        node-version: '20'
+        node-version: '24'
         cache: 'npm'
 
     - name: Build and Test
       id: build
       run: |
-        npm install
+        npm ci
         npm run build
         npm run test
