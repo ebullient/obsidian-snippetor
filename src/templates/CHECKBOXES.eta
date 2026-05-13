@@ -111,7 +111,11 @@ li[data-task="<%~ ts.data %>"] > p > input[type=checkbox]:checked::after {
     display: block;
     transform: none;
     -webkit-mask-image: none;
+    -webkit-mask-size: unset;
+    -webkit-mask-position: unset;
     background: unset;
+    width: auto;
+    height: auto;
     position: absolute;
     text-align: center;
     font-weight: 500;
