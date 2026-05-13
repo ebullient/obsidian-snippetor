@@ -17,12 +17,16 @@ export const DEFAULT_SETTINGS: SnippetorSettings = {
     debug: false,
 };
 
-export const DEFAULT_TASK_SNIPPET_SETTINGS: Partial<TaskSnippetConfig> = {
+export const DEFAULT_TASK_SNIPPET_SETTINGS: Partial<TaskSnippetConfig> & {
+    type: string;
+} = {
     type: "simple-task",
     taskSettings: [],
 };
 
-export const DEFAULT_FOLDER_SNIPPET_SETTINGS: Partial<FolderSnippetConfig> = {
+export const DEFAULT_FOLDER_SNIPPET_SETTINGS: Partial<FolderSnippetConfig> & {
+    type: string;
+} = {
     type: "folder",
     folders: [],
     borderRadius: 6,

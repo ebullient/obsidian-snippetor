@@ -19,6 +19,7 @@ export class SnippetorPlugin extends Plugin {
         console.debug("loaded Snippetor %s", this.manifest.version);
         addIcon(LOCK, LOCK_ICON);
         addIcon(UNLOCK, UNLOCK_ICON);
+        await this.loadSettings();
         this.addSettingTab(new SnippetorSettingsTab(this.app, this));
     }
 
@@ -39,6 +40,7 @@ export class SnippetorPlugin extends Plugin {
     async saveSettings(): Promise<void> {
         console.debug("Snippetor: saving settings");
         await this.saveData(this.settings);
+        this.snippetor.setDebug(() => this.settings.debug);
     }
 
     async removeSnippet(snippetCfg: SnippetConfig): Promise<void> {
