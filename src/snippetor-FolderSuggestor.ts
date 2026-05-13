@@ -66,7 +66,7 @@ class Suggester<T> {
         });
     }
     chooseSuggestion(evt: KeyboardEvent) {
-        if (!this.items || !this.items.length) return;
+        if (!this.items?.length) return;
         const currentValue = this.items[this.selectedItem];
         if (currentValue) {
             this.owner.onChooseSuggestion(currentValue, evt);
@@ -74,7 +74,7 @@ class Suggester<T> {
     }
     onSuggestionClick(event: MouseEvent, el: HTMLDivElement): void {
         event.preventDefault();
-        if (!this.suggestions || !this.suggestions.length) return;
+        if (!this.suggestions?.length) return;
 
         const item = this.suggestions.indexOf(el);
         this.setSelectedItem(item, false);
@@ -82,7 +82,7 @@ class Suggester<T> {
     }
 
     onSuggestionMouseover(_event: MouseEvent, el: HTMLDivElement): void {
-        if (!this.suggestions || !this.suggestions.length) return;
+        if (!this.suggestions?.length) return;
         const item = this.suggestions.indexOf(el);
         this.setSelectedItem(item, false);
     }
@@ -104,7 +104,7 @@ class Suggester<T> {
         this.setSelectedItem(0, false);
     }
     useSelectedItem(event: MouseEvent | KeyboardEvent) {
-        if (!this.items || !this.items.length) return;
+        if (!this.items?.length) return;
         const currentValue = this.items[this.selectedItem];
         if (currentValue) {
             this.owner.selectSuggestion(currentValue, event);
