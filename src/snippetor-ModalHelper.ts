@@ -55,7 +55,7 @@ export class ModalHelper {
         return (
             this.containerEl.hasClass("theme-light") ||
             (!this.containerEl.hasClass("theme-dark") &&
-                document.body.hasClass("theme-light"))
+                activeDocument.body.hasClass("theme-light"))
         );
     }
 
@@ -415,11 +415,13 @@ export class ModalHelper {
     }
 
     createHtmlStyleElement(cfg: SnippetConfig): HTMLStyleElement {
-        const style = document.createElement("style");
+        const style = activeDocument.createElement("style");
         if (cfg.cssFontImport) {
-            style.replaceChildren(document.createTextNode(cfg.cssFontImport));
+            style.replaceChildren(
+                activeDocument.createTextNode(cfg.cssFontImport),
+            );
         }
-        document.getElementsByTagName("head")[0].appendChild(style);
+        activeDocument.head.appendChild(style);
         return style;
     }
 
@@ -439,7 +441,7 @@ export class ModalHelper {
                     cfg.cssFontImport = v;
                     if (redraw) {
                         style.replaceChildren(
-                            document.createTextNode(cfg.cssFontImport),
+                            activeDocument.createTextNode(cfg.cssFontImport),
                         );
                     }
                 }),

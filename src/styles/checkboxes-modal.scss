@@ -59,6 +59,21 @@
           content: attr(data);
         }
 
+        /* Disabled delete button for the unchecked task row */
+        .extra-setting-button.disabled-action {
+          color: transparent;
+          pointer-events: none;
+        }
+
+        /* Unchecked task preview: hide the checkbox and make text invisible */
+        input[type="checkbox"].unchecked-preview {
+          border-style: hidden;
+          background: none;
+        }
+        .example.unchecked-preview {
+          color: transparent;
+        }
+
         /* Task list item settings */
         .example {
           font-size: var(--snippetor-text-font-size);

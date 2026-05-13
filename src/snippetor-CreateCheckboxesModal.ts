@@ -136,7 +136,7 @@ class CreateCheckboxesModal extends Modal {
     }
 
     finish(): void {
-        document.getElementsByTagName("head")[0].removeChild(this.style);
+        activeDocument.head.removeChild(this.style);
         this.contentEl.empty();
         this.elements = {};
         // do not persist the transient cache
@@ -200,9 +200,8 @@ class CreateCheckboxesModal extends Modal {
 
         if (this.cfg.styleUncheckedTask) {
             // make the preview checkbox invisible
-            checkbox.style.borderStyle = "hidden";
-            checkbox.style.background = "none";
-            example.style.color = "transparent";
+            checkbox.addClass("unchecked-preview");
+            example.addClass("unchecked-preview");
         }
         this.elements.defaultFontSize = Math.ceil(
             Number(getComputedStyle(checkbox).fontSize.replace("px", "")),
@@ -314,8 +313,7 @@ class CreateCheckboxesModal extends Modal {
             });
         if (taskSettings.unchecked) {
             remove.disabled = true;
-            remove.extraSettingsEl.style.color = "transparent";
-            remove.extraSettingsEl.style.pointerEvents = "none";
+            remove.extraSettingsEl.addClass("disabled-action");
         }
     }
 
@@ -945,7 +943,7 @@ class CreateCheckboxesModal extends Modal {
         checkbox.setAttribute("data", content);
 
         let font = "var(--font-monospace)";
-        let fontSize = this.elements.defaultFontSize;
+        let fontSize = this.elements.defaultFontSize ?? 16;
         const top = taskSettings.checkbox.top ? taskSettings.checkbox.top : 0;
 
         if (taskSettings.checkbox.format?.font) {
@@ -955,27 +953,17 @@ class CreateCheckboxesModal extends Modal {
             fontSize = taskSettings.checkbox.format.fontSize;
         }
 
-        checkbox.style.setProperty("--snippetor-box-font", font);
-        checkbox.style.setProperty(
-            "--snippetor-box-font-size",
-            `${fontSize}px`,
-        );
-
-        checkbox.style.setProperty("--snippetor-box-top", `${top}px`);
-
-        if (taskSettings.checkbox.left) {
-            checkbox.style.setProperty(
-                "--snippetor-box-left",
-                `${taskSettings.checkbox.left}px`,
-            );
-            checkbox.style.setProperty("--snippetor-box-margin-left", "0");
-        } else {
-            checkbox.style.setProperty("--snippetor-box-left", "50%");
-            checkbox.style.setProperty(
-                "--snippetor-box-margin-left",
-                `-${fontSize / 2}px`,
-            );
-        }
+        checkbox.setCssProps({
+            "--snippetor-box-font": font,
+            "--snippetor-box-font-size": `${fontSize}px`,
+            "--snippetor-box-top": `${top}px`,
+            "--snippetor-box-left": taskSettings.checkbox.left
+                ? `${taskSettings.checkbox.left}px`
+                : "50%",
+            "--snippetor-box-margin-left": taskSettings.checkbox.left
+                ? "0"
+                : `-${fontSize / 2}px`,
+        });
     }
 
     verifyDataValue(input: HTMLInputElement) {
