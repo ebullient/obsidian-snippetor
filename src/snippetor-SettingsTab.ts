@@ -29,39 +29,39 @@ export class SnippetorSettingsTab extends PluginSettingTab {
         this.icon = "stamp";
     }
 
-    async display(): Promise<void> {
-        await this.plugin.loadSettings();
+    display(): void {
+        void this.plugin.loadSettings().then(() => {
+            this.containerEl.empty();
+            this.containerEl.addClass("snippetor-plugin-settings");
 
-        this.containerEl.empty();
-        this.containerEl.addClass("snippetor-plugin-settings");
+            this.containerEl.createEl("h2", { text: "Snippetor" });
+            this.buildNewSnippet();
 
-        this.containerEl.createEl("h2", { text: "Snippetor" });
-        this.buildNewSnippet();
+            this.existingEl = this.containerEl.createDiv();
+            this.listExistingSnippets();
 
-        this.existingEl = this.containerEl.createDiv();
-        this.listExistingSnippets();
+            new Setting(this.containerEl)
+                .setName("Debug")
+                .setDesc("Enable debug messages in the console")
+                .addToggle((toggle) =>
+                    toggle
+                        .setValue(this.plugin.settings.debug)
+                        .onChange(async (value) => {
+                            this.plugin.settings.debug = value;
+                            await this.plugin.saveSettings();
+                        }),
+                );
 
-        new Setting(this.containerEl)
-            .setName("Debug")
-            .setDesc("Enable debug messages in the console")
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.settings.debug)
-                    .onChange(async (value) => {
-                        this.plugin.settings.debug = value;
-                        await this.plugin.saveSettings();
-                    }),
-            );
-
-        const div = this.containerEl.createDiv("coffee");
-        const fgColor = this.isLightMode() ? "666" : "AAA";
-        const bgColor = this.isLightMode() ? "D8C9D5" : "684B62";
-        div.createEl("a", {
-            href: "https://www.buymeacoffee.com/ebullient",
-        }).createEl("img", {
-            attr: {
-                src: `https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ebullient&button_colour=${bgColor}&font_colour=${fgColor}&font_family=Inter&outline_colour=${fgColor}&coffee_colour=FFDD00`,
-            },
+            const div = this.containerEl.createDiv("coffee");
+            const fgColor = this.isLightMode() ? "666" : "AAA";
+            const bgColor = this.isLightMode() ? "D8C9D5" : "684B62";
+            div.createEl("a", {
+                href: "https://www.buymeacoffee.com/ebullient",
+            }).createEl("img", {
+                attr: {
+                    src: `https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ebullient&button_colour=${bgColor}&font_colour=${fgColor}&font_family=Inter&outline_colour=${fgColor}&coffee_colour=FFDD00`,
+                },
+            });
         });
     }
 
@@ -90,7 +90,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
             })
             .addButton((button: ButtonComponent) =>
                 button
-                    .setTooltip("Create a Snippet")
+                    .setTooltip("Create a snippet")
                     .setIcon("plus-with-circle")
                     .onClick(async () => {
                         await this.openModal(selector.type, null);
@@ -108,7 +108,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 .addExtraButton((b: ExtraButtonComponent) =>
                     b
                         .setIcon("pencil")
-                        .setTooltip("Edit this Snippet")
+                        .setTooltip("Edit this snippet")
                         .onClick(async () => {
                             await this.openModal(snippet.type, snippet);
                             this.listExistingSnippets();
@@ -117,7 +117,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 .addExtraButton((b: ExtraButtonComponent) =>
                     b
                         .setIcon("duplicate-glyph")
-                        .setTooltip("Copy this Snippet")
+                        .setTooltip("Copy this snippet")
                         .onClick(async () => {
                             const copy = JSON.parse(JSON.stringify(snippet));
                             copy.id = undefined;
@@ -130,7 +130,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 .addExtraButton((b: ExtraButtonComponent) =>
                     b
                         .setIcon("trash")
-                        .setTooltip("Delete this Snippet")
+                        .setTooltip("Delete this snippet")
                         .onClick(async () => {
                             await this.plugin.removeSnippet(snippet);
                             this.listExistingSnippets();

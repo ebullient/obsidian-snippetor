@@ -403,7 +403,7 @@ export class ModalHelper {
                 button
                     .setIcon("wand-glyph")
                     .setClass("generate-css")
-                    .setTooltip("Generate CSS Snippet")
+                    .setTooltip("Generate CSS snippet")
                     .onClick(async () => {
                         button.buttonEl.addClass("is-active");
                         button.disabled = true;

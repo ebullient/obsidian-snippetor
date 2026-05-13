@@ -236,7 +236,7 @@ export class Snippetor {
     async generateCss(cfg: SnippetConfig): Promise<void> {
         if (!cfg.name) {
             new Notice("Unable to create snippet: Missing file name.");
-            return Promise.reject();
+            return Promise.reject(new Error("Missing file name"));
         }
         let snippet: string;
         switch (cfg.type) {
@@ -259,7 +259,7 @@ export class Snippetor {
             new Notice(
                 "Unable to create snippet: Content is empty. Check console for details.",
             );
-            return Promise.reject();
+            return Promise.reject(new Error("Snippet content is empty"));
         }
 
         const fileName = `${cfg.type}-${cfg.name}`;

@@ -37,15 +37,13 @@ export function openCreateFolderModal(
                 resolve(modal.cfg);
             } catch (error) {
                 snippetor.logDebug("Caught %o, rejecting promise", error);
-                Promise.reject();
             }
         };
 
         try {
             modal.open();
         } catch (error) {
-            console.debug("Caught %o, rejecting promise", error);
-            Promise.reject();
+            snippetor.logDebug("Caught %o, opening modal", error);
         }
     });
 }
@@ -93,7 +91,7 @@ class CreateFolderModal extends Modal {
         this.helper.createFilenameSetting(content, this.cfg);
 
         content.createEl("h3", {
-            text: "Custom Folder Values",
+            text: "Custom folder values",
         });
 
         const tableEl = content.createDiv("folders-content-container");
@@ -331,7 +329,7 @@ class CreateFolderModal extends Modal {
         );
         new ExtraButtonComponent(actions)
             .setIcon("trash")
-            .setTooltip("Delete this Folder configuration")
+            .setTooltip("Delete this folder configuration")
             .onClick(async () => {
                 this.snippetor.logDebug("Delete %o", containerEl);
                 this.cfg.folders.remove(folderSettings);
@@ -586,7 +584,7 @@ class CreateFolderModal extends Modal {
         // reset input element
         const resetFg = this.helper.createResetColorComponent(
             colorGroup,
-            async () => {
+            () => {
                 this.helper.clearModeColor(element, COLOR.FOREGROUND);
                 colorPicker.value = this.helper.getPickerValue(
                     element,
@@ -636,7 +634,7 @@ class CreateFolderModal extends Modal {
         // reset input element
         const reset = this.helper.createResetColorComponent(
             colorGroup,
-            async () => {
+            () => {
                 this.helper.clearModeColor(element, COLOR.BACKGROUND);
                 colorPicker.value = this.helper.getPickerValue(
                     element,

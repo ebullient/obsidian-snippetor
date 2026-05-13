@@ -32,15 +32,13 @@ export function openCreateCheckboxModal(
                 resolve(modal.cfg);
             } catch (error) {
                 snippetor.logDebug("Caught %o, rejecting promise", error);
-                Promise.reject();
             }
         };
 
         try {
             modal.open();
         } catch (error) {
-            console.debug("Caught %o, rejecting promise", error);
-            Promise.reject();
+            snippetor.logDebug("Caught %o, opening modal", error);
         }
     });
 }
@@ -94,7 +92,7 @@ class CreateCheckboxesModal extends Modal {
         this.helper.createFilenameSetting(content, this.cfg);
 
         content.createEl("h3", {
-            text: "Custom Task Values",
+            text: "Custom task values",
         });
 
         this.elements.list = content.createEl("ul", {
@@ -308,7 +306,7 @@ class CreateCheckboxesModal extends Modal {
         );
         const remove = new ExtraButtonComponent(actions)
             .setIcon("trash")
-            .setTooltip("Delete this Task")
+            .setTooltip("Delete this task")
             .onClick(async () => {
                 this.snippetor.logDebug("Delete %o", itemEl);
                 this.cfg.taskSettings.remove(taskSettings);
@@ -738,7 +736,7 @@ class CreateCheckboxesModal extends Modal {
         // reset input element
         const resetFg = this.helper.createResetColorComponent(
             colorGroup,
-            async () => {
+            () => {
                 this.helper.clearModeColor(element, COLOR.FOREGROUND);
                 taskColor.value = this.helper.getPickerValue(
                     element,
@@ -791,7 +789,7 @@ class CreateCheckboxesModal extends Modal {
         // reset input element
         const reset = this.helper.createResetColorComponent(
             colorGroup,
-            async () => {
+            () => {
                 this.helper.clearModeColor(element, COLOR.BACKGROUND);
                 taskColor.value = this.helper.getPickerValue(
                     element,

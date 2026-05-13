@@ -19,15 +19,13 @@ export function openCreateTemplateModal(
                 resolve(modal.cfg);
             } catch (error) {
                 snippetor.logDebug("Caught %o, rejecting promise", error);
-                Promise.reject();
             }
         };
 
         try {
             modal.open();
         } catch (error) {
-            console.debug("Caught %o, rejecting promise", error);
-            Promise.reject();
+            snippetor.logDebug("Caught %o, opening modal", error);
         }
     });
 }

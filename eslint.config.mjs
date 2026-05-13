@@ -24,14 +24,7 @@ export default defineConfig([
         },
         // Optional project overrides
         rules: {
-            "obsidianmd/ui/sentence-case": [
-                "warn",
-                {
-                    brands: ["Snippetor"],
-                    acronyms: ["CSS", "BRAT"],
-                    enforceCamelCaseLower: true,
-                },
-            ],
+            "obsidianmd/ui/sentence-case": "off",
         },
     },
 ]);
