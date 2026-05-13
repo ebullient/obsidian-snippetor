@@ -18,7 +18,7 @@ export function openCreateTemplateModal(
                 modal.finish();
                 resolve(modal.cfg);
             } catch (error) {
-                console.log("Caught %o, rejecting promise", error);
+                snippetor.logDebug("Caught %o, rejecting promise", error);
                 Promise.reject();
             }
         };
@@ -26,7 +26,7 @@ export function openCreateTemplateModal(
         try {
             modal.open();
         } catch (error) {
-            console.log("Caught %o, rejecting promise", error);
+            console.debug("Caught %o, rejecting promise", error);
             Promise.reject();
         }
     });

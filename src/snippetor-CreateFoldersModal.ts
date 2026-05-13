@@ -36,7 +36,7 @@ export function openCreateFolderModal(
                 modal.finish();
                 resolve(modal.cfg);
             } catch (error) {
-                console.log("Caught %o, rejecting promise", error);
+                snippetor.logDebug("Caught %o, rejecting promise", error);
                 Promise.reject();
             }
         };
@@ -44,7 +44,7 @@ export function openCreateFolderModal(
         try {
             modal.open();
         } catch (error) {
-            console.log("Caught %o, rejecting promise", error);
+            console.debug("Caught %o, rejecting promise", error);
             Promise.reject();
         }
     });
@@ -333,7 +333,7 @@ class CreateFolderModal extends Modal {
             .setIcon("trash")
             .setTooltip("Delete this Folder configuration")
             .onClick(async () => {
-                console.log("Delete %o", containerEl);
+                this.snippetor.logDebug("Delete %o", containerEl);
                 this.cfg.folders.remove(folderSettings);
                 this.showFolders(folderEl);
             });

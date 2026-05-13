@@ -31,7 +31,7 @@ export function openCreateCheckboxModal(
                 modal.finish();
                 resolve(modal.cfg);
             } catch (error) {
-                console.log("Caught %o, rejecting promise", error);
+                snippetor.logDebug("Caught %o, rejecting promise", error);
                 Promise.reject();
             }
         };
@@ -39,7 +39,7 @@ export function openCreateCheckboxModal(
         try {
             modal.open();
         } catch (error) {
-            console.log("Caught %o, rejecting promise", error);
+            console.debug("Caught %o, rejecting promise", error);
             Promise.reject();
         }
     });
@@ -209,7 +209,10 @@ class CreateCheckboxesModal extends Modal {
         this.elements.defaultFontSize = Math.ceil(
             Number(getComputedStyle(checkbox).fontSize.replace("px", "")),
         );
-        console.log("defaultFontSize", this.elements.defaultFontSize);
+        this.snippetor.logDebug(
+            "defaultFontSize",
+            this.elements.defaultFontSize,
+        );
 
         const actions = heading.createSpan("snippetor-li-actions");
 
@@ -307,7 +310,7 @@ class CreateCheckboxesModal extends Modal {
             .setIcon("trash")
             .setTooltip("Delete this Task")
             .onClick(async () => {
-                console.log("Delete %o", itemEl);
+                this.snippetor.logDebug("Delete %o", itemEl);
                 this.cfg.taskSettings.remove(taskSettings);
                 this.showTasks();
             });
@@ -985,7 +988,10 @@ class CreateCheckboxesModal extends Modal {
             (t) => input.value === t.data,
         ).length;
         if (count > 1) {
-            console.log("verifyDataValue: conflict over %s", input.value);
+            this.snippetor.logDebug(
+                "verifyDataValue: conflict over %s",
+                input.value,
+            );
             input.setAttribute("conflict", input.value);
             input.addClass("data-value-error");
             input.setAttribute(
@@ -1005,21 +1011,21 @@ class CreateCheckboxesModal extends Modal {
         } else {
             const conflict = input.getAttribute("conflict");
             if (input.value === " ") {
-                console.log("verifyDataValue: unchecked item");
+                this.snippetor.logDebug("verifyDataValue: unchecked item");
                 input.addClass("data-value-error");
                 input.setAttribute(
                     "aria-label",
                     "Unchecked tasks are a special case. See additional settings.",
                 );
             } else if (input.value === "") {
-                console.log("verifyDataValue: empty value");
+                this.snippetor.logDebug("verifyDataValue: empty value");
                 input.addClass("data-value-required");
                 input.setAttribute(
                     "aria-label",
                     "Specify a task value, e.g. X",
                 );
             } else if (conflict) {
-                console.log("verifyDataValue: conflict resolved");
+                this.snippetor.logDebug("verifyDataValue: conflict resolved");
                 input.removeAttribute("conflict");
                 for (const ts of this.cfg.taskSettings) {
                     const e = ts.cache.dataEl;

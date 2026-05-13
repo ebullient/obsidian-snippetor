@@ -41,6 +41,18 @@ export class SnippetorSettingsTab extends PluginSettingTab {
         this.existingEl = this.containerEl.createDiv();
         this.listExistingSnippets();
 
+        new Setting(this.containerEl)
+            .setName("Debug")
+            .setDesc("Enable debug messages in the console")
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.debug)
+                    .onChange(async (value) => {
+                        this.plugin.settings.debug = value;
+                        await this.plugin.saveSettings();
+                    }),
+            );
+
         const div = this.containerEl.createDiv("coffee");
         const fgColor = this.isLightMode() ? "666" : "AAA";
         const bgColor = this.isLightMode() ? "D8C9D5" : "684B62";
@@ -152,7 +164,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 this.plugin.snippetor,
             );
             if (taskCfg) {
-                console.debug("Snippetor: modal closed with %o", taskCfg);
+                this.plugin.snippetor.logDebug("modal closed with %o", taskCfg);
                 await this.plugin.setSnippet(taskCfg);
             }
             this.listExistingSnippets();
@@ -163,7 +175,7 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 this.plugin.snippetor,
             );
             if (taskCfg) {
-                console.debug("Snippetor: modal closed with %o", taskCfg);
+                this.plugin.snippetor.logDebug("modal closed with %o", taskCfg);
                 await this.plugin.setSnippet(taskCfg);
             }
             this.listExistingSnippets();

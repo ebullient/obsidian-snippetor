@@ -1,5 +1,6 @@
 export interface SnippetorSettings {
     snippets: Record<string, SnippetConfig>;
+    debug: boolean;
 }
 
 export interface SnippetConfig {

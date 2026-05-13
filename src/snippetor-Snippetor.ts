@@ -19,6 +19,7 @@ import { COLORED_FOLDERS, SIMPLE_TASK } from "./snippetor-Snippetor-Templates";
 
 export class Snippetor {
     eta: Eta;
+    private debugEnabled: () => boolean = () => false;
 
     constructor(private app: App) {
         this.eta = new Eta({
@@ -26,6 +27,16 @@ export class Snippetor {
             autoTrim: false,
             cache: true,
         });
+    }
+
+    setDebug(isDebug: () => boolean): void {
+        this.debugEnabled = isDebug;
+    }
+
+    logDebug(message: string, ...optionalParams: unknown[]): void {
+        if (this.debugEnabled()) {
+            console.debug(`(Snippetor) ${message}`, ...optionalParams);
+        }
     }
 
     get taskValues(): Set<string> {
@@ -254,7 +265,7 @@ export class Snippetor {
         const fileName = `${cfg.type}-${cfg.name}`;
         const path = this.app.customCss.getSnippetPath(fileName);
         const exists = await this.app.vault.adapter.exists(path);
-        console.log("Create CSS file %s for snippet %o", fileName, cfg);
+        this.logDebug("Create CSS file %s for snippet %o", fileName, cfg);
 
         let update: Promise<void>;
         if (exists) {

@@ -14,6 +14,7 @@ export const UNLOCK_ICON =
 
 export const DEFAULT_SETTINGS: SnippetorSettings = {
     snippets: {},
+    debug: false,
 };
 
 export const DEFAULT_TASK_SNIPPET_SETTINGS: Partial<TaskSnippetConfig> = {

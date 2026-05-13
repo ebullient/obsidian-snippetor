@@ -31,6 +31,7 @@ export class SnippetorPlugin extends Plugin {
             console.debug("Snippetor: loading settings");
             const options = await this.loadData();
             this.settings = Object.assign({}, DEFAULT_SETTINGS, options);
+            this.snippetor.setDebug(() => this.settings.debug);
         }
     }
 
