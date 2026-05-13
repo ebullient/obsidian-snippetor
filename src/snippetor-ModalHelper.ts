@@ -415,13 +415,13 @@ export class ModalHelper {
     }
 
     createHtmlStyleElement(cfg: SnippetConfig): HTMLStyleElement {
-        const style = activeDocument.createElement("style");
+        // eslint-disable-next-line obsidianmd/no-forbidden-elements -- live font preview: @font-face/@import are global regardless of where <style> lives in DOM; scoped to modal so cleanup is automatic
+        const style = this.containerEl.createEl("style");
         if (cfg.cssFontImport) {
             style.replaceChildren(
                 activeDocument.createTextNode(cfg.cssFontImport),
             );
         }
-        activeDocument.head.appendChild(style);
         return style;
     }
 
@@ -436,12 +436,14 @@ export class ModalHelper {
                 "Cut/paste a CSS @import statement to add an additional font to this snippet.",
             )
             .addTextArea((t) =>
-                t.setValue(cfg.cssFontImport).onChange((v) => {
+                t.setValue(cfg.cssFontImport ?? "").onChange((v) => {
                     const redraw = v !== cfg.cssFontImport;
-                    cfg.cssFontImport = v;
+                    cfg.cssFontImport = v || undefined;
                     if (redraw) {
                         style.replaceChildren(
-                            activeDocument.createTextNode(cfg.cssFontImport),
+                            activeDocument.createTextNode(
+                                cfg.cssFontImport ?? "",
+                            ),
                         );
                     }
                 }),

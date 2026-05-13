@@ -136,7 +136,6 @@ class CreateCheckboxesModal extends Modal {
     }
 
     finish(): void {
-        activeDocument.head.removeChild(this.style);
         this.contentEl.empty();
         this.elements = {};
         // do not persist the transient cache
@@ -1024,6 +1023,7 @@ class CreateCheckboxesModal extends Modal {
     }
 
     resetTaskElements(ts: TaskSettings): void {
+        if (!ts.cache) return;
         for (const [key, value] of Object.entries(ts.cache)) {
             if (value instanceof HTMLElement) {
                 Reflect.deleteProperty(ts.cache, key);
