@@ -5,7 +5,6 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
 
 export default defineConfig([
-    ...obsidianmd.configs.recommended,
     globalIgnores([
         "build/",
         "test/",
@@ -13,6 +12,7 @@ export default defineConfig([
         "*.js",
         "package.json"
     ]),
+    ...obsidianmd.configs.recommended,
     {
         files: ["src/**/*.ts"],
         languageOptions: {
