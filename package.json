@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "compare-versions": "^6.1.1",
-    "eta": "^4.4.1",
+    "eta": "^4.6.0",
     "random-word-slugs": "^0.1.6",
     "randomcolor": "^0.6.2"
   },
