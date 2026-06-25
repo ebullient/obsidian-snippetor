@@ -16,9 +16,9 @@ const MANIFEST: PluginManifest = {
     description: "",
 };
 
-jest.mock("obsidian", () => ({
-    App: jest.fn().mockImplementation(),
-    Plugin: jest.fn().mockImplementation(() => {
+vi.mock("obsidian", () => ({
+    App: vi.fn().mockImplementation(function () {}),
+    Plugin: vi.fn().mockImplementation(function () {
         return {
             manifest: MANIFEST,
             saveData: () => Promise.resolve(),
@@ -27,12 +27,12 @@ jest.mock("obsidian", () => ({
             // }
         };
     }),
-    PluginSettingTab: jest.fn().mockImplementation(),
-    Modal: jest.fn().mockImplementation(),
+    PluginSettingTab: vi.fn().mockImplementation(function () {}),
+    Modal: vi.fn().mockImplementation(function () {}),
 }));
 
-jest.mock("../src/templates/COLORED_FOLDER.eta", () => "");
-jest.mock("../src/templates/CHECKBOXES.eta", () => "");
+vi.mock("../src/templates/COLORED_FOLDER.eta", () => ({ default: "" }));
+vi.mock("../src/templates/CHECKBOXES.eta", () => ({ default: "" }));
 
 const snippetor = new Snippetor(new App());
 

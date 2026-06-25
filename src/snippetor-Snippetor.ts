@@ -161,7 +161,10 @@ export class Snippetor {
         return cfg as TaskSnippetConfig;
     }
 
-    initTaskSettings(version: string, ts: Partial<TaskSettings>): void {
+    initTaskSettings(
+        version: string | undefined,
+        ts: Partial<TaskSettings>,
+    ): void {
         this.initialize(ts, "cache");
         this.initialize(ts, "checkbox", "lightMode");
         this.initialize(ts, "checkbox", "darkMode");
