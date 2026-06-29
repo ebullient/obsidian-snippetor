@@ -32,7 +32,7 @@
     "@types/chroma-js": "^3.1.2",
     "@types/node": "^25.9.1",
     "@types/randomcolor": "^0.5.9",
-    "@typescript-eslint/parser": "^8.59.3",
+    "@typescript-eslint/parser": "^8.60.0",
     "auto-changelog": "^2.5.1",
     "esbuild": "0.28.1",
     "esbuild-sass-plugin": "^3.7.0",
