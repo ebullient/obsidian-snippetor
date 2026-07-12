@@ -4,11 +4,11 @@ import {
     Notice,
     PluginSettingTab,
     Setting,
+    type SettingDefinitionItem,
 } from "obsidian";
 import type {
     FolderSnippetConfig,
     SnippetConfig,
-    SnippetorSettings,
     TaskSnippetConfig,
 } from "./@types";
 import type SnippetorPlugin from "./main";
@@ -21,7 +21,6 @@ import {
 
 export class SnippetorSettingsTab extends PluginSettingTab {
     plugin: SnippetorPlugin;
-    newSettings!: SnippetorSettings;
     existingEl!: HTMLDivElement;
 
     constructor(app: App, plugin: SnippetorPlugin) {
@@ -30,92 +29,91 @@ export class SnippetorSettingsTab extends PluginSettingTab {
         this.icon = "stamp";
     }
 
-    async save(): Promise<void> {
-        this.plugin.settings = this.newSettings;
-        await this.plugin.saveSettings();
+    // ---- 1.13.0+: declarative path ----
+
+    getSettingDefinitions(): SettingDefinitionItem[] {
+        this.containerEl.addClass("snippetor-plugin-settings");
+
+        return [
+            {
+                name: "Create a new CSS snippet (select type)",
+                render: (setting) =>
+                    this.renderCreateRow(setting, () => {
+                        // eslint-disable-next-line obsidianmd/no-unsupported-api -- only invoked from within getSettingDefinitions(), which the host only calls on 1.13.0+
+                        this.update();
+                    }),
+            },
+            {
+                type: "list",
+                heading: "Snippets",
+                items: this.plugin.allSnippets.map((snippet) => ({
+                    name: snippet.name,
+                    desc: this.getDescription(snippet.type),
+                    render: (setting) =>
+                        this.renderSnippetRow(setting, snippet, () => {
+                            // eslint-disable-next-line obsidianmd/no-unsupported-api -- only invoked from within getSettingDefinitions(), which the host only calls on 1.13.0+
+                            this.update();
+                        }),
+                })),
+            },
+            {
+                name: "Debug",
+                desc: "Enable debug messages in the console",
+                control: { type: "toggle", key: "debug" },
+            },
+            {
+                name: "",
+                render: (setting) => this.renderCoffeeRow(setting),
+            },
+        ];
     }
 
-    private cloneSettings(): SnippetorSettings {
-        return JSON.parse(
-            JSON.stringify(this.plugin.settings),
-        ) as SnippetorSettings;
-    }
-
-    reset(): void {
-        this.newSettings = this.cloneSettings();
-        this.display();
-    }
+    // ---- < 1.13.0: imperative fallback, save-on-change, kept in sync with above ----
 
     display(): void {
-        if (!this.newSettings) {
-            this.newSettings = this.cloneSettings();
-        }
-
         this.containerEl.empty();
         this.containerEl.addClass("snippetor-plugin-settings");
 
-        new Setting(this.containerEl)
-            .setName("Save settings")
-            .setClass("snippetor-save-reset")
-            .addButton((button) =>
-                button
-                    .setIcon("reset")
-                    .setTooltip("Reset to previously saved values")
-                    .onClick(() => {
-                        this.reset();
-                    }),
-            )
-            .addButton((button) => {
-                button
-                    .setIcon("save")
-                    .setCta()
-                    .setTooltip("Save all changes")
-                    .onClick(async () => {
-                        await this.save();
-                    });
-            });
+        this.renderCreateRow(
+            new Setting(this.containerEl).setClass("snippetor-create-snippet"),
+            () => {
+                this.listExistingSnippets();
+            },
+        );
 
         new Setting(this.containerEl).setName("Snippets").setHeading();
-
-        this.buildNewSnippet();
-
         this.existingEl = this.containerEl.createDiv();
         this.listExistingSnippets();
-
-        new Setting(this.containerEl).setName("Debugging").setHeading();
 
         new Setting(this.containerEl)
             .setName("Debug")
             .setDesc("Enable debug messages in the console")
             .addToggle((toggle) =>
-                toggle.setValue(this.newSettings.debug).onChange((value) => {
-                    this.newSettings.debug = value;
-                }),
+                toggle
+                    .setValue(this.plugin.settings.debug)
+                    .onChange(async (value) => {
+                        this.plugin.settings.debug = value;
+                        await this.plugin.saveSettings();
+                    }),
             );
 
-        const div = this.containerEl.createDiv("coffee");
-        const fgColor = this.isLightMode() ? "666" : "AAA";
-        const bgColor = this.isLightMode() ? "D8C9D5" : "684B62";
-        div.createEl("a", {
-            href: "https://www.buymeacoffee.com/ebullient",
-        }).createEl("img", {
-            attr: {
-                src: `https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ebullient&button_colour=${bgColor}&font_colour=${fgColor}&font_family=Inter&outline_colour=${fgColor}&coffee_colour=FFDD00`,
-            },
-        });
+        this.renderCoffeeRow(new Setting(this.containerEl));
     }
 
-    /** Save on exit */
-    hide(): void {
-        void this.save();
+    listExistingSnippets(): void {
+        this.existingEl.empty();
+        for (const snippet of this.plugin.allSnippets) {
+            this.renderSnippetRow(new Setting(this.existingEl), snippet, () => {
+                this.listExistingSnippets();
+            });
+        }
     }
 
-    buildNewSnippet(): void {
-        const selector = {
-            type: DEFAULT_TASK_SNIPPET_SETTINGS.type,
-        };
-        new Setting(this.containerEl)
-            .setClass("snippetor-create-snippet")
+    // ---- shared row builders ----
+
+    private renderCreateRow(setting: Setting, onCreated: () => void): void {
+        const selector = { type: DEFAULT_TASK_SNIPPET_SETTINGS.type };
+        setting
             .setName("Create a new CSS snippet (select type)")
             .addDropdown((d) => {
                 d.addOption(
@@ -139,51 +137,66 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                     .setIcon("plus-with-circle")
                     .onClick(async () => {
                         await this.openModal(selector.type, null);
+                        onCreated();
                     }),
             );
     }
 
-    listExistingSnippets(): void {
-        this.existingEl.empty();
+    private renderSnippetRow(
+        setting: Setting,
+        snippet: SnippetConfig,
+        onChanged: () => void,
+    ): void {
+        setting
+            .setName(snippet.name)
+            .setDesc(this.getDescription(snippet.type))
+            .addExtraButton((b: ExtraButtonComponent) =>
+                b
+                    .setIcon("pencil")
+                    .setTooltip("Edit this snippet")
+                    .onClick(async () => {
+                        await this.openModal(snippet.type, snippet);
+                        onChanged();
+                    }),
+            )
+            .addExtraButton((b: ExtraButtonComponent) =>
+                b
+                    .setIcon("duplicate-glyph")
+                    .setTooltip("Copy this snippet")
+                    .onClick(async () => {
+                        const copy = JSON.parse(
+                            JSON.stringify(snippet),
+                        ) as SnippetConfig;
+                        Reflect.deleteProperty(copy, "id");
+                        Reflect.deleteProperty(copy, "name");
+                        new Notice(`Copied snippet '${snippet.name}'`);
+                        await this.openModal(snippet.type, copy);
+                        onChanged();
+                    }),
+            )
+            .addExtraButton((b: ExtraButtonComponent) =>
+                b
+                    .setIcon("trash")
+                    .setTooltip("Delete this snippet")
+                    .onClick(async () => {
+                        await this.plugin.removeSnippet(snippet);
+                        onChanged();
+                    }),
+            );
+    }
 
-        for (const snippet of this.plugin.allSnippets) {
-            new Setting(this.existingEl)
-                .setName(snippet.name)
-                .setDesc(this.getDescription(snippet.type))
-                .addExtraButton((b: ExtraButtonComponent) =>
-                    b
-                        .setIcon("pencil")
-                        .setTooltip("Edit this snippet")
-                        .onClick(async () => {
-                            await this.openModal(snippet.type, snippet);
-                            this.listExistingSnippets();
-                        }),
-                )
-                .addExtraButton((b: ExtraButtonComponent) =>
-                    b
-                        .setIcon("duplicate-glyph")
-                        .setTooltip("Copy this snippet")
-                        .onClick(async () => {
-                            const copy = JSON.parse(
-                                JSON.stringify(snippet),
-                            ) as SnippetConfig;
-                            Reflect.deleteProperty(copy, "id");
-                            Reflect.deleteProperty(copy, "name");
-                            new Notice(`Copied snippet '${snippet.name}'`);
-                            await this.openModal(snippet.type, copy);
-                            this.listExistingSnippets();
-                        }),
-                )
-                .addExtraButton((b: ExtraButtonComponent) =>
-                    b
-                        .setIcon("trash")
-                        .setTooltip("Delete this snippet")
-                        .onClick(async () => {
-                            await this.plugin.removeSnippet(snippet);
-                            this.listExistingSnippets();
-                        }),
-                );
-        }
+    private renderCoffeeRow(setting: Setting): void {
+        setting.settingEl.empty();
+        const div = setting.settingEl.createDiv("coffee");
+        const fgColor = this.isLightMode() ? "666" : "AAA";
+        const bgColor = this.isLightMode() ? "D8C9D5" : "684B62";
+        div.createEl("a", {
+            href: "https://www.buymeacoffee.com/ebullient",
+        }).createEl("img", {
+            attr: {
+                src: `https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ebullient&button_colour=${bgColor}&font_colour=${fgColor}&font_family=Inter&outline_colour=${fgColor}&coffee_colour=FFDD00`,
+            },
+        });
     }
 
     getDescription(type: string): string {
@@ -211,18 +224,19 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 this.plugin.snippetor.logDebug("modal closed with %o", taskCfg);
                 await this.plugin.setSnippet(taskCfg);
             }
-            this.listExistingSnippets();
         } else if (type === DEFAULT_FOLDER_SNIPPET_SETTINGS.type) {
-            const taskCfg = await openCreateFolderModal(
+            const folderCfg = await openCreateFolderModal(
                 this.app,
                 snippet as FolderSnippetConfig,
                 this.plugin.snippetor,
             );
-            if (taskCfg) {
-                this.plugin.snippetor.logDebug("modal closed with %o", taskCfg);
-                await this.plugin.setSnippet(taskCfg);
+            if (folderCfg) {
+                this.plugin.snippetor.logDebug(
+                    "modal closed with %o",
+                    folderCfg,
+                );
+                await this.plugin.setSnippet(folderCfg);
             }
-            this.listExistingSnippets();
         }
     }
 

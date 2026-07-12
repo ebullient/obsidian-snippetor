@@ -14,17 +14,18 @@ export default defineConfig([
     ]),
     ...obsidianmd.configs.recommended,
     {
-        files: ["src/**/*.ts"],
+        files: ["src/**/*.ts", "mocks/**/*.ts", "*.ts"],
         languageOptions: {
             parser: tsparser,
             parserOptions: {
                 project: "./tsconfig.json"
             },
-            globals: { ...globals.node, ...globals.browser },
+            globals: { ...globals.node, ...globals.browser, vi: "readonly" },
         },
         // Optional project overrides
         rules: {
             "obsidianmd/ui/sentence-case": "off",
+            "@typescript-eslint/no-deprecated": "warn",
         },
     },
 ]);
