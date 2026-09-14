@@ -30,7 +30,7 @@
     "@biomejs/biome": "2.5.6",
     "@popperjs/core": "^2.11.2",
     "@types/chroma-js": "^3.1.2",
-    "@types/node": "^26.0.0",
+    "@types/node": "^26.1.2",
     "@types/randomcolor": "^0.5.9",
     "@typescript-eslint/parser": "^8.65.0",
     "auto-changelog": "^2.6.0",
