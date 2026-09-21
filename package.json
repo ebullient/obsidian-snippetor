@@ -34,7 +34,7 @@
     "@types/randomcolor": "^0.5.9",
     "@typescript-eslint/parser": "^8.67.0",
     "auto-changelog": "^2.6.0",
-    "esbuild": "0.28.1",
+    "esbuild": "0.28.2",
     "esbuild-sass-plugin": "^3.7.0",
     "eslint-plugin-obsidianmd": "^0.3.0",
     "jsdom": "^30.0.1",
