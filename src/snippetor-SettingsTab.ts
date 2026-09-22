@@ -3,7 +3,7 @@ import {
     type ExtraButtonComponent,
     Notice,
     PluginSettingTab,
-    Setting,
+    type Setting,
     type SettingDefinitionItem,
 } from "obsidian";
 import type {
@@ -21,15 +21,12 @@ import {
 
 export class SnippetorSettingsTab extends PluginSettingTab {
     plugin: SnippetorPlugin;
-    existingEl!: HTMLDivElement;
 
     constructor(app: App, plugin: SnippetorPlugin) {
         super(app, plugin);
         this.plugin = plugin;
         this.icon = "stamp";
     }
-
-    // ---- 1.13.0+: declarative path ----
 
     getSettingDefinitions(): SettingDefinitionItem[] {
         this.containerEl.addClass("snippetor-plugin-settings");
@@ -39,7 +36,6 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 name: "Create a new CSS snippet (select type)",
                 render: (setting) =>
                     this.renderCreateRow(setting, () => {
-                        // eslint-disable-next-line obsidianmd/no-unsupported-api -- only invoked from within getSettingDefinitions(), which the host only calls on 1.13.0+
                         this.update();
                     }),
             },
@@ -51,7 +47,6 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                     desc: this.getDescription(snippet.type),
                     render: (setting) =>
                         this.renderSnippetRow(setting, snippet, () => {
-                            // eslint-disable-next-line obsidianmd/no-unsupported-api -- only invoked from within getSettingDefinitions(), which the host only calls on 1.13.0+
                             this.update();
                         }),
                 })),
@@ -66,47 +61,6 @@ export class SnippetorSettingsTab extends PluginSettingTab {
                 render: (setting) => this.renderCoffeeRow(setting),
             },
         ];
-    }
-
-    // ---- < 1.13.0: imperative fallback, save-on-change, kept in sync with above ----
-
-    display(): void {
-        this.containerEl.empty();
-        this.containerEl.addClass("snippetor-plugin-settings");
-
-        this.renderCreateRow(
-            new Setting(this.containerEl).setClass("snippetor-create-snippet"),
-            () => {
-                this.listExistingSnippets();
-            },
-        );
-
-        new Setting(this.containerEl).setName("Snippets").setHeading();
-        this.existingEl = this.containerEl.createDiv();
-        this.listExistingSnippets();
-
-        new Setting(this.containerEl)
-            .setName("Debug")
-            .setDesc("Enable debug messages in the console")
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.settings.debug)
-                    .onChange(async (value) => {
-                        this.plugin.settings.debug = value;
-                        await this.plugin.saveSettings();
-                    }),
-            );
-
-        this.renderCoffeeRow(new Setting(this.containerEl));
-    }
-
-    listExistingSnippets(): void {
-        this.existingEl.empty();
-        for (const snippet of this.plugin.allSnippets) {
-            this.renderSnippetRow(new Setting(this.existingEl), snippet, () => {
-                this.listExistingSnippets();
-            });
-        }
     }
 
     // ---- shared row builders ----

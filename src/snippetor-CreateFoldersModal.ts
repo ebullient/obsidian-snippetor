@@ -234,7 +234,6 @@ class CreateFolderModal extends Modal {
                 this.cfg.borderRadius === undefined ? 0 : this.cfg.borderRadius,
             )
             .setLimits(0, 25, 1)
-            .setDynamicTooltip()
             .onChange((v) => {
                 const redraw = v !== this.cfg.borderRadius;
                 this.cfg.borderRadius = v;
@@ -495,7 +494,6 @@ class CreateFolderModal extends Modal {
                     : folderSettings.fontSize,
             )
             .setLimits(6, 30, 1)
-            .setDynamicTooltip()
             .onChange((v) => {
                 folderSettings.fontSize = v;
                 this.setFolderColors(folderSettings);

@@ -9,6 +9,7 @@ export default defineConfig([
         "build/",
         "test/",
         "*.mjs",
+        "*.mts",
         "*.js",
         "package.json"
     ]),

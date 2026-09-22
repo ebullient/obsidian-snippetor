@@ -415,7 +415,6 @@ export class ModalHelper {
     }
 
     createHtmlStyleElement(cfg: SnippetConfig): HTMLStyleElement {
-        // eslint-disable-next-line obsidianmd/no-forbidden-elements -- live font preview: @font-face/@import are global regardless of where <style> lives in DOM; scoped to modal so cleanup is automatic
         const style = this.containerEl.createEl("style");
         if (cfg.cssFontImport) {
             style.replaceChildren(

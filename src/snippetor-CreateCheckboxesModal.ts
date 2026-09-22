@@ -218,7 +218,6 @@ class CreateCheckboxesModal extends Modal {
                 this.cfg.borderRadius === undefined ? 0 : this.cfg.borderRadius,
             )
             .setLimits(0, 50, 2)
-            .setDynamicTooltip()
             .onChange((v) => {
                 const redraw = v !== this.cfg.borderRadius;
                 this.cfg.borderRadius = v;
@@ -283,7 +282,7 @@ class CreateCheckboxesModal extends Modal {
         textEl.createSpan({ text: "example", cls: "example" });
 
         // Section for settings
-        const settings = itemEl.createEl("div", {
+        const settings = itemEl.createDiv({
             cls: "snippetor-settings",
             attr: {
                 style: `font-weight: normal; text-decoration: none; font-size: ${this.elements.defaultFontSize}px`,
@@ -457,7 +456,6 @@ class CreateCheckboxesModal extends Modal {
                     : ts.checkbox.format.fontSize,
             )
             .setLimits(6, 30, 1)
-            .setDynamicTooltip()
             .onChange((v) => {
                 this.snippetor.initialize(ts, "checkbox", "format");
                 ts.checkbox.format.fontSize = v;
@@ -571,7 +569,6 @@ class CreateCheckboxesModal extends Modal {
                     : ts.li.format.fontSize,
             )
             .setLimits(6, 30, 1)
-            .setDynamicTooltip()
             .onChange((v) => {
                 this.snippetor.initialize(ts, "li", "format");
                 ts.li.format.fontSize = v;
@@ -818,7 +815,6 @@ class CreateCheckboxesModal extends Modal {
         const position = new SliderComponent(posGroup)
             .setValue(initial)
             .setLimits(-12, 12, 1)
-            .setDynamicTooltip()
             .onChange(update);
         position.sliderEl.name = name;
         new ExtraButtonComponent(posGroup)
