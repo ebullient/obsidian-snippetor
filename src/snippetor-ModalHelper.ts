@@ -414,6 +414,16 @@ export class ModalHelper {
             );
     }
 
+    // Live font preview for the user-supplied @import. Triggers
+    // obsidianmd/no-forbidden-elements; the suppression comment for that rule is
+    // itself disallowed, so the error stands until the rule accounts for this case.
+    //
+    // styles.css can't express this: the font is named by the user at runtime and
+    // changes as they type. No element-free API accepts an @import either --
+    // CSSStyleSheet.replace()/replaceSync() strip it by spec, insertRule() throws on
+    // a constructable sheet, and FontFace needs a family name plus a font-file URL
+    // (an @import points at a stylesheet). Scoped to containerEl, so it is removed
+    // with the modal.
     createHtmlStyleElement(cfg: SnippetConfig): HTMLStyleElement {
         const style = this.containerEl.createEl("style");
         if (cfg.cssFontImport) {
