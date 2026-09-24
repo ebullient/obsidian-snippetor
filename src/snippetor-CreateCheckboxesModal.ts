@@ -50,7 +50,6 @@ class CreateCheckboxesModal extends Modal {
     elements: ConstructedElements;
     helper: ModalHelper;
     snippetor: Snippetor;
-    style: HTMLStyleElement;
 
     constructor(
         app: App,
@@ -88,7 +87,7 @@ class CreateCheckboxesModal extends Modal {
             this.containerEl,
             content,
         );
-        this.style = this.helper.createHtmlStyleElement(this.cfg);
+        void this.helper.loadFontPreview(this.cfg.cssFontImport);
         this.helper.createFilenameSetting(content, this.cfg);
 
         content.createEl("h3", {
@@ -132,10 +131,11 @@ class CreateCheckboxesModal extends Modal {
                 });
             });
 
-        this.helper.createImportFontSetting(content, this.cfg, this.style);
+        this.helper.createImportFontSetting(content, this.cfg);
     }
 
     finish(): void {
+        this.helper.removeFontPreview();
         this.contentEl.empty();
         this.elements = {};
         // do not persist the transient cache

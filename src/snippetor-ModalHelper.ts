@@ -1,6 +1,9 @@
 import {
     ButtonComponent,
+    type Debouncer,
+    debounce,
     ExtraButtonComponent,
+    requestUrl,
     Setting,
     ToggleComponent,
 } from "obsidian";
@@ -21,6 +24,17 @@ export class ModalHelper {
     canvas: HTMLCanvasElement;
     foreground: string;
     background: string;
+    fontSheet?: CSSStyleSheet;
+    fontDocument?: Document;
+    fontRequest = 0;
+    fontClosed = false;
+    updateFontPreview: Debouncer<[string | undefined], void> = debounce(
+        (cssImport?: string): void => {
+            void this.loadFontPreview(cssImport);
+        },
+        500,
+        true,
+    );
 
     // The container element (for the modal) supports light/dark mode toggle
     // The content element should have fg/bg colors assigned specifically
@@ -414,31 +428,79 @@ export class ModalHelper {
             );
     }
 
-    // Live font preview for the user-supplied @import. Triggers
-    // obsidianmd/no-forbidden-elements; the suppression comment for that rule is
-    // itself disallowed, so the error stands until the rule accounts for this case.
-    //
-    // styles.css can't express this: the font is named by the user at runtime and
-    // changes as they type. No element-free API accepts an @import either --
-    // CSSStyleSheet.replace()/replaceSync() strip it by spec, insertRule() throws on
-    // a constructable sheet, and FontFace needs a family name plus a font-file URL
-    // (an @import points at a stylesheet). Scoped to containerEl, so it is removed
-    // with the modal.
-    createHtmlStyleElement(cfg: SnippetConfig): HTMLStyleElement {
-        const style = this.containerEl.createEl("style");
-        if (cfg.cssFontImport) {
-            style.replaceChildren(
-                activeDocument.createTextNode(cfg.cssFontImport),
-            );
+    // Live font preview for the user-supplied @import. Constructable sheets drop
+    // @import (by spec), so fetch the stylesheet it points at (@font-face rules
+    // only, for Google fonts) and adopt that into the document temporarily.
+    async loadFontPreview(cssImport?: string): Promise<void> {
+        if (this.fontClosed) {
+            return;
         }
-        return style;
+        const request = ++this.fontRequest;
+        const url = /@import\s+(?:url\(\s*)?['"]?([^'")\s;]+)/.exec(
+            cssImport ?? "",
+        )?.[1];
+        if (!url || !this.isAllowedFontUrl(url)) {
+            this.clearFontPreview();
+            return;
+        }
+        let css = "";
+        try {
+            css = (await requestUrl(url)).text;
+        } catch (error) {
+            this.snippetor.logDebug("Unable to fetch %s: %o", url, error);
+        }
+        if (this.fontClosed || request !== this.fontRequest) {
+            return; // superseded by a newer request, or removed
+        }
+        const doc = this.containerEl.doc;
+        if (this.fontDocument && this.fontDocument !== doc) {
+            this.clearFontPreview();
+        }
+        if (!this.fontSheet) {
+            this.fontSheet = new CSSStyleSheet();
+            this.fontDocument = doc;
+            doc.adoptedStyleSheets = [
+                ...doc.adoptedStyleSheets,
+                this.fontSheet,
+            ];
+        }
+        this.fontSheet.replaceSync(css);
     }
 
-    createImportFontSetting(
-        content: HTMLDivElement,
-        cfg: SnippetConfig,
-        style: HTMLStyleElement,
-    ): void {
+    private isAllowedFontUrl(url: string): boolean {
+        try {
+            const parsed = new URL(url);
+            return (
+                parsed.protocol === "https:" &&
+                parsed.hostname === "fonts.googleapis.com" &&
+                parsed.port === "" &&
+                parsed.username === "" &&
+                parsed.password === ""
+            );
+        } catch {
+            return false;
+        }
+    }
+
+    removeFontPreview(): void {
+        this.updateFontPreview.cancel();
+        this.fontClosed = true;
+        this.clearFontPreview();
+    }
+
+    private clearFontPreview(): void {
+        const sheet = this.fontSheet;
+        const doc = this.fontDocument;
+        if (sheet && doc) {
+            doc.adoptedStyleSheets = doc.adoptedStyleSheets.filter(
+                (s) => s !== sheet,
+            );
+        }
+        this.fontSheet = undefined;
+        this.fontDocument = undefined;
+    }
+
+    createImportFontSetting(content: HTMLDivElement, cfg: SnippetConfig): void {
         const result = new Setting(content)
             .setName("Import (CSS) additional fonts")
             .setDesc(
@@ -449,11 +511,7 @@ export class ModalHelper {
                     const redraw = v !== cfg.cssFontImport;
                     cfg.cssFontImport = v || undefined;
                     if (redraw) {
-                        style.replaceChildren(
-                            activeDocument.createTextNode(
-                                cfg.cssFontImport ?? "",
-                            ),
-                        );
+                        this.updateFontPreview(cfg.cssFontImport);
                     }
                 }),
             );

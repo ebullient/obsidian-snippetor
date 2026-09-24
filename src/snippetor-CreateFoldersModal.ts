@@ -54,7 +54,6 @@ class CreateFolderModal extends Modal {
     id: number;
     helper: ModalHelper;
     snippetor: Snippetor;
-    style: HTMLStyleElement;
     defaultFontSize: number;
 
     constructor(
@@ -89,7 +88,7 @@ class CreateFolderModal extends Modal {
             this.containerEl,
             content,
         );
-        this.style = this.helper.createHtmlStyleElement(this.cfg);
+        void this.helper.loadFontPreview(this.cfg.cssFontImport);
         this.helper.createFilenameSetting(content, this.cfg);
 
         content.createEl("h3", {
@@ -197,10 +196,11 @@ class CreateFolderModal extends Modal {
                 });
             });
 
-        this.helper.createImportFontSetting(content, this.cfg, this.style);
+        this.helper.createImportFontSetting(content, this.cfg);
     }
 
     finish(): void {
+        this.helper.removeFontPreview();
         this.contentEl.empty();
         // do not persist the transient cache
         if (this.cfg.default) {
