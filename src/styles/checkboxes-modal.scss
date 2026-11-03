@@ -36,13 +36,13 @@
         color: var(--snippetor-fg);
         background-color: var(--snippetor-bg);
 
-        input[type=checkbox]:checked {
+        input[type="checkbox"]:checked {
           color: var(--checkbox-color);
           border-color: var(--checkbox-border-color);
           background: var(--checkbox-bg);
         }
 
-        input[type=checkbox]:checked::after {
+        input[type="checkbox"]:checked::after {
           transform: none;
           -webkit-mask-image: none;
           background: unset;
